@@ -1,2 +1,2 @@
-# pa-repositorio-practica-inicial
+# repositorio-practica-inicial
 Repositorio inicial para clases de práctica de Programación Avanzada
