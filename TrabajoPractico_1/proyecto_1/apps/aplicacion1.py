@@ -20,5 +20,5 @@ DIRECCION=RUTA + "frases_de_peliculas.txt"
 opcion=int(input("Ingrese su opción: "))
 
 if opcion == 1:
-    for i in mostrar_lista_peliculas(DIRECCION):
+     for i in mostrar_lista_peliculas(DIRECCION):
         print(str(i[0])+")",i[1])
