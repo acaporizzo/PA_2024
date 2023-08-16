@@ -31,7 +31,6 @@ while opcion!=5:
             print(mostrar_opciones_seleccionadas(DIRECCION1))
       elif opcion==4:
             borrar_opciones(DIRECCION1)
-            print("El historial se eliminó correctamente")
       elif opcion>5:
             print("La opción elegida no es correcta, vuelva a intentarlo.")
       opcion=int(input("Ingrese otra opción: "))
