@@ -13,18 +13,14 @@ Elige una opción
 3 - Mostrar secuencia de opciones seleccionadas previamente.
 4 - Borrar historial de opciones.
 5 - Salir
-      """
-)
+      """)
+
 RUTA="./data/"
 DIRECCION=RUTA + "frases_de_peliculas.txt"
 lista_opciones=[]
-opcion=int(input("Ingrese su opción: "))
+opcion=int(input("Ingrese una opción: "))
 lista_opciones.append(opcion)
-if opcion!=1 and opcion!=2 and opcion!=3 and opcion!=4:
-      print("La opción elegida no es correcta, vuelva a intentarlo.")
-      opcion=int(input("Ingrese su opción: "))
-      lista_opciones.append(opcion)
-while opcion<5:
+while opcion!=5:
       if opcion == 1:
             for i in mostrar_lista_peliculas(DIRECCION):
                   print(str(i[0])+")",i[1])
@@ -35,6 +31,9 @@ while opcion<5:
       elif opcion==4:
             lista_opciones.clear()
             print("El historial se eliminó correctamente")
-      opcion=int(input("Ingrese su opción: "))
+      elif opcion>5:
+            print("La opción elegida no es correcta, vuelva a intentarlo.")
+      opcion=int(input("Ingrese otra opción: "))
       lista_opciones.append(opcion)
-
+if opcion==5:
+      print("Gracias por utilizar el programa.")
