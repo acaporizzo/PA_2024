@@ -1,5 +1,7 @@
 # módulo para organizar funciones o clases utilizadas en nuestro proyecto
 
+import datetime
+
 def mostrar_lista_peliculas (archivo_peliculas):
     """Función que lee el archivo con las frases de las peliculas y muestra una lista de tuplas"""
     lista=[]
@@ -38,7 +40,22 @@ def trivia (archivo_peliculas):
 
     return("\n ¡¡¡Gracias por participar!!!")
 
-"""def op_seleccionadas (opcion1):
-    lista_opciones=[]
-    lista_opciones.append(opcion1)
-    return(lista_opciones)"""
+def guardar_opciones (opciones):
+    current_datetime = datetime.datetime.now()  
+    formatted_datetime = current_datetime.strftime("%d/%m/%y %H:%M")
+    with open ("./data/registro de opciones selecionadas.txt","a") as f:
+        f.write(f"Opciones: {opciones}, Fecha y hora {formatted_datetime}\n")
+def mostrar_opciones_seleccionadas(archivo):
+    try:
+        with open (archivo,"r") as f:
+            linea=f.read()
+            print("Las opciones selccionasdas previamente son:")
+            print(linea+"\n")
+    except FileNotFoundError:
+        print("Aún no se han registrado opciones.")
+
+def borrar_opciones (archivo):
+    with open (archivo,"w") as f:
+        f.write("")
+
+    

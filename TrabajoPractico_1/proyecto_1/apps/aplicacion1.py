@@ -1,6 +1,6 @@
 # Aplicación secundaria
 
-from modules.modulo1 import mostrar_lista_peliculas, trivia
+from modules.modulo1 import mostrar_lista_peliculas, trivia, guardar_opciones, mostrar_opciones_seleccionadas, borrar_opciones
 
 print("""
 #######################################
@@ -17,9 +17,10 @@ Elige una opción
 
 RUTA="./data/"
 DIRECCION=RUTA + "frases_de_peliculas.txt"
+DIRECCION1=RUTA+"registro de opciones selecionadas.txt"
 lista_opciones=[]
 opcion=int(input("Ingrese una opción: "))
-lista_opciones.append(opcion)
+guardar_opciones(opcion)
 while opcion!=5:
       if opcion == 1:
             for i in mostrar_lista_peliculas(DIRECCION):
@@ -27,13 +28,13 @@ while opcion!=5:
       elif opcion==2:
             print(trivia(DIRECCION))
       elif opcion==3:
-            print(lista_opciones)
+            print(mostrar_opciones_seleccionadas(DIRECCION1))
       elif opcion==4:
-            lista_opciones.clear()
+            borrar_opciones(DIRECCION1)
             print("El historial se eliminó correctamente")
       elif opcion>5:
             print("La opción elegida no es correcta, vuelva a intentarlo.")
       opcion=int(input("Ingrese otra opción: "))
-      lista_opciones.append(opcion)
+      guardar_opciones(opcion)
 if opcion==5:
       print("Gracias por utilizar el programa.")
