@@ -2,66 +2,80 @@
 
 import datetime
 
-def mostrar_lista_peliculas (archivo_peliculas):
-    """Función que lee el archivo con las frases de las peliculas y muestra una lista de tuplas"""
+def mostrar_lista_peliculas (lista_de_pelis_y_frases):
+    """
+    Esta función recibe una lista con todos los datos y devuelve una lista de tuplas
+
+    Args:
+        lista_de_pelis_y_frases (lista): es una lista de tuplas en la cual cada tupla contiene 
+        una frase y su pelicula, esta lista se obtuvo de abrir el archivo, leerlo.
+
+    Returns:
+        lista: contiene todas las peliculas ordenadas alfabéticamente donde se eliminaron las repetidas
+        y se indexaron.
+    """
     lista=[]
     lista_sin=[]
-    with open (archivo_peliculas, "r",encoding="utf-8") as f: #reconoce caracteres especiales en la lista
-        for linea in f:
-            frase,pelicula=linea.rstrip("\n").split(";")
-            lista.append(pelicula)
+    for linea in lista_de_pelis_y_frases:
+        frase,pelicula=linea.rstrip("\n").split(";")
+        lista.append(pelicula)
     lista_sin=set(lista)
     return [(i+1,elemento) for i,elemento in enumerate (sorted(lista_sin))] #elemento no es variable, es como i, en el fo
 
-def trivia (archivo_peliculas):
+def trivia (lista_de_pelis_y_frases):
+    """
+    Esta función recibe una lista con todos los datos y devuelve una lista con los datos necesarios
+    para que la persona pueda jugar a la trivia
+
+    Args:
+        lista_de_pelis_y_frases (lista): es una lista de tuplas en la cual cada tupla contiene 
+        una frase y su pelicula, esta lista se obtuvo de abrir el archivo, leerlo.
+
+    Return:
+        Lista: es una lista que contiene:
+        * En el índice 0 contiene la frase que se le muestra a la persona.
+        * En el índice 1 contiene la opción de película correcta.
+        * En el índice 2 contiene una lista con las dos opciones elegidas al azar y la correcta 
+    """
     import random
-    """Función que lee el archivo con las frases de las peliculas y extrae 3 películas y 1 frase al azar"""
-    with open (archivo_peliculas, "r",encoding="utf-8") as f: # utf-8 reconoce caracteres especiales en la lista
-        repeticiones=int(input("Ingrese la cantidad de frases en la que consistirá la trivia (mínimo 3, máximo 10): "))
-        while repeticiones<3 or repeticiones>10:
-            repeticiones=int(input("Ingrese nuevamente la cantidad. Debe ser un número entre 3 y 10. "))
-        lista1=f.readlines()
-        frases_y_pelis = [(linea.strip().split(';')[0], linea.strip().split(';')[1]) for linea in lista1]
-
-        for i in range(1,repeticiones+1):   #se recorre la cantidad de veces que el usuario solicita
-            op_ganadora=random.choice(frases_y_pelis) #tupla con frase y pelicula ganadora
-            pelis_no_ganadoras= [p[1] for p in frases_y_pelis if p != op_ganadora] #lista de todas las peliculas != a op_ganadora
-            pelis_no_ganadoras1=sorted(set(pelis_no_ganadoras)) #eliminamos las opciones repetidas
-            opciones=random.sample(pelis_no_ganadoras1, k=2) #lista de las dos opciones no ganadoras
-            opciones.append(op_ganadora[1]) #le agregamos la opcion correcta a la lista de opciones
-            random.shuffle(opciones) #mezcla las opciones
-            print("Adivine a que película pertenece la siguiente frase: ",i,": ",op_ganadora[0])
-            print("Las opciones para elegir son: ")
-            for i,j in zip(opciones,range(1,4)): #agrega numero a las opciones de peliculas
-                print(j,i)        
-            opcion=int(input("Elija la opción correcta, ingresando 1, 2 o 3 : "))
-            if opcion-1==opciones.index(op_ganadora[1]):
-                print("¡¡¡Felicitaciones, la opción elegida es la correcta!!!")
-            elif opcion-1!=opciones.index(op_ganadora[1]):
-                if opcion!=1 and opcion!=2 and opcion!=3:
-                    print("El número ingresado no es una opción posible")
-                else:
-                    print("La opción es incorrecta :( , la opción correcta es: ",op_ganadora[1])
-            frases_y_pelis.pop(frases_y_pelis.index(op_ganadora))    #eliminamos la frase para que no se repitan
-
-    return("\n ¡¡¡Gracias por participar!!!")
+    op_ganadora=random.choice(lista_de_pelis_y_frases) #tupla con frase y pelicula ganadora
+    pelis_no_ganadoras= [p[1] for p in lista_de_pelis_y_frases if p[1] != op_ganadora[1]] #lista de todas las peliculas != a op_ganadora
+    pelis_no_ganadoras1=sorted(set(pelis_no_ganadoras)) #eliminamos las opciones repetidas
+    opciones=random.sample(pelis_no_ganadoras1, k=2) #lista de las dos opciones no ganadoras
+    opciones.append(op_ganadora[1]) #le agregamos la opcion correcta a la lista de opciones
+    
+    lista=[op_ganadora[0],op_ganadora[1],opciones]
+    return(lista)
 
 def guardar_opciones (opciones):
-    current_datetime = datetime.datetime.now()  #proporciona fecha actual
-    formatted_datetime = current_datetime.strftime("%d/%m/%y %H:%M")  #le damos formato cadena de texto
-    with open ("./data/registro de opciones selecionadas.txt","a") as f:
-        f.write(f"Opciones: {opciones}, Fecha y hora {formatted_datetime}\n")  #escribimos el archivo con los datos
+    """
+    Función que crea y escribe el archivo con la opción elegida junto con la fecha y la hora
+
+    Args:
+        opciones (int): el parámetro va a tomar el valor de la opción que elige la persona
+    """
+    if opciones >=1 and opciones <=5: #solo se añaden las opciones que sean mayor igual a 1 y menor igual a 5
+        current_datetime = datetime.datetime.now()  #proporciona fecha actual
+        formatted_datetime = current_datetime.strftime("%d/%m/%y %H:%M")  #le damos formato cadena de texto
+        with open ("./data/registro de opciones selecionadas.txt","a") as f:
+            f.write(f"Opciones: {opciones}, Fecha y hora {formatted_datetime}\n")  #escribimos el archivo con los datos
+    else:
+        pass 
 def mostrar_opciones_seleccionadas(archivo):
+    """
+    Función que muestra el archivo que contiene el historial de las opciones elegidas, y en caso
+    de que no se encuentre ese achrivo cuando se lo quiere leer, lo crea.
+    """
     try:
         with open (archivo,"r") as f:
-            linea=f.read()                    #se lee el archivo con los datos
-            print("Las opciones seleccionadas previamente son:")
-            return(linea+"\n")                 #se muestra el historial
+            linea=f.readlines()                    #se lee el archivo con los datos
+            return(linea)                 #se muestra el historial
     except FileNotFoundError:
-        print("Aún no se han registrado opciones.")    #excepción en el caso de que el historial esté vacío
-
+        with open ("data\registro de opciones selecionadas.txt","w") as f:   #excepción en el caso de que el historial esté vacío
+            f.write()
 def borrar_opciones (archivo):
-    with open (archivo,"w") as f:
-        f.write("")                     #se reescribe el archivo, dejandolo vacío
-    return(print("El historial se eliminó correctamente. "))
-    
+    with open (archivo,"w") as f:                 #se reescribe el archivo, dejandolo vacío
+        return(f.write(""))
+
+if __name__=="_main":
+    pass

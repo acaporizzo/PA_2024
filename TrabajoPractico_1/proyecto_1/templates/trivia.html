@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trivia</title>
+</head>
+<body>
+    <form action="{{url_for('agregar')}} " method="post">
+
+        <label for="fname">Número de Frases:</label><br>
+        <input type="text" id="fname" name="input_nombre" value=""><br>
+
+        <label for="lname">Ingrese su nombre:</label><br>
+        <input type="text" id="lname" name="input_autor" value=""><br>
+
+        <input type="submit" value="Agregar">
+    </form>
+</body>
+</html>

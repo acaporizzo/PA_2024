@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Trivia de Películas</title>
+    </head>
+
+    <body>
+        <img src="static\Captura de pantalla 2023-08-23 103215.png" alt="">
+
+        <label for="fname">Numero de frases:</label><br>
+        <input type="text" id="fname" name="input_frases" value=""><br>
+    
+        <label for="lname">Ingrese su nombre:</label><br>
+        <input type="text" id="lname" name="input_nombre" value=""><br>
+
+        <form action="{{url_for('Trivia')}} " method="post">
+
+        </form>
+    </body>
+</html>
