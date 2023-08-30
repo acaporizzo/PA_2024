@@ -78,5 +78,11 @@ def borrar_opciones (archivo):
     with open (archivo,"w") as f:                 #se reescribe el archivo, dejandolo vacío
         return(f.write(""))
 
+def trivia2(opcion_elegida, lista):
+    if opcion_elegida == lista[1]:
+        return(True)
+    else:
+        return(False)
+
 if __name__=="_main":
     pass
