@@ -9,14 +9,19 @@
     <body>
         <img src="static\Captura de pantalla 2023-08-23 103215.png" alt="">
 
-        <label for="fname">Numero de frases:</label><br>
-        <input type="text" id="fname" name="input_frases" value=""><br>
-    
-        <label for="lname">Ingrese su nombre:</label><br>
-        <input type="text" id="lname" name="input_nombre" value=""><br>
-
-        <form action="{{url_for('Trivia')}} " method="post">
-
+        <p>Instrucciones: debajo encontrará dos casillas que debe completar. 
+            Luego tendrá dos botones para iniciar el juego de la trivia y otro 
+            en el cual podrá ver como le fue en la trivia.
+        </p>
+        <form action="/" method="post">
+            <label for="input_numero">Número de opciones:</label>
+            <input type="number" id="input_numero" name="input_numero" required><br>
+            <label for="input_nombre">Nombre de usuario:</label>
+            <input type="text" id="input_nombre" name="input_nombre" required><br>
+            <form action="{{ url_for('jugar_trivia') }}" method="post"> 
+                <button type="submit">Jugar Trivia</button>
+            </form>
         </form>
+
     </body>
 </html>

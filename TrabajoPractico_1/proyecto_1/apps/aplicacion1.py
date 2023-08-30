@@ -33,8 +33,7 @@ while opcion!=5:
             while repeticiones<3 or repeticiones>10:
                   repeticiones=int(input("Ingrese nuevamente la cantidad. Debe ser un número entre 3 y 10: \n"))
             for i in range(1,repeticiones+1):
-                  lista=trivia(frases_y_pelis)  #va a ser una lista con los tres datos. 
-                  random.shuffle(lista[2])      #desordena las opciones para que no quede la opción ganadora en el mismo lugar
+                  lista=trivia(frases_y_pelis)  #va a ser una lista con los tres datos.
                   print("\nAdivine a que película pertenece la siguiente frase: \n","\n"+str(i)+")",lista[0])
                   print("\nLas opciones para elegir son: ")
                   for i,j in zip(lista[2],range(1,4)): #agrega numero a las opciones de peliculas

@@ -45,6 +45,7 @@ def trivia (lista_de_pelis_y_frases):
     opciones.append(op_ganadora[1]) #le agregamos la opcion correcta a la lista de opciones
     
     lista=[op_ganadora[0],op_ganadora[1],opciones]
+    random.shuffle(lista[2])
     return(lista)
 
 def guardar_opciones (opciones):

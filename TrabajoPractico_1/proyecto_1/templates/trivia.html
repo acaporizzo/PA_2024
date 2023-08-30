@@ -1,20 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trivia</title>
-</head>
-<body>
-    <form action="{{url_for('agregar')}} " method="post">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>trivia</title>
+    </head>
 
-        <label for="fname">Número de Frases:</label><br>
-        <input type="text" id="fname" name="input_nombre" value=""><br>
+    <body>
+        <img src="static\Captura de pantalla 2023-08-23 103215.png" alt="">
 
-        <label for="lname">Ingrese su nombre:</label><br>
-        <input type="text" id="lname" name="input_autor" value=""><br>
-
-        <input type="submit" value="Agregar">
-    </form>
-</body>
+        <h3>Adivine de que pelicula proviene la siguiente frase: </h3>
+        {{ lista[0] }}
+        <h3>Aquí se encuentran las opciones: </h3>
+        <form action="/submit" method="post">
+            {% for i in range(3)%}
+                <button type="button" class="option-button" name="opcion_elegida" value="{{lista[2][i]}}">
+                    {{lista[2][i]}}
+                </button>
+                <br>
+        </form>
+    </body>
 </html>
