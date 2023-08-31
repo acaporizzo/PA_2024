@@ -1,9 +1,14 @@
 from flask import Flask, render_template, request, redirect, url_for
-app = Flask("server")
-from modules.modulo1 import trivia, guardar_opciones, trivia2
+from modules.modulo1 import trivia, guardar_opciones
 import datetime
+app = Flask("server")
+
+aciertos=0
+contador_repeticiones=1
 lista=[]
 numero_de_opciones=0
+respuesta=None
+
 RUTA="./data/"
 DIRECCION=RUTA + "frases_de_peliculas.txt"
 
@@ -13,10 +18,11 @@ with open (DIRECCION, "r",encoding="utf-8") as f:
 
 @app.route("/",methods=["GET", "POST"])
 def home():
-    global numero_de_opciones
     global nombre_de_usuario 
+    global numero_de_opciones
+    
     if request.method == 'POST':
-        numero_de_opciones=int(request.form['input_numero'])
+        numero_de_opciones=int(request.form.get('input_numero'))
         nombre_de_usuario=request.form['input_nombre']
         if numero_de_opciones>=3 and numero_de_opciones<=10:
             return redirect( url_for('jugar_trivia') )
@@ -25,34 +31,32 @@ def home():
             return render_template("home.html", mensaje=mensaje)
     return render_template("home.html")
 
-#@app.route("/borrar", methods=["GET", "POST"])
-#def borrar():
-    #global opcion_elegida
-    
-    #for i in range(1,numero_de_opciones+1):
-        #lista = trivia(frases_y_pelis)
-    #if request.method == 'POST':
-        #opcion_elegida = request.form['opcion_elegida']
-    #return render_template("borrar.html", lista=lista)
-
 @app.route("/trivia", methods=["GET", "POST"])
 def jugar_trivia():
+    global aciertos
+    global contador_repeticiones
     global frases_y_pelis
-    global opcion_elegida
-    for i in range(1,numero_de_opciones+1):
+    global lista
+    
+    if contador_repeticiones<=numero_de_opciones:
         lista = trivia(frases_y_pelis)
         return render_template("trivia.html",lista=lista)
-    return redirect( url_for('home') )
+    
+    else:
+        contador_repeticiones=1
+        aciertos=0
+        return redirect( url_for('home') )
     
 @app.route("/respuestas", methods=["GET", "POST"])
 def respuestas():
     global aciertos
+    global calificacion
+    global contador_repeticiones
     global numero_de_opciones
     global opcion_elegida
-    global lista
-    aciertos=0
-    
-    lista = trivia(frases_y_pelis)
+    global respuesta
+    contador_repeticiones+=1
+
     if request.method == 'POST':
         opcion_elegida = request.form['opcion_elegida']
     if opcion_elegida == lista[1]:
@@ -62,7 +66,7 @@ def respuestas():
     else:
         calificacion=(f"{aciertos}/{numero_de_opciones}")
         respuesta=(f"incorrecta, la correcta es: {lista[1]}")
-    return render_template("respuestas.html", respuesta=respuesta,calificacion=calificacion)
+    return render_template("respuestas.html", respuesta=respuesta,calificacion=calificacion, contador_repeticiones=contador_repeticiones, numero_de_opciones=numero_de_opciones)
 
 
 #@app.route("/resultados", methods=["GET", "POST"])
