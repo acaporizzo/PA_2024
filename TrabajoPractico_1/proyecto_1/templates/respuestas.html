@@ -16,9 +16,7 @@
                 <button type="submit">Volver a jugar</button>
             </form>
         {% else %}
-            <form action="{{ url_for('home') }}" method="post"> 
-                <button type="submit">Volver al inicio</button>
-            </form>
+            <a href="{{ url_for('home') }}" class="btn btn-primary">Volver al inicio</a>
         {% endif %}
 
         

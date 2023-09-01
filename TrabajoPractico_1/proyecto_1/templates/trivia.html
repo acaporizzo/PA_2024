@@ -12,14 +12,12 @@
         <h3>Adivine de que pelicula proviene la siguiente frase: </h3>
         {{ lista[0] }}
 
-       
-
         <form action="{{ url_for('respuestas') }}" method= "post">
-            <input type="radio" id="{{lista[2][0]}}" name="opcion_elegida" value="{{lista[2][0]}}">
+            <input type="radio" id="{{lista[2][0]}}" name="opcion_elegida" value="{{lista[2][0]}}" required>
             <label for="{{lista[2][0]}}">{{lista[2][0]}}</label><br>
-            <input type="radio" id="{{lista[2][1]}}" name="opcion_elegida" value="{{lista[2][1]}}">
+            <input type="radio" id="{{lista[2][1]}}" name="opcion_elegida" value="{{lista[2][1]}}" required>
             <label for="{{lista[2][1]}}">{{lista[2][1]}}</label><br>
-            <input type="radio" id="{{lista[2][2]}}" name="opcion_elegida" value="{{lista[2][2]}}">
+            <input type="radio" id="{{lista[2][2]}}" name="opcion_elegida" value="{{lista[2][2]}}" required>
             <label for="{{lista[2][2]}}">{{lista[2][2]}}</label><br><br>
             <input type="submit" value="enviar">
         </form> 
