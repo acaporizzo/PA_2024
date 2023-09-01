@@ -13,14 +13,12 @@
             Luego tendrá dos botones para iniciar el juego de la trivia y otro 
             en el cual podrá ver como le fue en la trivia.
         </p>
-        <form action="/" method="post">
+        <form action="{{ url_for('home') }}" method="post">
             <label for="input_numero">Número de opciones:</label>
             <input type="number" id="input_numero" name="input_numero" required><br>
             <label for="input_nombre">Nombre de usuario:</label>
             <input type="text" id="input_nombre" name="input_nombre" required><br>
-            <form action="{{ url_for('jugar_trivia') }}" method="post"> 
-                <button type="submit">Jugar Trivia</button>
-            </form>
+            <button type="submit">Jugar Trivia</button>
         </form>
 
     </body>

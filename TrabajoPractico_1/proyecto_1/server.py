@@ -6,7 +6,8 @@ app = Flask("server")
 aciertos=0
 contador_repeticiones=1
 lista=[]
-numero_de_opciones=0
+numero_de_opciones = 0
+nombre_de_usuario = ""
 respuesta=None
 
 RUTA="./data/"
@@ -22,13 +23,16 @@ def home():
     global numero_de_opciones
     
     if request.method == 'POST':
-        numero_de_opciones=int(request.form.get('input_numero'))
+        numero_de_opciones=int(request.form['input_numero'])
         nombre_de_usuario=request.form['input_nombre']
+
         if numero_de_opciones>=3 and numero_de_opciones<=10:
             return redirect( url_for('jugar_trivia') )
+        
         else:
             mensaje = "El número de opciones debe estar entre 3 y 10."
-            return render_template("home.html", mensaje=mensaje)
+            return render_template("home.html", mensaje=mensaje, numero_de_opciones=numero_de_opciones)
+
     return render_template("home.html")
 
 @app.route("/trivia", methods=["GET", "POST"])
@@ -37,7 +41,7 @@ def jugar_trivia():
     global contador_repeticiones
     global frases_y_pelis
     global lista
-    
+    global numero_de_opciones 
     if contador_repeticiones<=numero_de_opciones:
         lista = trivia(frases_y_pelis)
         return render_template("trivia.html",lista=lista)
@@ -45,6 +49,7 @@ def jugar_trivia():
     else:
         contador_repeticiones=1
         aciertos=0
+        numero_de_opciones=0
         return redirect( url_for('home') )
     
 @app.route("/respuestas", methods=["GET", "POST"])
@@ -56,7 +61,6 @@ def respuestas():
     global opcion_elegida
     global respuesta
     contador_repeticiones+=1
-
     if request.method == 'POST':
         opcion_elegida = request.form['opcion_elegida']
     if opcion_elegida == lista[1]:
