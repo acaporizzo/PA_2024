@@ -4,25 +4,38 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Trivia de Películas</title>
+        <style>
+            .center-image {text-align: center}
+            .center-text {text-align: center; font-size: 20px}
+            button[type="submit"] {background-color: #f37d0f; color: #fff; font-size: 20px; 
+            padding: 10px 20px; border: none; cursor: pointer; display: block; margin: 20px auto 0; 
+            border-radius: 10px}
+        </style>
     </head>
 
     <body>
-        <img src="static\Captura de pantalla 2023-08-23 103215.png" alt="">
+        <div class="center-image">
+            <img src="static\Trivia de películas.jpg" alt="" width="650">
+        </div>
 
-        <p>Instrucciones: debajo encontrará dos casillas que debe completar. 
-            Luego tendrá dos botones para iniciar el juego de la trivia y otro 
-            en el cual podrá ver como le fue en la trivia.
-        </p>
-        {%if numero_de_opciones < 3 or numero_de_opciones > 10%}
-            <ul>{{mensaje}}</ul>
-        {% endif %}
-        <form action="{{ url_for('home') }}" method="post">
-            <label for="input_numero">Número de opciones:</label>
-            <input type="number" id="input_numero" name="input_numero" required><br>
-            <label for="input_nombre">Nombre de usuario:</label>
-            <input type="text" id="input_nombre" name="input_nombre" required><br>
-            <button type="submit">Jugar Trivia</button>
-        </form>
+        <div class="center-text">
+            <p>Instrucciones: debajo encontrará dos casillas para completar. Debe ingresar el 
+            número de veces que desea jugar (entre 3 y 10) y su nombre.Luego podrá acceder a dos 
+            botones: uno para iniciar el juego de la trivia y otro para ver sus resultados históricos.</p>
+
+            {%if numero_de_opciones < 3 or numero_de_opciones > 10%}
+                <ul>{{mensaje}}</ul>
+            {% endif %}
+
+            <form action="{{ url_for('home') }}" method="post">
+                <label for="input_numero">Número de opciones:</label>
+                <input type="number" id="input_numero" name="input_numero" required><br>
+                <label for="input_nombre">Nombre de usuario:</label>
+                <input type="text" id="input_nombre" name="input_nombre" required><br>
+        </div>
+                <button type="submit">Jugar Trivia</button>
+            </form>
+        
 
     </body>
 </html>

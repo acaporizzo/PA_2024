@@ -4,19 +4,33 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>respuestas</title>
+        <style>
+            .center-image {text-align: center}
+            .center-text {text-align: center; font-size: 20px}
+            button[type="submit"] {background-color: #f37d0f; color: #fff; 
+            font-size: 20px; padding: 10px 20px; border: none; cursor: pointer; display: block;
+            margin: 20px auto 0;border-radius: 10px;}
+            .center-button {text-align: center;background-color: #f37d0f; color: #fff; 
+            font-size: 20px; padding: 10px 20px; border: none; cursor: pointer; display: block;
+            margin: 20px auto 0;border-radius: 10px;}
+        </style>
     </head>
 
     <body>
-        <ul>
-            {{respuesta}}
-            {{calificacion}}
-        </ul>  
+        <div class="center-text">
+            <ul>{{respuesta}}</ul> 
+            <ul>{{calificacion}}</ul>
+        </div>
+
         {% if contador_repeticiones < numero_de_opciones %}
             <form action="{{ url_for('jugar_trivia') }}" method="post"> 
                 <button type="submit">Volver a jugar</button>
             </form>
         {% else %}
+
+        <div class="center-button">
             <a href="{{ url_for('home') }}" class="btn btn-primary">Volver al inicio</a>
+        </div>
         {% endif %}
 
         

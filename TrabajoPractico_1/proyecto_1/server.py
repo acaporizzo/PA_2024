@@ -1,12 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for
 from modules.modulo1 import trivia, guardar_opciones
 import datetime
-app = Flask("server")
 aciertos=0
+app = Flask("server")
 contador_repeticiones=0
 lista=[]
-numero_de_opciones = 3
 nombre_de_usuario = ""
+numero_de_opciones = 3
 respuesta=None
 
 RUTA="./data/"
@@ -33,6 +33,7 @@ def home():
         else:
             numero_de_opciones = 0
             return render_template("home.html", mensaje=mensaje, numero_de_opciones=numero_de_opciones)
+        
     aciertos = 0
     contador_repeticiones = 0
     return render_template("home.html", mensaje=mensaje, numero_de_opciones=numero_de_opciones)
@@ -64,11 +65,12 @@ def respuestas():
         opcion_elegida = request.form['opcion_elegida']
     if opcion_elegida == lista[1]:
         aciertos+=1
-        calificacion=(f"{aciertos}/{numero_de_opciones}")
-        respuesta="correcta"  
+        calificacion=(f"Su calificación es: {aciertos}/{numero_de_opciones}")
+        respuesta="¡Correcta!"  
     else:
-        calificacion=(f"{aciertos}/{numero_de_opciones}")
-        respuesta=(f"incorrecta, la correcta es: {lista[1]}")
+        calificacion=(f"Su calificación es: {aciertos}/{numero_de_opciones}")
+        respuesta=(f"¡Incorrecta!, la respuesta correcta es: {lista[1]}.")
+    
     return render_template("respuestas.html", respuesta=respuesta,calificacion=calificacion, contador_repeticiones=contador_repeticiones, numero_de_opciones=numero_de_opciones)
 
 
