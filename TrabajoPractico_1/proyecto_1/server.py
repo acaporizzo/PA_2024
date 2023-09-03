@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for
-from modules.modulo1 import trivia, guardar_opciones
+from modules.modulo1 import trivia
 import datetime
 aciertos=0
 app = Flask("server")
