@@ -35,7 +35,9 @@
         </div>
                 <button type="submit">Jugar Trivia</button>
             </form>
-        
+        <form action="{{ url_for('ver_resultados') }}" method="post"> 
+            <button type="submit">Ver los resultados</button>
+        </form>
 
     </body>
 </html>

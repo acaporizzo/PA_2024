@@ -8,6 +8,7 @@ lista=[]
 nombre_de_usuario = ""
 numero_de_opciones = 3
 respuesta=None
+resultados_partidas=[]
 
 RUTA="./data/"
 DIRECCION=RUTA + "frases_de_peliculas.txt"
@@ -74,15 +75,19 @@ def respuestas():
     return render_template("respuestas.html", respuesta=respuesta,calificacion=calificacion, contador_repeticiones=contador_repeticiones, numero_de_opciones=numero_de_opciones)
 
 
-#@app.route("/resultados", methods=["GET", "POST"])
-#def ver_resultados():
-#    resultados_partidas=[]
-#    try:
-#        fecha_hora = datetime.datetime.now().strftime('%d/%m/%y %H:%M')
-#        calificacion=aciertos/numero_de_opciones
-#        resultados_partidas.append(f"{opcion_elegida} - {calificacion} - {fecha_hora}")
-#        return render_template("resultados.html", resultados_partidas=resultados_partidas)
-#    except KeyError:
+@app.route("/resultados", methods=["GET", "POST"])
+def ver_resultados():
+    global advertencia
+    global resultados_partidas
+    if len(resultados_partidas) == 0:
+        info = False
+        advertencia = "No hay resultados para mostrar ya que todavía no empezó la trivia"
+    info = True
+    advertencia = None
+    fecha_hora = datetime.datetime.now().strftime('%d/%m/%y %H:%M')
+    resultados_partidas.append(f"Hola, {nombre_de_usuario} {calificacion} y su partida inició el: {fecha_hora}")
+    return render_template("resultados.html", resultados_partidas=resultados_partidas, advertencia=advertencia, info=info)
+
 
 if __name__=="__main__":
     app.run(debug=True, host='0.0.0.0')
