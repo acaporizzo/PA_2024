@@ -79,13 +79,14 @@ def respuestas():
 def ver_resultados():
     global advertencia
     global resultados_partidas
+    info = False  # Inicializa info como False por defecto
     if len(resultados_partidas) == 0:
-        info = False
-        advertencia = "No hay resultados para mostrar ya que todavía no empezó la trivia"
-    info = True
-    advertencia = None
+        info = True
+    advertencia = "No hay resultados para mostrar ya que todavía no empezó la trivia"
     fecha_hora = datetime.datetime.now().strftime('%d/%m/%y %H:%M')
     resultados_partidas.append(f"Hola, {nombre_de_usuario} {calificacion} y su partida inició el: {fecha_hora}")
+
+
     return render_template("resultados.html", resultados_partidas=resultados_partidas, advertencia=advertencia, info=info)
 
 

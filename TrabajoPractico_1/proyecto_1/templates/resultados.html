@@ -8,13 +8,14 @@
 
     <body>
         {% if info %}
+            <p>{{ advertencia }}</p>
+
+        {% else %}
         <ul>
             {% for i in resultados_partidas %}
             <li>{{ i }}</li>
             {% endfor %}
         </ul>
-        {% else %}
-            <p>{{ advertencia }}</p>
         {% endif %}
         <div class="center-button">
             <a href="{{ url_for('home') }}" class="btn btn-primary">Volver al inicio</a>
