@@ -4,11 +4,13 @@ import datetime
 aciertos=0
 app = Flask("server")
 contador_repeticiones=0
+info = False
 lista=[]
 nombre_de_usuario = ""
 numero_de_opciones = 3
 respuesta=None
 resultados_partidas=[]
+resultados_partidas.clear()
 
 RUTA="./data/"
 DIRECCION=RUTA + "frases_de_peliculas.txt"
@@ -48,7 +50,6 @@ def jugar_trivia():
     if contador_repeticiones <= numero_de_opciones:
         lista = trivia(frases_y_pelis)
         return render_template("trivia.html",lista=lista)
-    
     else:
         return render_template("home.html",numero_de_opciones=numero_de_opciones,nombre_de_usuario=nombre_de_usuario)
     
@@ -71,23 +72,27 @@ def respuestas():
     else:
         calificacion=(f"Su calificación es: {aciertos}/{numero_de_opciones}")
         respuesta=(f"¡Incorrecta!, la respuesta correcta es: {lista[1]}.")
-    
+
     return render_template("respuestas.html", respuesta=respuesta,calificacion=calificacion, contador_repeticiones=contador_repeticiones, numero_de_opciones=numero_de_opciones)
 
 
 @app.route("/resultados", methods=["GET", "POST"])
 def ver_resultados():
     global advertencia
+    global info
     global resultados_partidas
-    info = False  # Inicializa info como False por defecto
-    if len(resultados_partidas) == 0:
-        info = True
     advertencia = "No hay resultados para mostrar ya que todavía no empezó la trivia"
-    fecha_hora = datetime.datetime.now().strftime('%d/%m/%y %H:%M')
-    resultados_partidas.append(f"Hola, {nombre_de_usuario} {calificacion} y su partida inició el: {fecha_hora}")
+    
+    try: 
+        info = False
+        fecha_hora = datetime.datetime.now().strftime('%d/%m/%y %H:%M')
+        resultados_partidas.append(f"Hola, {nombre_de_usuario}. {calificacion} y su partida inició el: {fecha_hora}")
+        
 
-
-    return render_template("resultados.html", resultados_partidas=resultados_partidas, advertencia=advertencia, info=info)
+    except NameError: 
+        info = True
+        
+    return render_template("resultados.html", resultados_partidas=resultados_partidas, advertencia=advertencia, info=info)  
 
 
 if __name__=="__main__":

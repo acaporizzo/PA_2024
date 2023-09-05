@@ -3,22 +3,31 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Respuestas</title>
+        <title>Resultados</title>
+        <style>
+            .center-text {text-align: center; font-size: 20px}
+            .center-button {text-align: center;background-color: #f37d0f; color: #fff; 
+            font-size: 20px; padding: 10px 20px; border: none; cursor: pointer; display: block;
+            margin: 20px auto 0;border-radius: 10px;}
+        </style>
     </head>
 
     <body>
-        {% if info %}
-            <p>{{ advertencia }}</p>
+        <div class="center-text">
+            {% if info %}
+                <p>{{ advertencia }}</p>
 
-        {% else %}
-        <ul>
-            {% for i in resultados_partidas %}
-            <li>{{ i }}</li>
-            {% endfor %}
-        </ul>
-        {% endif %}
+            {% else %}
+                <ul>
+                    {% for i in resultados_partidas %}
+                        <li>{{ i }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
         <div class="center-button">
             <a href="{{ url_for('home') }}" class="btn btn-primary">Volver al inicio</a>
         </div>
     </body>
-    </html>
+</html>
