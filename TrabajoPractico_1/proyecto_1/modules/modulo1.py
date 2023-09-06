@@ -1,7 +1,6 @@
 # módulo para organizar funciones o clases utilizadas en nuestro proyecto
 
 import datetime
-frases_utilizadas=[]
 def mostrar_lista_peliculas (lista_de_pelis_y_frases):
     """
     Esta función recibe una lista con todos los datos y devuelve una lista de tuplas
@@ -22,7 +21,7 @@ def mostrar_lista_peliculas (lista_de_pelis_y_frases):
     lista_sin=set(lista)
     return [(i+1,elemento) for i,elemento in enumerate (sorted(lista_sin))] #elemento no es variable, es como i, en el fo
 
-def trivia (lista_de_pelis_y_frases):
+def trivia (lista_de_pelis_y_frases,frases_utilizadas):
     """
     Esta función recibe una lista con todos los datos y devuelve una lista con los datos necesarios
     para que la persona pueda jugar a la trivia
@@ -38,7 +37,6 @@ def trivia (lista_de_pelis_y_frases):
         * En el índice 2 contiene una lista con las dos opciones elegidas al azar y la correcta 
     """
     import random
-    global frases_utilizadas 
  
     op_ganadora=random.choice(lista_de_pelis_y_frases) #tupla con frase y pelicula ganadora
     while op_ganadora[0] in frases_utilizadas: # Verificar si la frase ya ha sido utilizada

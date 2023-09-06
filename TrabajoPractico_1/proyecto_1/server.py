@@ -5,6 +5,7 @@ aciertos=0
 app = Flask("server")
 archivo_vacio = False #se inicializa en false porque el archivo tiene que mostrarse
 contador_repeticiones=0
+frases_utilizadas=[]
 lista=[] #donde se guardan los datos de la funcion trivia [frase, peli ganadora, opciones de peli]
 nombre_de_usuario = "" 
 numero_de_opciones = 3 #lo inicializamos en 3 para que no nos muestre el mensaje
@@ -37,16 +38,16 @@ def home():
             return render_template("home.html", mensaje=mensaje, numero_de_opciones=numero_de_opciones)
     
     aciertos = 0
-    contador_repeticiones = 0
     archivo_vacio=False #se tiene que mostrar la lista de datos, el archivo no está vacío
+    contador_repeticiones = 0
+    frases_utilizadas.clear()
     return render_template("home.html", mensaje=mensaje, numero_de_opciones=numero_de_opciones)
 
 @app.route("/trivia", methods=["GET", "POST"])
 def jugar_trivia():
-    global contador_repeticiones, frases_y_pelis, lista, numero_de_opciones
-
+    global contador_repeticiones, frases_y_pelis,frases_utilizadas, lista, numero_de_opciones
     if contador_repeticiones <= numero_de_opciones:
-        lista = trivia(frases_y_pelis)
+        lista = trivia(frases_y_pelis,frases_utilizadas)
         contador_repeticiones+=1
         return render_template("trivia.html",lista=lista)
     else:

@@ -17,6 +17,7 @@ DIRECCION=RUTA + "frases_de_peliculas.txt"
 DIRECCION1=RUTA+"registro de opciones selecionadas.txt"
 
 lista_opciones=[]
+
 opcion=int(input("Ingrese una opción: "))
 
 guardar_opciones(opcion)
@@ -30,12 +31,13 @@ while opcion!=5: #si la opción es 5, sale del bucle y finaliza el código
             for i in mostrar_lista_peliculas(lista1): 
                   print(str(i[0])+")",i[1])
 
-      elif opcion == 2:
+      elif opcion == 2:  
+            frases_utilizadas=[]
             repeticiones=int(input("Ingrese la cantidad de frases en la que consistirá la trivia (mínimo 3, máximo 10): "))
             while repeticiones<3 or repeticiones>10:
                   repeticiones=int(input("Ingrese nuevamente la cantidad. Debe ser un número entre 3 y 10: \n"))
             for i in range(1,repeticiones+1):
-                  lista=trivia(frases_y_pelis)  #va a ser una lista con los tres datos: la frase, la opción ganadora y una tupla con las 3 opciones a mostrar
+                  lista=trivia(frases_y_pelis,frases_utilizadas)  #va a ser una lista con los tres datos: la frase, la opción ganadora y una tupla con las 3 opciones a mostrar
                   print("\nAdivine a que película pertenece la siguiente frase: \n","\n"+str(i)+")",lista[0])
                   print("\nLas opciones para elegir son: ")
                   for i,j in zip(lista[2],range(1,4)): #agrega numero a las opciones de peliculas
@@ -57,7 +59,7 @@ while opcion!=5: #si la opción es 5, sale del bucle y finaliza el código
             borrar_opciones(DIRECCION1)
             print("Se eliminó correctamente el historial.")
 
-      elif opcion > 5:
+      elif opcion != 5:
             print("La opción elegida no es correcta, vuelva a intentarlo.")
             
       opcion=int(input("\nIngrese otra opción: "))
