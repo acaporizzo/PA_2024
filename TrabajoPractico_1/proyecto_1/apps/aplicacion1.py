@@ -1,5 +1,4 @@
 from modules.modulo1 import mostrar_lista_peliculas, trivia, guardar_opciones, mostrar_opciones_seleccionadas, borrar_opciones
-import random
 print("""
 #######################################
  Películas: Preguntas y respuestas
