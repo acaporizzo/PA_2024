@@ -82,6 +82,16 @@ def mostrar_opciones_seleccionadas(archivo):
 def borrar_opciones (archivo):
     with open (archivo,"w") as f:                 #se reescribe el archivo, dejandolo vacío
         return(f.write(""))
+def guardar_datos_del_juego(nombre_de_usuario, calificacion, fecha_hora):
+    """Función que toma estos tres parámetros y escribe linea por linea
+
+    Args:
+        nombre_de_usuario (text): nombre dado por la persona
+        calificacion (str): es una cadena que muestra aciertos/N (N=veces que se juega la trivia)
+        fecha_hora (str): fecha y hora en la que se inicializa la trivia
+    """
+    with open("./data/resultados_historicos.txt", "a") as f:
+        f.write(f"Hola, {nombre_de_usuario}. {calificacion} y su partida inició el: {fecha_hora}\n")
 
 
 if __name__=="_main":
