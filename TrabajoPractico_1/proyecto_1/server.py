@@ -5,12 +5,12 @@ aciertos=0
 app = Flask("server")
 contador_repeticiones=0
 info = False
+guardado = False
 lista=[]
 nombre_de_usuario = ""
 numero_de_opciones = 3
 respuesta=None
 resultados_partidas=[]
-resultados_partidas.clear()
 
 RUTA="./data/"
 DIRECCION=RUTA + "frases_de_peliculas.txt"
@@ -19,31 +19,38 @@ with open (DIRECCION, "r",encoding="utf-8") as f:
     lista1=f.readlines()
     frases_y_pelis=[(linea.strip().split(';')[0], linea.strip().split(';')[1]) for linea in lista1]
 
+
 @app.route("/",methods=["GET", "POST"])
 def home():
     global aciertos
     global contador_repeticiones
+    global fecha_hora
+    global guardado
     global mensaje
     global nombre_de_usuario 
     global numero_de_opciones
     mensaje = "El número de opciones debe estar entre 3 y 10."
-
     if request.method == 'POST':
         numero_de_opciones=int(request.form['input_numero'])
         nombre_de_usuario=request.form['input_nombre']
         if numero_de_opciones >= 3 and numero_de_opciones <= 10:
+            guardado = False
+            fecha_hora = datetime.datetime.now().strftime('%d/%m/%y %H:%M')
             return redirect(url_for('jugar_trivia'))
+
         else:
             numero_de_opciones = 0
             return render_template("home.html", mensaje=mensaje, numero_de_opciones=numero_de_opciones)
         
     aciertos = 0
     contador_repeticiones = 0
+
     return render_template("home.html", mensaje=mensaje, numero_de_opciones=numero_de_opciones)
 
 @app.route("/trivia", methods=["GET", "POST"])
 def jugar_trivia():
     global frases_y_pelis
+    global guardado
     global lista
     global numero_de_opciones
 
@@ -51,13 +58,15 @@ def jugar_trivia():
         lista = trivia(frases_y_pelis)
         return render_template("trivia.html",lista=lista)
     else:
-        return render_template("home.html",numero_de_opciones=numero_de_opciones,nombre_de_usuario=nombre_de_usuario)
+        guardado = False
+        return render_template("home.html",numero_de_opciones=numero_de_opciones,nombre_de_usuario=nombre_de_usuario,guardado=guardado)
     
 @app.route("/respuestas", methods=["GET", "POST"])
 def respuestas():
     global aciertos
     global calificacion
     global contador_repeticiones
+    global guardado
     global numero_de_opciones
     global opcion_elegida
     global respuesta
@@ -65,13 +74,18 @@ def respuestas():
 
     if request.method == 'POST':
         opcion_elegida = request.form['opcion_elegida']
+
     if opcion_elegida == lista[1]:
         aciertos+=1
         calificacion=(f"Su calificación es: {aciertos}/{numero_de_opciones}")
         respuesta="¡Correcta!"  
+
     else:
         calificacion=(f"Su calificación es: {aciertos}/{numero_de_opciones}")
         respuesta=(f"¡Incorrecta!, la respuesta correcta es: {lista[1]}.")
+    if not guardado:
+        resultados_partidas.append(f"Hola, {nombre_de_usuario}. {calificacion} y su partida inició el: {fecha_hora}")
+        guardado = True
 
     return render_template("respuestas.html", respuesta=respuesta,calificacion=calificacion, contador_repeticiones=contador_repeticiones, numero_de_opciones=numero_de_opciones)
 
@@ -79,15 +93,17 @@ def respuestas():
 @app.route("/resultados", methods=["GET", "POST"])
 def ver_resultados():
     global advertencia
+    global guardado
     global info
     global resultados_partidas
     advertencia = "No hay resultados para mostrar ya que todavía no empezó la trivia"
+    calificacion=(f"Su calificación es: {aciertos}/{numero_de_opciones}")
     
     try: 
         info = False
-        fecha_hora = datetime.datetime.now().strftime('%d/%m/%y %H:%M')
-        resultados_partidas.append(f"Hola, {nombre_de_usuario}. {calificacion} y su partida inició el: {fecha_hora}")
-        
+        if not guardado:
+            resultados_partidas.append(f"Hola, {nombre_de_usuario}. {calificacion} y su partida inició el: {fecha_hora}")
+            guardado = True
 
     except NameError: 
         info = True

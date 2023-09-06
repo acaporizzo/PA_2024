@@ -18,7 +18,6 @@
     <body>
         <div class="center-text">
             <ul>{{respuesta}}</ul> 
-            <ul>{{calificacion}}</ul>
         </div>
 
         {% if contador_repeticiones < numero_de_opciones %}
@@ -26,7 +25,9 @@
                 <button type="submit">Volver a jugar</button>
             </form>
         {% else %}
-
+        <div class="center-text">
+            <ul>{{calificacion}}</ul>
+        </div>
         <div class="center-button">
             <a href="{{ url_for('home') }}" class="btn btn-primary">Volver al inicio</a>
         </div>

@@ -1,7 +1,7 @@
 # módulo para organizar funciones o clases utilizadas en nuestro proyecto
 
 import datetime
-
+frases_utilizadas=[]
 def mostrar_lista_peliculas (lista_de_pelis_y_frases):
     """
     Esta función recibe una lista con todos los datos y devuelve una lista de tuplas
@@ -38,12 +38,17 @@ def trivia (lista_de_pelis_y_frases):
         * En el índice 2 contiene una lista con las dos opciones elegidas al azar y la correcta 
     """
     import random
+    global frases_utilizadas 
+ 
     op_ganadora=random.choice(lista_de_pelis_y_frases) #tupla con frase y pelicula ganadora
+    while op_ganadora[0] in frases_utilizadas: # Verificar si la frase ya ha sido utilizada
+        op_ganadora = random.choice(lista_de_pelis_y_frases)
+    frases_utilizadas.append(op_ganadora[0]) # Agregar la frase a la lista de frases utilizadas
+
     pelis_no_ganadoras= [p[1] for p in lista_de_pelis_y_frases if p[1] != op_ganadora[1]] #lista de todas las peliculas != a op_ganadora
     pelis_no_ganadoras1=sorted(set(pelis_no_ganadoras)) #eliminamos las opciones repetidas
     opciones=random.sample(pelis_no_ganadoras1, k=2) #lista de las dos opciones no ganadoras
     opciones.append(op_ganadora[1]) #le agregamos la opcion correcta a la lista de opciones
-    
     lista=[op_ganadora[0],op_ganadora[1],opciones]
     random.shuffle(lista[2])
     return(lista)
