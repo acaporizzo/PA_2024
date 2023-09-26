@@ -16,19 +16,20 @@ class Cinta_Transportadora:
 
         while len(lista_de_alimentos) < p_n_alimentos:            
             datos_alimento = detector.detectar_alimento()
-            nombre_alimento = datos_alimento['alimento']
+            tipo_alimento = datos_alimento['alimento']
             peso_alimento = datos_alimento['peso']
 
-            if nombre_alimento == "undefined":
+            if tipo_alimento == "undefined":
                 continue
-            if nombre_alimento == "kiwi":
-                alimento= Kiwi(nombre_alimento, peso_alimento)
-            elif nombre_alimento == "manzana":
-                alimento= Manzana(nombre_alimento, peso_alimento)
-            elif nombre_alimento  == "papa":
-                alimento= Papa(nombre_alimento, peso_alimento)
-            elif nombre_alimento == "zanahoria":
-                alimento= Zanahoria(nombre_alimento, peso_alimento)
+            if tipo_alimento == "kiwi":
+                alimento= Kiwi(peso_alimento)
+            elif tipo_alimento == "manzana":
+                alimento= Manzana(peso_alimento)
+            elif tipo_alimento  == "papa":
+                alimento= Papa(peso_alimento)
+            elif tipo_alimento == "zanahoria":
+                alimento= Zanahoria(peso_alimento)
+
             lista_de_alimentos.append(alimento)  
             
         return(lista_de_alimentos)
