@@ -7,7 +7,7 @@ from modules.cinta_transportadora import Cinta_Transportadora
 def raiz():
     n= int(request.form.get('usuario', 0))
     cinta = Cinta_Transportadora()
-    lista_alimentos= cinta.transportar(n)
+    lista_alimentos= cinta.clasificar_alimentos(n)
     cajon = Cajon(lista_alimentos)
 
     aw_kiwis, aw_manzanas, aw_papas, aw_zanahorias = cajon.agregar_y_calcular_aw(lista_alimentos)

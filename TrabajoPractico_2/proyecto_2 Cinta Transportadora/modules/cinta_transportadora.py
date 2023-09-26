@@ -2,8 +2,7 @@ from modules.alimentos import Kiwi, Manzana, Papa, Zanahoria
 from modules.detector_alimentos import DetectorAlimento
 
 class Cinta_Transportadora:
-
-    def transportar(self, p_n_alimentos):
+    def clasificar_alimentos(self, p_n_alimentos):
         """Método que va a simular el transporte de los alimentos, donde en cada iteración del while se van a 
         determinar n alimentos especificando su nombre (kiwi, manzana, papa, zanahoria o undefined) y peso. 
         Luego cada alimento se agrega a la lista de alimentos. 
@@ -15,7 +14,7 @@ class Cinta_Transportadora:
         detector= DetectorAlimento() #instanciamos un dectector de alimentos 
 
         while len(lista_de_alimentos) < p_n_alimentos:            
-            datos_alimento = detector.detectar_alimento()
+            datos_alimento = detector.detectar_alimento()  #detector_alimentos.py
             tipo_alimento = datos_alimento['alimento']
             peso_alimento = datos_alimento['peso']
 
