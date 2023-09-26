@@ -59,6 +59,7 @@ class Manzana(Fruta):
         """Calcula la actividad acuosa de la MANZANA
         """
         awm = 0.97 * ((15 * self._peso_del_alimento) ** 2) / (1 + (15 * self._peso_del_alimento) ** 2)
+
         return(awm)
             
     def __str__(self):

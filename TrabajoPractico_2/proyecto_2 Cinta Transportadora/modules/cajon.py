@@ -1,9 +1,13 @@
-from modules.alimentos import Fruta, Verdura, Kiwi, Manzana, Papa, Zanahoria
+from modules.alimentos import Kiwi, Manzana, Papa, Zanahoria
 
 class Cajon:
     def __init__(self, p_lista_de_alimentos):
         self._lista_de_alimentos= p_lista_de_alimentos
 
+    @property
+    def lista_de_alimentos(self):
+        return(self._lista_de_alimentos)
+    
     def agregar_y_calcular_aw(self, p_lista_de_alimentos):
         """método que calcula la actividad acuosa de cada alimento que pasa por la cinta transportadora y lo agrega a la lista del
         alimento correspondiente 
@@ -11,48 +15,43 @@ class Cajon:
         Args:
             p_lista_de_alimentos (lista): todos los alimentos que pasan por la cinta transportadora
         """
-        aw_kiwis= []
-        aw_manzanas= []
-        aw_papas= []
-        aw_zanahorias= []
-        aw_frutas= []
-        aw_verduras= []
+        diccionario_con_listas_aw = {'Kiwi': [], 'Manzana': [], 'Papa': [], 'Zanahoria': []}
 
         for alimento in p_lista_de_alimentos:
-            aw_de_alimento= alimento.calcular_aw()
+            if isinstance(alimento, (Kiwi, Manzana, Papa, Zanahoria)):
+                aw_de_alimento = alimento.calcular_aw()
+                tipo_alimento = type(alimento).__name__
+                aw_valor = [aw_de_alimento]
+                diccionario_con_listas_aw[tipo_alimento].extend(aw_valor)
 
-            if isinstance(alimento, Fruta):
-                aw_kiwis.append(aw_de_alimento)
-                promedio_frutas= sum(aw_frutas)/len(aw_frutas)
-                awf= round(promedio_frutas,2)
+        return (diccionario_con_listas_aw)
+    
+    def calcular_aw_prom_diccionario(self,diccionario_con_listas_aw):
+        """Calcula el promedio de la actividad acuosa para cada tipo de alimento.
 
-                if isinstance(alimento, Kiwi):
-                    aw_kiwis.append(aw_de_alimento)
-                    promedio_kiwis= sum(aw_kiwis)/len(aw_kiwis)
-                    awk= round(promedio_kiwis,2)
+        Args:
+            diccionario_con_listas_aw (dict): Diccionario con listas de actividad acuosa para cada tipo de alimento.
 
-                elif isinstance(alimento, Manzana):
-                    aw_manzanas.append(aw_de_alimento)
-                    promedio_manzanas= sum(aw_manzanas)/len(aw_manzanas)
-                    awm= round(promedio_manzanas,2)
+        Returns:
+            promedios (dict): Diccionario con los promedios de actividad acuosa para cada tipo de alimento.
+        """
+        promedios = {}
 
-            elif isinstance(alimento, Verdura):
-                aw_verduras.append(aw_de_alimento)
-                promedio_verduras= sum(aw_verduras)/len(aw_verduras)
-                awv= round(promedio_verduras,2)
-
-                if isinstance(alimento,Papa):
-                    aw_papas.append(aw_de_alimento)
-                    promedio_papas= sum(aw_papas)/len(aw_papas)
-                    awp= round(promedio_papas,2)
-
-                elif isinstance(alimento, Zanahoria):
-                    aw_zanahorias.append(aw_de_alimento)
-                    promedio_zanahorias= sum(aw_zanahorias)/len(aw_zanahorias)
-                    awz= round(promedio_zanahorias,2)
-
+        for tipo, lista_aw in diccionario_con_listas_aw.items():
+            if lista_aw:
+                promedio = round(sum(lista_aw) / len(lista_aw), 2)
+                promedios[tipo] = promedio
             else:
-                return (0)
-                
-        return(awk, awm, awp, awz, awf, awv)
+                promedios[tipo] = 0.0
 
+        return(promedios)
+    
+    def calcular_aw_prom(self,lista_aw):
+        if not lista_aw:  
+            return 0
+        
+        promedio= sum(lista_aw)/len(lista_aw)
+        promedio= round(promedio, 2)
+
+        return(promedio) 
+        
