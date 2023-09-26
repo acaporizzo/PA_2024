@@ -1,6 +1,6 @@
 from flask import Flask, render_template,request
 app= Flask(__name__)
-from modules.cajon import Cajon_Alimentos 
+from modules.cajon import Cajon
 from modules.cinta_transportadora import Cinta_Transportadora
 
 @app.route("/", methods=['GET', 'POST'])
@@ -8,7 +8,7 @@ def raiz():
     n= int(request.form.get('usuario', 0))
     cinta = Cinta_Transportadora()
     lista_alimentos= cinta.transportar(n)
-    cajon = Cajon_Alimentos(lista_alimentos)
+    cajon = Cajon(lista_alimentos)
 
     aw_kiwis, aw_manzanas, aw_papas, aw_zanahorias = cajon.agregar_y_calcular_aw(lista_alimentos)
 
