@@ -1,34 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title></title>
-  </head>
-  <body>
-    <form action="/" method="POST">
-      <img src="static\cinta transportadora.png" alt="" />
-      <div>
-        <label for="usuario">Ingrese el N° de alimentos:</label>
-        <input type="text" name="usuario" placeholder="Ingrese n° de alimentos" />
-        <br/>
-        <button type="submit">INICIAR CARGA</button>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Cinta Transportadora</title>
+        <style>
+            .center-image {text-align: center}
+            .center-text {text-align: center; font-size: 15px}
+            button[type="submit"] {background-color: #f37d0f; color: #fff; font-size: 15px; 
+            padding: 10px 20px; border: none; cursor: pointer; display: block; margin: 20px auto 0; 
+            border-radius: 10px}
+        </style>
+    </head>
+
+    <body>
+      <div class="center-image">
+        <img src="static\cinta transportadora.png" alt="" />
       </div>
-    </form>
-    <div class="right">
-      <p> aw FRUTAS: {{aw_promedio_frutas if aw_promedio_frutas else 0}}</p>
-      <p> aw KIWIS: {{awk if awk else 0}}</p>
-      <p> aw MANZANAS: {{awm if awm else 0}}</p>
-      <p> aw VERDURAS: {{aw_promedio_verduras if aw_promedio_verduras else 0}}</p>
-      <p> aw PAPAS: {{awp if awp else 0}}</p>
-      <p> aw ZANAHORIAS: {{awz if awz else 0}}</p>
-      <p> aw TOTAL: {{aw_total_promedio if aw_total_promedio else 0}}</p>
-    </div>
-    {% if (aw_promedio_frutas > 0.95) or (aw_promedio_verduras > 0.95) or (awk > 0.95) or (awm > 0.95) or (awp > 0.95) or (awz > 0.95) or (aw_total_promedio > 0.95) %}
-    <div class="warning">
+
+      <div class="center-text">
+        <form action="/" method="POST">
+          <label for= "usuario" >Ingrese la cantidad de alimentos:</label>
+          <input type="text" name="usuario" required><br/>
+      </div>
+          <button type="submit">INICIAR CARGA</button>
+        </form>
+        
+      <div class="center-text">
+        <p> aw FRUTAS: {{aw_promedio_frutas if aw_promedio_frutas else 0}}</p>
+        <p style="{% if awk > 0.95 %}color: red;{% endif %}"> aw KIWIS: {{ awk if awk else 0 }}</p>
+        <p style="{% if awm > 0.95 %}color: red;{% endif %}"> aw MANZANAS: {{awm if awm else 0}}</p>
+        <p> aw VERDURAS: {{aw_promedio_verduras if aw_promedio_verduras else 0}}</p>
+        <p style="{% if awp > 0.95 %}color: red;{% endif %}"> aw PAPAS: {{awp if awp else 0}}</p>
+        <p style="{% if awz > 0.95 %}color: red;{% endif %}"> aw ZANAHORIAS: {{awz if awz else 0}}</p>
+        <p> aw TOTAL: {{aw_total_promedio if aw_total_promedio else 0}}</p>
+      </div>
+
+    <div class="center-text">
+      {% if (aw_promedio_frutas > 0.95) or (aw_promedio_verduras > 0.95) or (awk > 0.95) or (awm > 0.95) or (awp > 0.95) or (awz > 0.95) or (aw_total_promedio > 0.95) %}
       Se recomienda inspección del cajón.
+      {% endif %}
     </div>
-    {% endif %} 
   </body>
 </html>

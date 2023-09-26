@@ -1,12 +1,11 @@
 from flask import Flask, render_template,request
+app= Flask(__name__)
 from modules.cajon import Cajon_Alimentos 
 from modules.cinta_transportadora import Cinta_Transportadora
-app= Flask(__name__)
 
 @app.route("/", methods=['GET', 'POST'])
 def raiz():
-   
-    n= int(request.form.get('usuario',0))
+    n= int(request.form.get('usuario', 0))
     cinta = Cinta_Transportadora()
     lista_alimentos= cinta.transportar(n)
     cajon = Cajon_Alimentos(lista_alimentos)
