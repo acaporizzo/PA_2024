@@ -54,15 +54,15 @@ class Facultad:
         """método para mostrar los cursos de un departamento en específico
         """
         for dpto in self._departamentos:
-            if p_nombre_dpto == dpto._nombre_dpto:
-                return(dpto._cursos)
+            if p_nombre_dpto == dpto.nombre_dpto:
+                return(dpto.cursos)
 
     def devolver_director_de_dpto (self, p_nombre_dpto):
         """método para mostrar el director de un dpto (se define en departamento.py)
         """
         for dpto in self._departamentos:
-            if p_nombre_dpto == dpto._nombre_dpto:
-                return(dpto._director_de_dpto)
+            if p_nombre_dpto == dpto.nombre_dpto:
+                return(dpto.director_de_dpto)
             
     def devolver_profesores_de_dpto(self, p_nombre_dpto):
         """método para mostrar los profesores de un dpto (la lista de profesores 

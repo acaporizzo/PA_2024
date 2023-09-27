@@ -9,6 +9,16 @@ class Cajon:
         return(self._lista_de_alimentos)
     
     
+
+
+
+
+
+
+
+
+
+    
     
     def agregar_y_calcular_aw(self, p_lista_de_alimentos):
         """método que calcula la actividad acuosa de cada alimento que pasa por la cinta transportadora,
