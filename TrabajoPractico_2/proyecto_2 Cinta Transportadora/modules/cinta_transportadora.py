@@ -3,9 +3,9 @@ from modules.detector_alimentos import DetectorAlimento
 
 class Cinta_Transportadora:
     def clasificar_alimentos(self, p_n_alimentos):
-        """Método que simula el transporte de los alimentos, donde en cada iteración del ciclo while se van a 
+        """método que simula el transporte de los alimentos, donde en cada iteración del ciclo while se van a 
         clasificar n alimentos especificando su nombre (kiwi, manzana, papa, zanahoria o undefined) y peso. 
-        Luego cada alimento se agrega a la lista de alimentos. Retorna la lista de alimentos.
+        Luego cada alimento se agrega a la lista de alimentos que corresponde. Retorna la lista de alimentos.
 
         Args:
             p_n_alimentos (int): determina cuantos alimentos van a pasar por la cinta

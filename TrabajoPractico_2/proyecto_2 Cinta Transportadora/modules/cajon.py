@@ -16,7 +16,7 @@ class Cajon:
         Args:
             p_lista_de_alimentos (lista): todos los alimentos que pasan por la cinta transportadora
         """
-        diccionario_con_listas_aw = {'Kiwi': [], 'Manzana': [], 'Papa': [], 'Zanahoria': []}
+        diccionario_con_listas_aw = {"Kiwi": [], "Manzana": [], "Papa": [], "Zanahoria": []}
 
         for alimento in p_lista_de_alimentos:
             if isinstance(alimento, (Kiwi, Manzana, Papa, Zanahoria)):
@@ -28,14 +28,14 @@ class Cajon:
         return (diccionario_con_listas_aw)
     
     def calcular_aw_prom_diccionario(self,diccionario_con_listas_aw):
-        """Calcula el promedio de la actividad acuosa para cada tipo de alimento, utilizando datos otorgados
+        """calcula el promedio de la actividad acuosa para cada tipo de alimento, utilizando datos otorgados
         por un diccionario (del método agregar_y_calcular_aw).
 
         Args:
-            diccionario_con_listas_aw (dict): Diccionario con listas de actividad acuosa para cada tipo de alimento.
+            diccionario_con_listas_aw (dict): diccionario con listas de actividad acuosa para cada tipo de alimento.
 
         Returns:
-            promedios (dict): Diccionario con los promedios de actividad acuosa para cada tipo de alimento.
+            promedios (dict): diccionario con los promedios de actividad acuosa para cada tipo de alimento.
         """
         promedios = {}
 

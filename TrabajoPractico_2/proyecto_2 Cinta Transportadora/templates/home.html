@@ -1,45 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Cinta Transportadora</title>
-        <style>
-            .center-image {text-align: center}
-            .center-text {text-align: center; font-size: 15px}
-            button[type="submit"] {background-color: #f019daa2; color: #fff; font-size: 15px; 
-            padding: 10px 20px; border: none; cursor: pointer; display: block; margin: 20px auto 0; 
-            border-radius: 10px}
-        </style>
-    </head>
-
-    <body>
-      <div class="center-image">
-        <img src="static\cinta transportadora.png" alt="" />
-      </div>
-
-      <div class="center-text">
-        <form action="/" method="POST">
-          <label for= "usuario" >Ingrese la cantidad de alimentos:</label>
-          <input type="text" name="usuario" required><br/>
-      </div>
-          <button type="submit">INICIAR CARGA</button>
-        </form>
-        
-      <div class="center-text">
-        <p> aw FRUTAS: {{promedio_fruta if promedio_fruta else 0}}</p>
-        <p style="{% if awk > 0.95 %} color: red ; {% endif %}"> aw KIWIS: {{ awk if awk else 0 }}</p>
-        <p style="{% if awm > 0.95 %} color: red ; {% endif %}"> aw MANZANAS: {{awm if awm else 0}}</p>
-        <p> aw VERDURAS: {{promedio_verdura if promedio_verdura else 0}}</p>
-        <p style="{% if awp > 0.95 %} color: red; {% endif %}"> aw PAPAS: {{awp if awp else 0}}</p>
-        <p style="{% if awz > 0.95 %} color: red; {% endif %}"> aw ZANAHORIAS: {{awz if awz else 0}}</p>
-        <p> aw TOTAL: {{promedio_total if promedio_total else 0}}</p>
-      </div>
-
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cinta Transportadora</title>
+    <style>
+        body {background-color: #f019da2c}
+        .center-text {text-align: center; font-size: 15px;}
+        .container {clear: both;}
+        .image {float: left; margin-right: 5px; width: 400px}
+        button[type="submit"] {background-color: #f019daa2; color: #ffffff; font-size: 15px;
+            padding: 10px 20px; border: none; cursor: pointer; display: block; margin: 20px auto 0;
+            border-radius: 10px;}
+    </style>
+</head>
+<body>
     <div class="center-text">
-      {% if (promedio_fruta > 0.95) or (promedio_verdura > 0.95) or (awk > 0.95) or (awm > 0.95) or (awp > 0.95) or (awz > 0.95) or (promedio_total > 0.95) %}
-      Se recomienda inspección del cajón.
-      {% endif %}
+        <div class="container">
+            <img class="image" src="static\cinta transportadora.png" alt="" />
+            <form action="/" method="POST">
+                <label for="usuario">Ingrese la cantidad de alimentos:</label>
+                <input type="text" name="usuario" required><br/>
+                <button type="submit">INICIAR CARGA</button>
+            </form>
+        </div>
+        <p> aw FRUTAS: {{awf if awf else 0}}</p>
+        <p style="{% if awk > 0.95 %} color: #d71e4f ; {% endif %}"> aw KIWIS: {{ awk if awk else 0 }}</p>
+        <p style="{% if awm > 0.95 %} color: #d71e4f ; {% endif %}"> aw MANZANAS: {{awm if awm else 0}}</p>
+        <p> aw VERDURAS: {{awv if awv else 0}}</p>
+        <p style="{% if awp > 0.95 %} color: #d71e4f; {% endif %}"> aw PAPAS: {{awp if awp else 0}}</p>
+        <p style="{% if awz > 0.95 %} color: #d71e4f; {% endif %}"> aw ZANAHORIAS: {{awz if awz else 0}}</p>
+        <p> aw TOTAL: {{awt if awt else 0}}</p>
     </div>
-  </body>
+    <div class="center-text">
+        {% if (awk > 0.95) or (awm > 0.95) or (awp > 0.95) or (awz > 0.95) or (awf > 0.95) or (awv > 0.95) or (awt > 0.95) %}
+        Se recomienda inspección del cajón.
+        {% endif %}
+    </div>
+</body>
 </html>
