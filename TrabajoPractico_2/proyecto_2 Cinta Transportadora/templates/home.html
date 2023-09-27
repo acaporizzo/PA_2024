@@ -27,17 +27,17 @@
         </form>
         
       <div class="center-text">
-        <p> aw FRUTAS: {{aw_promedio_frutas if aw_promedio_frutas else 0}}</p>
+        <p> aw FRUTAS: {{promedio_fruta if promedio_fruta else 0}}</p>
         <p style="{% if awk > 0.95 %}color: red;{% endif %}"> aw KIWIS: {{ awk if awk else 0 }}</p>
         <p style="{% if awm > 0.95 %}color: red;{% endif %}"> aw MANZANAS: {{awm if awm else 0}}</p>
-        <p> aw VERDURAS: {{aw_promedio_verduras if aw_promedio_verduras else 0}}</p>
+        <p> aw VERDURAS: {{promedio_verdura if promedio_verdura else 0}}</p>
         <p style="{% if awp > 0.95 %}color: red;{% endif %}"> aw PAPAS: {{awp if awp else 0}}</p>
         <p style="{% if awz > 0.95 %}color: red;{% endif %}"> aw ZANAHORIAS: {{awz if awz else 0}}</p>
-        <p> aw TOTAL: {{aw_total_promedio if aw_total_promedio else 0}}</p>
+        <p> aw TOTAL: {{promedio_total if promedio_total else 0}}</p>
       </div>
 
     <div class="center-text">
-      {% if (aw_promedio_frutas > 0.95) or (aw_promedio_verduras > 0.95) or (awk > 0.95) or (awm > 0.95) or (awp > 0.95) or (awz > 0.95) or (aw_total_promedio > 0.95) %}
+      {% if (promedio_fruta > 0.95) or (promedio_verdura > 0.95) or (awk > 0.95) or (awm > 0.95) or (awp > 0.95) or (awz > 0.95) or (promedio_total > 0.95) %}
       Se recomienda inspección del cajón.
       {% endif %}
     </div>

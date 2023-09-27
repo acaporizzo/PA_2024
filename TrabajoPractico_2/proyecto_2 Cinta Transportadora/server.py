@@ -4,27 +4,27 @@ from modules.cajon import Cajon
 from modules.cinta_transportadora import Cinta_Transportadora
 
 @app.route("/", methods=['GET', 'POST'])
-def raiz():
+def home():
     n= int(request.form.get('usuario', 0))
-    cinta = Cinta_Transportadora()
-    lista_alimentos= cinta.clasificar_alimentos(n)
-    cajon = Cajon(lista_alimentos)
+    cinta_transportadora = Cinta_Transportadora()
+    lista_alimentos= cinta_transportadora.clasificar_alimentos(n)
+    cajon_de_n_alimentos = Cajon(lista_alimentos)
 
-    aw_kiwis, aw_manzanas, aw_papas, aw_zanahorias = cajon.agregar_y_calcular_aw(lista_alimentos)
+    diccionario_con_listas_aw = cajon_de_n_alimentos.agregar_y_calcular_aw(lista_alimentos)
+    lista_aw_frutas = (diccionario_con_listas_aw["Kiwi"] + diccionario_con_listas_aw["Manzana"])
+    lista_aw_verduras = (diccionario_con_listas_aw["Papa"] + diccionario_con_listas_aw["Zanahoria"])
+    lista_total = lista_aw_frutas + lista_aw_verduras
 
-    aw_frutas= aw_kiwis + aw_manzanas
-    aw_verduras= aw_papas + aw_zanahorias
-    aw_total= aw_frutas + aw_verduras
+    promedios = cajon_de_n_alimentos.calcular_aw_prom_diccionario(diccionario_con_listas_aw)
+    awk = promedios["Kiwi"]
+    awm = promedios["Manzana"]
+    awp = promedios["Papa"]
+    awz=promedios["Zanahoria"]
+    promedio_fruta = cajon_de_n_alimentos.calcular_aw_prom(lista_aw_frutas)
+    promedio_verdura = cajon_de_n_alimentos.calcular_aw_prom(lista_aw_verduras)
+    promedio_total = cajon_de_n_alimentos.calcular_aw_prom(lista_total)
 
-    awk= cajon.calcular_aw_prom(aw_kiwis)
-    awm= cajon.calcular_aw_prom(aw_manzanas)
-    awz= cajon.calcular_aw_prom(aw_zanahorias)
-    awp= cajon.calcular_aw_prom(aw_papas)
-    aw_promedio_frutas= cajon.calcular_aw_prom(aw_frutas)
-    aw_promedio_verduras= cajon.calcular_aw_prom(aw_verduras)
-    aw_total_promedio= cajon.calcular_aw_prom(aw_total)
-    
-    return render_template("home.html",awk= awk, awp= awp, awz= awz,awm= awm, aw_promedio_verduras= aw_promedio_verduras,aw_promedio_frutas= aw_promedio_frutas, aw_total_promedio= aw_total_promedio)
+    return render_template("home.html",awk= awk, awp= awp, awz= awz,awm= awm, promedio_verdura= promedio_verdura,promedio_fruta= promedio_fruta, promedio_total= promedio_total)
     
 if __name__ == "__main__":
     app.run(debug=True)
