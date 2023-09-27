@@ -7,7 +7,7 @@
         <style>
             .center-image {text-align: center}
             .center-text {text-align: center; font-size: 15px}
-            button[type="submit"] {background-color: #19f09a; color: #fff; font-size: 15px; 
+            button[type="submit"] {background-color: #f019daa2; color: #fff; font-size: 15px; 
             padding: 10px 20px; border: none; cursor: pointer; display: block; margin: 20px auto 0; 
             border-radius: 10px}
         </style>
@@ -28,11 +28,11 @@
         
       <div class="center-text">
         <p> aw FRUTAS: {{promedio_fruta if promedio_fruta else 0}}</p>
-        <p style="{% if awk > 0.95 %}color: red;{% endif %}"> aw KIWIS: {{ awk if awk else 0 }}</p>
-        <p style="{% if awm > 0.95 %}color: red;{% endif %}"> aw MANZANAS: {{awm if awm else 0}}</p>
+        <p style="{% if awk > 0.95 %} color: red ; {% endif %}"> aw KIWIS: {{ awk if awk else 0 }}</p>
+        <p style="{% if awm > 0.95 %} color: red ; {% endif %}"> aw MANZANAS: {{awm if awm else 0}}</p>
         <p> aw VERDURAS: {{promedio_verdura if promedio_verdura else 0}}</p>
-        <p style="{% if awp > 0.95 %}color: red;{% endif %}"> aw PAPAS: {{awp if awp else 0}}</p>
-        <p style="{% if awz > 0.95 %}color: red;{% endif %}"> aw ZANAHORIAS: {{awz if awz else 0}}</p>
+        <p style="{% if awp > 0.95 %} color: red; {% endif %}"> aw PAPAS: {{awp if awp else 0}}</p>
+        <p style="{% if awz > 0.95 %} color: red; {% endif %}"> aw ZANAHORIAS: {{awz if awz else 0}}</p>
         <p> aw TOTAL: {{promedio_total if promedio_total else 0}}</p>
       </div>
 

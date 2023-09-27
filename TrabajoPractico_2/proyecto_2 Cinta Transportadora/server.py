@@ -5,9 +5,9 @@ from modules.cinta_transportadora import Cinta_Transportadora
 
 @app.route("/", methods=['GET', 'POST'])
 def home():
-    n= int(request.form.get('usuario', 0))
+    n_alimentos= int(request.form.get('usuario', 0))
     cinta_transportadora = Cinta_Transportadora()
-    lista_alimentos= cinta_transportadora.clasificar_alimentos(n)
+    lista_alimentos= cinta_transportadora.clasificar_alimentos(n_alimentos)
     cajon_de_n_alimentos = Cajon(lista_alimentos)
 
     diccionario_con_listas_aw = cajon_de_n_alimentos.agregar_y_calcular_aw(lista_alimentos)
