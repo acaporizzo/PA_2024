@@ -13,7 +13,7 @@ class Cinta_Transportadora:
         detector= DetectorAlimento() #instanciamos un detector de alimentos 
         lista_de_alimentos= []
        
-        while len(lista_de_alimentos) < p_n_alimentos:      
+        while len(lista_de_alimentos) < p_n_alimentos:
             datos_alimento = detector.detectar_alimento()
             tipo_alimento = datos_alimento['alimento']
             peso_alimento = datos_alimento['peso']
@@ -22,12 +22,15 @@ class Cinta_Transportadora:
                 continue
             elif tipo_alimento == "kiwi":
                 alimento= Kiwi(peso_alimento)
+                lista_de_alimentos.append(alimento)
             elif tipo_alimento == "manzana":
                 alimento= Manzana(peso_alimento)
+                lista_de_alimentos.append(alimento)
             elif tipo_alimento  == "papa":
                 alimento= Papa(peso_alimento)
+                lista_de_alimentos.append(alimento)
             elif tipo_alimento == "zanahoria":
                 alimento= Zanahoria(peso_alimento)
-            lista_de_alimentos.append(alimento)  
+                lista_de_alimentos.append(alimento)
             
         return(lista_de_alimentos)

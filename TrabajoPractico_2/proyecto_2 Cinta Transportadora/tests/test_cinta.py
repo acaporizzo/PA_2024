@@ -7,7 +7,7 @@ class TestCintaTransportadora(unittest.TestCase):
     def test_clasificar_alimentos(self):
     
         cinta_transportadora = Cinta_Transportadora()
-        n_alimentos = 5  
+        n_alimentos = 1000  
         lista_de_alimentos = cinta_transportadora.clasificar_alimentos(n_alimentos)
 
         self.assertEqual(len(lista_de_alimentos), n_alimentos)
