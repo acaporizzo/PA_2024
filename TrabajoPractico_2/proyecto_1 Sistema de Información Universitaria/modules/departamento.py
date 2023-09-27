@@ -51,7 +51,7 @@ class Departamento:
         if isinstance(p_profesor, Profesor):
             if p_profesor in self._profesores and not p_profesor._es_director:
                 self._director_de_dpto = p_profesor
-                p_profesor._es_director = True #se define en la clase Profesor
+                p_profesor.es_director = True #se define en la clase Profesor
     
     def __str__(self):
         """para definir una representación legible de una instancia de una clase o 

@@ -17,7 +17,7 @@ tercer_curso = Curso("Ecuaciones Diferenciales")
 #creamos otro departamento y mostramos todos los departamentos de la facultad:
 facultad.crear_departamento("Dpto Matemática",cuarto_profesor)
 print("Los departamentos de la facultad son: ")
-for i,depto in enumerate(facultad._departamentos):
+for i,depto in enumerate(facultad.departamentos):
     print(i+1,depto)
 
 #la facultad asigna un departamento a cada profesor:
@@ -37,7 +37,7 @@ for i,profesor in enumerate(facultad.devolver_profesores_de_dpto("Dpto Programac
 
 #definimos UN profesor del departamento como director SOLO DE ESE departamento y lo mostramos:
 facultad.atribuir_director_a_dpto(primer_profesor, "Dpto Programación")
-#facultad.atribuir_director_a_dpto(segundo_profesor, "Dpto Programación")   #prueba para cambiar el director y que se muestre solo uno
+facultad.atribuir_director_a_dpto(segundo_profesor, "Dpto Programación")   #prueba para cambiar el director y que se muestre solo uno
 director=facultad.devolver_director_de_dpto("Dpto Programación")
 print(f"El director es: {director}")
 

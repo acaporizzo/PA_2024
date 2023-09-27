@@ -27,14 +27,14 @@ class Facultad:
         """
         if isinstance(p_nombre_del_curso, Curso):
             for dpto in self._departamentos:
-                if p_nombre_dpto == dpto._nombre_dpto:
+                if p_nombre_dpto == dpto.nombre_dpto:
                     dpto.atribuir_curso(p_nombre_del_curso) #en departamento.py
 
     def atribuir_director_a_dpto (self, p_profesor, p_nombre_dpto):
         """método para asignar a un profesor como director de un dpto
         """
         for depto in self._departamentos:
-            if p_nombre_dpto == depto._nombre_dpto:
+            if p_nombre_dpto == depto.nombre_dpto:
                 depto.atribuir_director(p_profesor) #en departamento.py
 
     def atribuir_dpto_a_profesor (self, p_nuevo_profesor, p_nombre_dpto):
@@ -42,7 +42,7 @@ class Facultad:
         """
         if isinstance(p_nuevo_profesor, Profesor):
             for dpto in self._departamentos:
-                if p_nombre_dpto == dpto._nombre_dpto:
+                if p_nombre_dpto == dpto.nombre_dpto:
                     dpto.agregar_profesor_a_dpto(p_nuevo_profesor) #en departamento.py
 
     def crear_departamento (self, p_nombre_dpto, p_profesor):
@@ -70,8 +70,8 @@ class Facultad:
         """
         profesores_de_dpto = []
         for dpto in self._departamentos:
-            if dpto._nombre_dpto == p_nombre_dpto:
-                profesores_de_dpto = dpto._profesores
+            if dpto.nombre_dpto == p_nombre_dpto:
+                profesores_de_dpto = dpto.profesores
                 break
         return(profesores_de_dpto)
 
