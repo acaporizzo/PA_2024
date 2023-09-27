@@ -9,8 +9,9 @@ class Cajon:
         return(self._lista_de_alimentos)
     
     def agregar_y_calcular_aw(self, p_lista_de_alimentos):
-        """método que calcula la actividad acuosa de cada alimento que pasa por la cinta transportadora y lo agrega a la lista del
-        alimento correspondiente 
+        """método que calcula la actividad acuosa de cada alimento que pasa por la cinta transportadora,
+        y la agrega a la lista del alimento correspondiente, retornando un diccionario con una lista en
+        cada tipo de alimento.
 
         Args:
             p_lista_de_alimentos (lista): todos los alimentos que pasan por la cinta transportadora
@@ -27,7 +28,8 @@ class Cajon:
         return (diccionario_con_listas_aw)
     
     def calcular_aw_prom_diccionario(self,diccionario_con_listas_aw):
-        """Calcula el promedio de la actividad acuosa para cada tipo de alimento.
+        """Calcula el promedio de la actividad acuosa para cada tipo de alimento, utilizando datos otorgados
+        por un diccionario (del método agregar_y_calcular_aw).
 
         Args:
             diccionario_con_listas_aw (dict): Diccionario con listas de actividad acuosa para cada tipo de alimento.
@@ -47,6 +49,15 @@ class Cajon:
         return(promedios)
     
     def calcular_aw_prom(self,lista_aw):
+        """Calcula el promedio de la actividad acuosa para cada tipo de alimento, utilizando datos otorgados
+        por una lista con las actividades acuosas. Se utiliza para fruta, verdura y total.
+
+        Args:
+            lista_aw (list): lista de actividad acuosa para cada tipo de alimento.
+
+        Returns:
+            promedio (float): promedio de actividad acuosa de la lista.
+        """
         if not lista_aw:  
             return 0
         

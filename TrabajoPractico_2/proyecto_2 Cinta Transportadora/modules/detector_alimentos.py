@@ -25,7 +25,8 @@ class DetectorAlimento:
         alimento_detectado = self.alimentos[random.randint(0, n_alimentos-1)]
         peso_detectado = random.choices(self.peso_alimentos, self.prob_pesos)[0]
         return {"alimento": alimento_detectado, "peso": peso_detectado}
-    
+
+
 if __name__ == "__main__":
     
     random.seed(1)

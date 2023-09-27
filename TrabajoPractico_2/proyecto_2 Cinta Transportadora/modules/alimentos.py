@@ -39,7 +39,7 @@ class Kiwi(Fruta):
         super().__init__(p_peso_del_alimento)
 
     def calcular_aw(self):
-        """Calcula la actividad acuosa de la KIWI
+        """Método que calcula la actividad acuosa del Kiwi
         """
         awk = 0.96 * ((1 - math.exp(-18 * self._peso_del_alimento)) / (1 + math.exp(-18 * self._peso_del_alimento)))
         return(awk)
@@ -56,10 +56,9 @@ class Manzana(Fruta):
         super().__init__(p_peso_del_alimento)
 
     def calcular_aw(self):
-        """Calcula la actividad acuosa de la MANZANA
+        """Método que calcula la actividad acuosa de la Manzana
         """
         awm = 0.97 * ((15 * self._peso_del_alimento) ** 2) / (1 + (15 * self._peso_del_alimento) ** 2)
-
         return(awm)
             
     def __str__(self):
@@ -74,7 +73,7 @@ class Papa(Verdura):
         super().__init__(p_peso_del_alimento)
     
     def calcular_aw(self):
-        """Calcula la actividad acuosa de la PAPA
+        """Método que calcula la actividad acuosa de la Papa
         """
         awp = 0.66 * (np.arctan(18 * self._peso_del_alimento))
         return(awp)
@@ -92,7 +91,7 @@ class Zanahoria(Verdura):
         super().__init__(p_peso_del_alimento)
  
     def calcular_aw(self):
-        """Calcula la actividad acuosa de la ZANAHORIA
+        """Método que calcula la actividad acuosa de la Zanahoria
         """
         awz = 0.96 * ((1 - math.exp(-10 * self._peso_del_alimento)))
         return(awz)
