@@ -32,5 +32,5 @@ class Cinta_Transportadora:
             elif tipo_alimento == "zanahoria":
                 alimento= Zanahoria(peso_alimento)
                 lista_de_alimentos.append(alimento)
-            
+
         return(lista_de_alimentos)
