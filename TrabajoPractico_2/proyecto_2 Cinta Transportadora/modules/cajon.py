@@ -10,9 +10,19 @@ class Cajon:
         return(self._lista_de_alimentos)
     
     def __iter__(self):
+        """método especial que permite que un objeto sea iterable.
+
+        Returns:
+            self: El propio objeto, ya que este objeto se considera iterable.
+        """
         return self
 
     def __next__(self):
+        """método especial que permite la iteración sobre una lista de alimentos.
+
+        Returns:
+            elemento: El siguiente elemento en la lista de alimentos.
+        """
         if self._index < len(self._lista_de_alimentos):
             elemento = self._lista_de_alimentos[self._index]
             self._index += 1
@@ -21,10 +31,13 @@ class Cajon:
             raise StopIteration
 
     def calcular_aw_promedios(self):
-        """método que calcula la actividad acuosa de cada alimento que pasa por la cinta transportadora,
-        y la agrega a la lista del alimento correspondiente. Luego, calcula el promedio de la actividad acuosa 
-        para cada tipo de alimento, incluyendo Frutas, Verduras y Total. Retorna una lista con todos los aw
-        promedio
+        """método que calcula los valores promedio de la actividad de agua (Aw) para diferentes tipos 
+        de alimentos en un cajón.
+
+        Returns:
+            lista (list): Una lista que contiene los valores promedio de Aw para kiwis, manzanas, papas, zanahorias, 
+                      frutas (kiwis y manzanas combinados), verduras (papas y zanahorias combinadas) y el total 
+                      de alimentos en el cajón. Los valores están redondeados a 2 decimales.
         """
         cajon = Cajon(self._lista_de_alimentos)
         listakiwis = []
@@ -57,8 +70,3 @@ class Cajon:
         lista=[round(awk,2),round(awm,2),round(awp,2),round(awz,2),round(awf,2),round(awv,2),round(awt,2)]
         
         return(lista)
-
-
-
-
-        
