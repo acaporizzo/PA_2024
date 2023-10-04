@@ -8,7 +8,7 @@ class TestAlimentos(unittest.TestCase):
         kiwi = Kiwi(0.07)  # instanciamos un kiwi
         resultado_de_aw = kiwi.calcular_aw()
         self.assertAlmostEqual(resultado_de_aw, 0.5357, places=3) 
-
+        
     def test_manzana_calcular_aw(self):
         manzana = Manzana(0.18)  # instanciamos una manzana
         resultado_de_aw = manzana.calcular_aw()
