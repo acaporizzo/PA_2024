@@ -1,3 +1,4 @@
+from modules.alimentos import Kiwi,Manzana, Papa, Zanahoria, Fruta, Verdura, Alimentos
 from modules.cajon import Cajon
 from modules.cinta_transportadora import Cinta_Transportadora
 from modules.calculador_aw import calcular_aw_promedio
@@ -13,19 +14,25 @@ def home():
     n_alimentos = int(request.form.get("usuario", 0))
 
     # Obtenemos una lista de alimentos instanciados, y la utilizamos como parámetro para instanciar un cajón:
-    lista_de_n_alimentos = cinta_transportadora.clasificar_alimentos(n_alimentos)
-    cajon_de_n_alimentos = Cajon(lista_de_n_alimentos)
+    cajon=Cajon()
+    while len(cajon) < n_alimentos:
+        alimento = cinta_transportadora.clasificar_alimento()
+        if alimento != None:
+            cajon.agregar_alimento(alimento)
 
     # Calculamos el aw promedio de cada clase: 
-    aw_promedios = cajon_de_n_alimentos.calcular_aw_promedios()
 
+    diccionario_de_aw_promedio={"aw_kiwi": round(calcular_aw_promedio(Kiwi,cajon),2),
+    "aw_manzana": round(calcular_aw_promedio(Manzana,cajon),2),
+    "aw_papa": round(calcular_aw_promedio(Papa,cajon),2),
+    "aw_zanahoria": round(calcular_aw_promedio(Zanahoria,cajon),2),
+    "aw_frutas": round(calcular_aw_promedio(Fruta,cajon),2),
+    "aw_verduras": round(calcular_aw_promedio(Verdura,cajon),2),
+    "aw_total": round(calcular_aw_promedio(Alimentos,cajon),2),
+    }
     
 
-    lista_de_alimentos= []
-    while len(lista_de_alimentos) < p_n_alimentos:
+    return render_template("home.html",awk=diccionario_de_aw_promedio["aw_kiwi"], awm=diccionario_de_aw_promedio["aw_manzana"], awp=diccionario_de_aw_promedio["aw_papa"], awz=diccionario_de_aw_promedio["aw_zanahoria"], awf=diccionario_de_aw_promedio["aw_frutas"], awv=diccionario_de_aw_promedio["aw_verduras"], awt=diccionario_de_aw_promedio["aw_total"])
 
-    #return render_template("home.html",awk=aw_promedios[0], awm=aw_promedios[1], awp=aw_promedios[2], awz=aw_promedios[3], awf=aw_promedios[4], awv=aw_promedios[5], awt=aw_promedios[6])
-        return()
-    
 if __name__ == "__main__":
     app.run(debug=True)

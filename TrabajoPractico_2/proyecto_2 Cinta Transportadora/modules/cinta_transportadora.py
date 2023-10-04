@@ -11,19 +11,20 @@ class Cinta_Transportadora:
         tipo_alimento = datos_alimento['alimento']
         peso_alimento = datos_alimento['peso']
 
-        while tipo_alimento == "undefined":
-            datos_alimento = self._detector.detectar_alimento()
-            tipo_alimento = datos_alimento['alimento']
-            peso_alimento = datos_alimento['peso']
-        
+        if tipo_alimento == "undefined":
+            alimento = None
+            
         if tipo_alimento == "kiwi":
-            alimento= Kiwi(peso_alimento)
+            alimento = Kiwi(peso_alimento)
+
         elif tipo_alimento == "manzana":
-            alimento= Manzana(peso_alimento)
+            alimento = Manzana(peso_alimento)
+
         elif tipo_alimento  == "papa":
-                alimento= Papa(peso_alimento)
+            alimento = Papa(peso_alimento)
+            
         elif tipo_alimento == "zanahoria":
-                alimento= Zanahoria(peso_alimento)
+            alimento = Zanahoria(peso_alimento)
 
         return(alimento)
     
