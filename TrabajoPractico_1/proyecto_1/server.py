@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for
-from modules.modulo1 import trivia, guardar_datos_del_juego
+from modules.modulo1 import trivia, guardar_datos_del_juego,mostrar_lista_peliculas
 import datetime
 aciertos=0
 app = Flask("server")
@@ -88,6 +88,10 @@ def ver_resultados():
         archivo_vacio = True
         
     return render_template("resultados.html", resultados_partidas=resultados_partidas, advertencia=advertencia, archivo_vacio=archivo_vacio)  
+
+@app.route("/lista_pelis", methods=["GET", "POST"])
+def listar_pelis():
+    return render_template("lista_pelis.html")
 
 if __name__=="__main__":
     app.run(debug=True, host='0.0.0.0')
