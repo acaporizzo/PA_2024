@@ -1,1 +1,4 @@
+<<<<<<< HEAD
 Hola, ana clara . Su calificación es: 2/3 y su partida inició el: 01/04/24 21:00
+=======
+>>>>>>> 5b6c8a918a01d5283beb0a7a84c42dd2f7d30741

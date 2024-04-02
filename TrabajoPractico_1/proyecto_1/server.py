@@ -1,6 +1,5 @@
-from flask import Flask, render_template, request, redirect, url_for, send_file
-import matplotlib.pyplot as plt
-from modules.modulo1 import generar_graficas_pdf,trivia, guardar_datos_del_juego, mostrar_lista_peliculas, generar_grafica, generar_grafica_circular
+from flask import Flask, render_template, request, redirect, url_for
+from modules.modulo1 import trivia, guardar_datos_del_juego
 import datetime
 
 aciertos=0
@@ -95,27 +94,5 @@ def ver_resultados():
         archivo_vacio = True
     return render_template("resultados.html", resultados_partidas=resultados_partidas, advertencia=advertencia, archivo_vacio=archivo_vacio)  
 
-@app.route("/graficas", methods=["GET", "POST"])
-def ver_resultados_graficos():
-    global grafica, grafica_circular
-    if lista_para_graficar:
-        grafica = generar_grafica(lista_para_graficar)
-        grafica_circular = generar_grafica_circular(lista_para_graficar)
-    else:
-        mensaje_error = "No hay datos disponibles para generar gráficas."
-        return render_template("graficas.html", mensaje_error=mensaje_error)
-    return render_template("graficas.html", grafica=grafica, grafica_circular=grafica_circular)
-    
-@app.route("/lista_peliculas", methods=["GET", "POST"])
-def listar_peliculas():
-    lista_peliculas = mostrar_lista_peliculas(lista1)
-    return render_template("lista_peliculas.html", lista_peliculas=lista_peliculas)
-
-@app.route('/mostrar_graficas_pdf')
-def mostrar_graficas_pdf():
-    generar_graficas_pdf(lista_para_graficar)  # Generar las gráficas y guardarlas en el archivo PDF
-
-    # Devolver el archivo PDF al usuario para descargarlo
-    return send_file("graficas.pdf", as_attachment=True)
 if __name__=="__main__":
     app.run(debug=True, host='0.0.0.0')
