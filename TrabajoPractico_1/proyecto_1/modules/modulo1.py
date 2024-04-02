@@ -1,6 +1,9 @@
 # módulo para organizar funciones o clases utilizadas en nuestro proyecto
+import matplotlib.pyplot as plt
+import io, datetime, base64 
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+import base64
 
-import datetime
 def mostrar_lista_peliculas (lista_de_pelis_y_frases):
     """
     Esta función recibe una lista con todos los datos y devuelve una lista de tuplas
@@ -13,13 +16,13 @@ def mostrar_lista_peliculas (lista_de_pelis_y_frases):
         lista: contiene todas las peliculas ordenadas alfabéticamente donde se eliminaron las repetidas
         y se indexaron.
     """
-    lista=[]
-    lista_sin=[]
+    lista_sin_repetir = []
     for linea in lista_de_pelis_y_frases:
         frase,pelicula=linea.rstrip("\n").split(";")
-        lista.append(pelicula)
-    lista_sin=set(lista)
-    return [(i+1,elemento) for i,elemento in enumerate (sorted(lista_sin))] #elemento no es variable, es como i, en el fo
+        lista_sin_repetir.append(pelicula.lower())
+
+    lista_sin_repetir = sorted(set(lista_sin_repetir))
+    return [(i+1, pelicula.capitalize()) for i, pelicula in enumerate(lista_sin_repetir)] #elemento no es variable, es como i, en el fo
 
 def trivia (lista_de_pelis_y_frases,frases_utilizadas):
     """
@@ -37,17 +40,17 @@ def trivia (lista_de_pelis_y_frases,frases_utilizadas):
         * En el índice 2 contiene una lista con las dos opciones elegidas al azar y la correcta 
     """
     import random
- 
+    
     op_ganadora=random.choice(lista_de_pelis_y_frases) #tupla con frase y pelicula ganadora
     while op_ganadora[0] in frases_utilizadas: # Verificar si la frase ya ha sido utilizada
         op_ganadora = random.choice(lista_de_pelis_y_frases)
     frases_utilizadas.append(op_ganadora[0]) # Agregar la frase a la lista de frases utilizadas
 
-    pelis_no_ganadoras= [p[1] for p in lista_de_pelis_y_frases if p[1] != op_ganadora[1]] #lista de todas las peliculas != a op_ganadora
+    pelis_no_ganadoras= [p[1].lower() for p in lista_de_pelis_y_frases if p[1].lower() != op_ganadora[1].lower()] #lista de todas las peliculas != a op_ganadora
     pelis_no_ganadoras1=sorted(set(pelis_no_ganadoras)) #eliminamos las opciones repetidas
     opciones=random.sample(pelis_no_ganadoras1, k=2) #lista de las dos opciones no ganadoras
-    opciones.append(op_ganadora[1]) #le agregamos la opcion correcta a la lista de opciones
-    lista=[op_ganadora[0],op_ganadora[1],opciones]
+    opciones.append(op_ganadora[1].lower()) #le agregamos la opcion correcta a la lista de opciones
+    lista=[op_ganadora[0], op_ganadora[1].capitalize(), [i.capitalize() for i in opciones]]
     random.shuffle(lista[2])
     return(lista)
 
@@ -65,21 +68,7 @@ def guardar_opciones (opciones):
             f.write(f"Opciones: {opciones}, Fecha y hora {formatted_datetime}\n")  #escribimos el archivo con los datos
     else:
         pass 
-def mostrar_opciones_seleccionadas(archivo):
-    """
-    Función que muestra el archivo que contiene el historial de las opciones elegidas, y en caso
-    de que no se encuentre ese achrivo cuando se lo quiere leer, lo crea.
-    """
-    try:
-        with open (archivo,"r") as f:
-            linea=f.readlines()                    #se lee el archivo con los datos
-            return(linea)                 #se muestra el historial
-    except FileNotFoundError:
-        with open ("data\registro de opciones selecionadas.txt","w") as f:   #excepción en el caso de que el historial esté vacío
-            f.write()
-def borrar_opciones (archivo):
-    with open (archivo,"w") as f:                 #se reescribe el archivo, dejandolo vacío
-        return(f.write(""))
+
 def guardar_datos_del_juego(nombre_de_usuario, calificacion, fecha_hora):
     """Función que toma estos tres parámetros y escribe linea por linea
 
@@ -91,6 +80,95 @@ def guardar_datos_del_juego(nombre_de_usuario, calificacion, fecha_hora):
     with open("./data/resultados_historicos.txt", "a") as f:
         f.write(f"Hola, {nombre_de_usuario}. {calificacion} y su partida inició el: {fecha_hora}\n")
 
+def borrar_opciones (archivo):
+    with open (archivo,"w") as f:                 #se reescribe el archivo, dejandolo vacío
+        return(f.write(""))
+    
+def mostrar_opciones_seleccionadas(archivo):
+    """
+    Función que muestra el archivo que contiene el historial de las opciones elegidas, y en caso
+    de que no se encuentre ese archivo cuando se lo quiere leer, lo crea.
+    """
+    try:
+        with open (archivo,"r") as f:
+            linea=f.readlines()                    #se lee el archivo con los datos
+            return(linea)                 #se muestra el historial
+    except FileNotFoundError:
+        with open ("data\registro de opciones selecionadas.txt","w") as f:   #excepción en el caso de que el historial esté vacío
+            f.write()
 
-if __name__=="_main":
-    pass
+def generar_grafica(lista_de_valores):
+    # Gráfico de líneas para aciertos y desaciertos en función de las fechas
+    fechas = [valor[2] for valor in lista_de_valores]  # Acceder al tercer elemento de cada tupla
+    aciertos = [valor[0] for valor in lista_de_valores]  # Acceder al primer elemento de cada tupla
+    desaciertos = [valor[1] for valor in lista_de_valores]  # Acceder al segundo elemento de cada tupla
+
+    plt.figure(figsize=(10, 5))
+    plt.plot(fechas, aciertos, label='Aciertos', marker='o', color='blue')  # Primera curva de aciertos
+    plt.plot(fechas, desaciertos, label='Desaciertos', marker='x', color='red')  # Segunda curva de desaciertos
+    plt.xlabel('Fechas de juego')
+    plt.ylabel('Cantidad')
+    plt.title('Aciertos y desaciertos acumulados por fecha de juego')
+    plt.legend()
+    plt.grid(True)
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+    imagen_base64 = base64.b64encode(buffer.getvalue()).decode()
+    buffer.close()     #convierte a formato imagen
+    plt.close()  # Limpiar la figura actual
+
+    return (imagen_base64)
+
+def generar_grafica_circular(lista_de_valores):
+    aciertos = [valor[0] for valor in lista_de_valores]  # Acceder al primer elemento de cada tupla
+    desaciertos = [valor[1] for valor in lista_de_valores]  # Acceder al segundo elemento de cada tupla
+    fig, ax = plt.subplots()
+    aciertos_totales = sum(aciertos)
+    desaciertos_totales = sum(desaciertos)
+    ax.pie([aciertos_totales, desaciertos_totales], labels=['Correcto', 'Incorrecto'], autopct='%1.1f%%')
+
+    # Convertir el gráfico a imagen PNG
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format="png")
+    imagen_circular_base64 = base64.b64encode(buffer.getvalue()).decode()
+    buffer.close()
+    plt.close()
+
+    return(imagen_circular_base64)
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_pdf import PdfPages
+
+def generar_graficas_pdf(lista_de_valores):
+    fechas = [valor[2] for valor in lista_de_valores]
+    aciertos = [valor[0] for valor in lista_de_valores]
+    desaciertos = [valor[1] for valor in lista_de_valores]
+
+    # Generar gráfica de líneas
+    fig, ax = plt.subplots(figsize=(10, 5))
+    ax.plot(fechas, aciertos, label='Aciertos', marker='o', color='blue')
+    ax.plot(fechas, desaciertos, label='Desaciertos', marker='x', color='red')
+    ax.set_xlabel('Fechas de juego')
+    ax.set_ylabel('Cantidad')
+    ax.set_title('Aciertos y desaciertos acumulados por fecha de juego')
+    ax.legend()
+    ax.grid(True)
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+
+    # Generar gráfica circular
+    fig, ax = plt.subplots()
+    aciertos_totales = sum(aciertos)
+    desaciertos_totales = sum(desaciertos)
+    ax.pie([aciertos_totales, desaciertos_totales], labels=['Correcto', 'Incorrecto'], autopct='%1.1f%%')
+
+    # Guardar ambas gráficas en el archivo PDF
+    with PdfPages("graficas.pdf") as pdf:
+        pdf.savefig(fig)  # Guardar gráfica de líneas
+        plt.close()
+
+        pdf.savefig()  # Guardar gráfica c
+
