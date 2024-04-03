@@ -32,14 +32,13 @@ def trivia (lista_de_pelis_y_frases,frases_utilizadas):
         lista_de_pelis_y_frases (lista): es una lista de tuplas en la cual cada tupla contiene 
         una frase y su pelicula, esta lista se obtuvo de abrir el archivo, leerlo.
 
-    Return:
+    Returns:
         Lista: es una lista que contiene:
         * En el índice 0 contiene la frase que se le muestra a la persona.
         * En el índice 1 contiene la opción de película correcta.
         * En el índice 2 contiene una lista con las dos opciones elegidas al azar y la correcta 
     """
     import random
-    
     op_ganadora=random.choice(lista_de_pelis_y_frases) #tupla con frase y pelicula ganadora
     while op_ganadora[0] in frases_utilizadas: # Verificar si la frase ya ha sido utilizada
         op_ganadora = random.choice(lista_de_pelis_y_frases)
@@ -80,13 +79,29 @@ def guardar_datos_del_juego(nombre_de_usuario, calificacion, fecha_hora):
         f.write(f"Hola, {nombre_de_usuario}. {calificacion} y su partida inició el: {fecha_hora}\n")
 
 def borrar_opciones (archivo):
+    """
+    Función que borra el contenido de un archivo.
+
+    Args:
+        archivo (str): La ruta del archivo que se desea borrar.
+
+    Returns:
+        archivo vacío.
+    """
     with open (archivo,"w") as f:                 #se reescribe el archivo, dejandolo vacío
         return(f.write(""))
     
 def mostrar_opciones_seleccionadas(archivo):
     """
-    Función que muestra el archivo que contiene el historial de las opciones elegidas, y en caso
-    de que no se encuentre ese archivo cuando se lo quiere leer, lo crea.
+    Función que muestra el contenido del archivo que contiene el historial de las opciones elegidas.
+    Si el archivo no existe, se crea.
+
+    Args:
+        archivo (str): La ruta del archivo que contiene el historial de opciones elegidas.
+
+    Returns:
+        list: Una lista de cadenas que representan cada línea del archivo, o una lista vacía si el archivo 
+        está vacío.
     """
     try:
         with open (archivo,"r") as f:
@@ -97,11 +112,20 @@ def mostrar_opciones_seleccionadas(archivo):
             f.write()
 
 def generar_grafica(lista_de_valores):
-    # Gráfico de líneas para aciertos y desaciertos en función de las fechas
+    """
+    Genera una gráfica lineal de aciertos y desaciertos en función de la fecha.
+
+    Args:
+        lista_de_valores (list): lista de tuplas, en la cual cada tupla tiene 3 elementos: en primer lugar, el
+        número de aciertos (int), en segundo lugar el número de desaciertos (int), y en tercer lugar la fecha
+        en la que se llevó a cabo esa partida en formato datetime.datetime.now().
+
+    Returns:
+        str: imagen codificada en base64 de la gráfica lineal de aciertos y desaciertos según la fecha.
+    """
     fechas = [valor[2] for valor in lista_de_valores]  # Acceder al tercer elemento de cada tupla
     aciertos = [valor[0] for valor in lista_de_valores]  # Acceder al primer elemento de cada tupla
     desaciertos = [valor[1] for valor in lista_de_valores]  # Acceder al segundo elemento de cada tupla
-
     plt.figure(figsize=(10, 5))
     plt.plot(fechas, aciertos, label='Aciertos', marker='o', color='blue')  # Primera curva de aciertos
     plt.plot(fechas, desaciertos, label='Desaciertos', marker='x', color='red')  # Segunda curva de desaciertos
@@ -122,6 +146,17 @@ def generar_grafica(lista_de_valores):
     return (imagen_base64)
 
 def generar_grafica_circular(lista_de_valores):
+    """
+    Genera una gráfica circular que muestra el porcentaje de aciertos y desaciertos.
+
+    Args:
+        lista_de_valores (list): lista de tuplas, en la cual cada tupla tiene 3 elementos: en primer lugar, el
+        número de aciertos (int), en segundo lugar el número de desaciertos (int), y en tercer lugar la fecha
+        en la que se llevó a cabo esa partida en formato datetime.datetime.now().
+
+    Returns:
+        str: imagen codificada en base64 de la gráfica circular.
+    """
     aciertos = [valor[0] for valor in lista_de_valores]  # Acceder al primer elemento de cada tupla
     desaciertos = [valor[1] for valor in lista_de_valores]  # Acceder al segundo elemento de cada tupla
     fig, ax = plt.subplots()
@@ -137,6 +172,15 @@ def generar_grafica_circular(lista_de_valores):
     return(imagen_circular_base64)
 
 def generar_graficas_pdf(lista_de_valores):
+    """
+    Genera un archivo PDF con dos gráficas: una gráfica de líneas que muestra la cantidad de aciertos y desaciertos
+    acumulados por fecha de juego, y una gráfica circular que muestra el porcentaje de aciertos y desaciertos.
+
+    Args:
+        lista_de_valores (list): lista de tuplas, en la cual cada tupla tiene 3 elementos: en primer lugar, el
+        número de aciertos (int), en segundo lugar el número de desaciertos (int), y en tercer lugar la fecha
+        en la que se llevó a cabo esa partida en formato datetime.datetime.now().
+    """
     fechas = [valor[2] for valor in lista_de_valores]
     aciertos = [valor[0] for valor in lista_de_valores]
     desaciertos = [valor[1] for valor in lista_de_valores]
@@ -163,6 +207,4 @@ def generar_graficas_pdf(lista_de_valores):
     with PdfPages("graficas.pdf") as pdf:
         pdf.savefig(fig)  # Guardar gráfica de líneas
         plt.close()
-
-        pdf.savefig()  # Guardar gráfica c
-
+        pdf.savefig()  # Guardar gráfica circular
