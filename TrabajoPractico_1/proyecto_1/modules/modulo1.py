@@ -1,8 +1,7 @@
 # módulo para organizar funciones o clases utilizadas en nuestro proyecto
 import matplotlib.pyplot as plt
 import io, datetime, base64 
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-import base64
+from matplotlib.backends.backend_pdf import PdfPages
 
 def mostrar_lista_peliculas (lista_de_pelis_y_frases):
     """
@@ -120,7 +119,6 @@ def generar_grafica(lista_de_valores):
     imagen_base64 = base64.b64encode(buffer.getvalue()).decode()
     buffer.close()     #convierte a formato imagen
     plt.close()  # Limpiar la figura actual
-
     return (imagen_base64)
 
 def generar_grafica_circular(lista_de_valores):
@@ -130,17 +128,13 @@ def generar_grafica_circular(lista_de_valores):
     aciertos_totales = sum(aciertos)
     desaciertos_totales = sum(desaciertos)
     ax.pie([aciertos_totales, desaciertos_totales], labels=['Correcto', 'Incorrecto'], autopct='%1.1f%%')
-
     # Convertir el gráfico a imagen PNG
     buffer = io.BytesIO()
     plt.savefig(buffer, format="png")
     imagen_circular_base64 = base64.b64encode(buffer.getvalue()).decode()
     buffer.close()
     plt.close()
-
     return(imagen_circular_base64)
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_pdf import PdfPages
 
 def generar_graficas_pdf(lista_de_valores):
     fechas = [valor[2] for valor in lista_de_valores]
