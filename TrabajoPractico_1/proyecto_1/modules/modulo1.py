@@ -52,21 +52,6 @@ def trivia (lista_de_pelis_y_frases,frases_utilizadas):
     random.shuffle(lista[2])
     return(lista)
 
-def guardar_opciones (opciones): #PARTE DE CONSOLA
-    """
-    Función que crea y escribe el archivo con la opción elegida junto con la fecha y la hora
-
-    Args:
-        opciones (int): el parámetro va a tomar el valor de la opción que elige la persona
-    """
-    if opciones >=1 and opciones <=5: #Solo se añaden las opciones que sean mayor igual a 1 y menor igual a 5.
-        current_datetime = datetime.datetime.now()  #proporciona fecha actual
-        formatted_datetime = current_datetime.strftime("%d/%m/%y %H:%M")  #le damos formato cadena de texto.
-        with open ("./data/registro de opciones selecionadas.txt","a") as f:
-            f.write(f"Opciones: {opciones}, Fecha y hora {formatted_datetime}\n")  #escribimos el archivo con los datos
-    else:
-        pass 
-
 def guardar_datos_del_juego(nombre_de_usuario, calificacion, fecha_hora):
     """Función que toma estos tres parámetros y escribe linea por linea
 
@@ -77,40 +62,7 @@ def guardar_datos_del_juego(nombre_de_usuario, calificacion, fecha_hora):
     """
     with open("./data/resultados_historicos.txt", "a") as f:
         f.write(f"Hola, {nombre_de_usuario}. {calificacion} y su partida inició el: {fecha_hora}\n")
-
-def borrar_opciones (archivo): #PARTE DE CONSOLA
-    """
-    Función que borra el contenido de un archivo.
-
-    Args:
-        archivo (str): La ruta del archivo que se desea borrar.
-
-    Returns:
-        archivo vacío.
-    """
-    with open (archivo,"w") as f: # Se reescribe el archivo, dejandolo vacío.
-        return(f.write(""))
     
-def mostrar_opciones_seleccionadas(archivo): #PARTE DE CONSOLA
-    """
-    Función que muestra el contenido del archivo que contiene el historial de las opciones elegidas.
-    Si el archivo no existe, se crea.
-
-    Args:
-        archivo (str): La ruta del archivo que contiene el historial de opciones elegidas.
-
-    Returns:
-        list: Una lista de cadenas que representan cada línea del archivo, o una lista vacía si el archivo 
-        está vacío.
-    """
-    try:
-        with open (archivo,"r") as f:
-            linea=f.readlines() #Se lee el archivo con los datos.
-            return(linea) #Se muestra el historial.
-    except FileNotFoundError:
-        with open ("data\registro de opciones selecionadas.txt","w") as f: #Excepción en el caso de que el historial esté vacío.
-            f.write()
-
 def generar_grafica(lista_de_valores):
     """
     Genera una gráfica lineal de aciertos y desaciertos en función de la fecha.
