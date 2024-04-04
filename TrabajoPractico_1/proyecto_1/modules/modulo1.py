@@ -1,6 +1,6 @@
 # Módulo para organizar funciones o clases utilizadas en nuestro proyecto
 import matplotlib.pyplot as plt
-import io, datetime, base64 
+import io, base64 
 from matplotlib.backends.backend_pdf import PdfPages
 
 def mostrar_lista_peliculas (lista_de_pelis_y_frases):
@@ -89,7 +89,7 @@ def generar_grafica(lista_de_valores):
     plt.grid(True)
     plt.xticks(rotation=45)
     plt.tight_layout()
-
+    # Codificacion base64 (devuelve str)
     buffer = io.BytesIO()
     plt.savefig(buffer, format='png')
     buffer.seek(0)
@@ -117,7 +117,7 @@ def generar_grafica_circular(lista_de_valores):
     aciertos_totales = sum(aciertos) 
     desaciertos_totales = sum(desaciertos)
     ax.pie([aciertos_totales, desaciertos_totales], labels=['Correcto', 'Incorrecto'], autopct='%1.1f%%')
-    # Convertir el gráfico a imagen PNG.
+    # Codificacion base64 (devuelve str)
     buffer = io.BytesIO()
     plt.savefig(buffer, format="png")
     imagen_circular_base64 = base64.b64encode(buffer.getvalue()).decode()
@@ -138,7 +138,6 @@ def generar_graficas_pdf(lista_de_valores):
     fechas = [valor[2] for valor in lista_de_valores]
     aciertos = [valor[0] for valor in lista_de_valores]
     desaciertos = [valor[1] for valor in lista_de_valores]
-
     # Generar gráfica de líneas.
     fig, ax = plt.subplots(figsize=(10, 5))
     ax.plot(fechas, aciertos, label='Aciertos', marker='o', color='blue')
@@ -150,15 +149,13 @@ def generar_graficas_pdf(lista_de_valores):
     ax.grid(True)
     plt.xticks(rotation=45)
     plt.tight_layout()
-
     # Generar gráfica circular.
     fig, ax = plt.subplots()
     aciertos_totales = sum(aciertos)
     desaciertos_totales = sum(desaciertos)
     ax.pie([aciertos_totales, desaciertos_totales], labels=['Correcto', 'Incorrecto'], autopct='%1.1f%%')
-
     # Guardar ambas gráficas en el archivo PDF.
     with PdfPages("graficas.pdf") as pdf:
-        pdf.savefig(fig)  # Guardar gráfica de líneas.
+        pdf.savefig(fig)  # Guardar gráfica circular.
         plt.close()
-        pdf.savefig()  # Guardar gráfica circular.
+        pdf.savefig()  # Guardar gráfica lineal.

@@ -1,6 +1,6 @@
 import datetime
 import matplotlib
-matplotlib.use('Agg')
+matplotlib.use('Agg') #se usa cuando se guardan gráficas en un archivo (matplot no interactivo)
 import matplotlib.pyplot as plt
 from flask import Flask, render_template, redirect, url_for, send_file, request
 from modules.modulo1 import trivia, guardar_datos_del_juego, mostrar_lista_peliculas, generar_grafica, generar_grafica_circular, generar_graficas_pdf
@@ -108,7 +108,6 @@ def ver_resultados_graficos():
     else: #Si no se muestra el siguiente mensaje.
         mensaje_error = "No hay datos disponibles para generar gráficas."
         return render_template("graficas.html", mensaje_error=mensaje_error)
-    
 
 @app.route("/lista_peliculas", methods=["GET", "POST"])
 def listar_peliculas():
