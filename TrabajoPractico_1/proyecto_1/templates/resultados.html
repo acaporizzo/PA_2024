@@ -19,8 +19,8 @@
 
             {% else %}
                 <ul>
-                    {% for i in resultados_partidas %}
-                        <li>{{ i }}</li>
+                    {% for i1, i2, i3 in resultados_partidas %}
+                        <li>Hola, {{ i1 }} . Su calificación es: {{ i2 }} y su partida inició el: {{ i3 }} </li>
                     {% endfor %}
                 </ul>
             {% endif %}

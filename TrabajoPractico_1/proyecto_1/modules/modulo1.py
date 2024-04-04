@@ -3,6 +3,10 @@ import matplotlib.pyplot as plt
 import io, base64 
 from matplotlib.backends.backend_pdf import PdfPages
 
+def lista_grafica(archivo):
+    with open ("./data/archivo.txt","r", encoding="utf-8")as a:
+        lista_para_graficar= a.readlines
+
 def mostrar_lista_peliculas (lista_de_pelis_y_frases):
     """
     Esta función recibe una lista con todos los datos y devuelve una lista de tuplas
@@ -61,14 +65,15 @@ def guardar_datos_del_juego(nombre_de_usuario, calificacion, fecha_hora):
         fecha_hora (str): fecha y hora en la que se inicializa la trivia
     """
     with open("./data/resultados_historicos.txt", "a") as f:
-        f.write(f"Hola, {nombre_de_usuario}. {calificacion} y su partida inició el: {fecha_hora}\n")
+        f.write(f"{nombre_de_usuario},{calificacion},{fecha_hora}\n")
+
     
 def generar_grafica(lista_de_valores):
     """
     Genera una gráfica lineal de aciertos y desaciertos en función de la fecha.
 
     Args:
-        lista_de_valores (list): lista de tuplas, en la cual cada tupla tiene 3 elementos: en primer lugar, el
+        lista_de_valores (list): lista, en la cual cada linea tiene 3 elementos: en primer lugar, el
         número de aciertos (int), en segundo lugar el número de desaciertos (int), y en tercer lugar la fecha
         en la que se llevó a cabo esa partida en formato datetime.datetime.now().
 
@@ -98,12 +103,13 @@ def generar_grafica(lista_de_valores):
     plt.close()  # Limpiar la figura actual.
     return (imagen_base64)
 
+
 def generar_grafica_circular(lista_de_valores):
     """
     Genera una gráfica circular que muestra el porcentaje de aciertos y desaciertos.
 
     Args:
-        lista_de_valores (list): lista de tuplas, en la cual cada tupla tiene 3 elementos: en primer lugar, el
+        lista_de_valores (list): lista, en la cual cada linea tiene 3 elementos: en primer lugar, el
         número de aciertos (int), en segundo lugar el número de desaciertos (int), y en tercer lugar la fecha
         en la que se llevó a cabo esa partida en formato datetime.datetime.now().
 
