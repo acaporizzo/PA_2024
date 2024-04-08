@@ -1,6 +1,6 @@
 # Módulo para organizar funciones o clases utilizadas en nuestro proyecto
 import matplotlib.pyplot as plt
-import io, base64 
+import io, base64, datetime
 from matplotlib.backends.backend_pdf import PdfPages
 
 def lista_grafica(archivo):
@@ -73,20 +73,40 @@ def generar_grafica(lista_de_valores):
     Genera una gráfica lineal de aciertos y desaciertos en función de la fecha.
 
     Args:
-        lista_de_valores (list): lista, en la cual cada linea tiene 3 elementos: en primer lugar, el
-        número de aciertos (int), en segundo lugar el número de desaciertos (int), y en tercer lugar la fecha
-        en la que se llevó a cabo esa partida en formato datetime.datetime.now().
+        lista_de_valores (list): lista, en la cual cada linea tiene 3 elementos:
+        [0]: nombre del jugador.
+        [1]: calificacion. 
+        [2]: fecha en la que se llevó a cabo esa partida en formato datetime.datetime.now().
 
     Returns:
         str: imagen codificada en base64 de la gráfica lineal de aciertos y desaciertos según la fecha.
     """
-    fechas = [valor[2] for valor in lista_de_valores]  # Acceder al tercer elemento de cada tupla.
-    aciertos = [valor[0] for valor in lista_de_valores]  # Acceder al primer elemento de cada tupla.
-    desaciertos = [valor[1] for valor in lista_de_valores]  # Acceder al segundo elemento de cada tupla.
+        # Crear un diccionario para almacenar los aciertos y desaciertos acumulados por fecha
+    resultados_por_fecha = {}
+
+    for valor in lista_de_valores:
+        fecha = datetime.datetime.strptime(valor[2], '%Y-%m-%d %H:%M:%S').date()  # Obtener solo la fecha (sin la hora)
+        aciertos, total_partidas = map(int, valor[1].split('/'))
+        desaciertos = total_partidas - aciertos
+        
+        if fecha not in resultados_por_fecha:
+            resultados_por_fecha[fecha] = [aciertos, desaciertos]
+        else:
+            resultados_por_fecha[fecha][0] += aciertos
+            resultados_por_fecha[fecha][1] += desaciertos
+    
+    fechas = list(resultados_por_fecha.keys())
+    fechas.sort()  # Ordenar las fechas
+
+    aciertos_acumulados = [resultados_por_fecha[fecha][0] for fecha in fechas]
+    desaciertos_acumulados = [resultados_por_fecha[fecha][1] for fecha in fechas]
+
+    # Formatear las fechas para mostrar solo el día y el mes
+    fechas_formateadas = [fecha.strftime('%d-%m-%Y') for fecha in fechas]  
+
     plt.figure(figsize=(10, 5))
-    plt.plot(fechas, aciertos, label='Aciertos', marker='o', color='blue')  # Primera curva de aciertos.
-    plt.plot(fechas, desaciertos, label='Desaciertos', marker='x', color='red')  # Segunda curva de desaciertos.
-    # Nombramos los ejes 
+    plt.plot(fechas_formateadas, aciertos_acumulados, label='Aciertos', marker='o', color='blue')
+    plt.plot(fechas_formateadas, desaciertos_acumulados, label='Desaciertos', marker='x', color='red')
     plt.xlabel('Fechas de juego')
     plt.ylabel('Cantidad')
     plt.title('Aciertos y desaciertos acumulados por fecha de juego')
@@ -94,13 +114,15 @@ def generar_grafica(lista_de_valores):
     plt.grid(True)
     plt.xticks(rotation=45)
     plt.tight_layout()
-    # Codificacion base64 (devuelve str)
+
+    # Codificación base64 (devuelve str)
     buffer = io.BytesIO()
     plt.savefig(buffer, format='png')
     buffer.seek(0)
     imagen_base64 = base64.b64encode(buffer.getvalue()).decode()
-    buffer.close() # Convierte a formato imagen.
-    plt.close()  # Limpiar la figura actual.
+    buffer.close()
+    plt.close()  
+
     return (imagen_base64)
 
 
@@ -116,8 +138,9 @@ def generar_grafica_circular(lista_de_valores):
     Returns:
         str: imagen codificada en base64 de la gráfica circular.
     """
-    aciertos = [valor[0] for valor in lista_de_valores]  # Acceder al primer elemento de cada tupla.
-    desaciertos = [valor[1] for valor in lista_de_valores]  # Acceder al segundo elemento de cada tupla.
+    calificacion=[valor[1].split('/') for valor in lista_de_valores]
+    aciertos = [int(i[0]) for i in calificacion]  # Acceder al primer elemento de cada tupla.
+    desaciertos = [int(i[1])-int(i[0]) for i in calificacion]  # Acceder al segundo elemento de cada tupla.
     fig, ax = plt.subplots()
     # Sumamos el total de aciertos y desaciertos.
     aciertos_totales = sum(aciertos) 

@@ -13,7 +13,7 @@ lista = [] #Donde se guardan los datos de la función trivia [frase, peli ganado
 nombre_de_usuario = "" 
 numero_de_opciones = 3 #Lo inicializamos en 3 para que no nos muestre el mensaje.
 respuesta = None  #Es la respuesta que se muestra para cada opcion.
-resultados_partidas = [] #Guarda una línea con los resultados de la trivia.
+ #Guarda una línea con los resultados de la trivia.
 valores=[]
 
 RUTA ="./data/"
@@ -25,12 +25,12 @@ with open (DIRECCION, "r",encoding="utf-8") as f: # lee el archivo con frases y 
     frases_y_pelis=[(linea.strip().split(';')[0], linea.strip().split(';')[1]) for linea in lista1]
 
 try:
-    with open ("./data/resultados_historicos_graficas.txt", "r",encoding="utf-8") as a: 
+    with open ("./data/resultados_historicos.txt", "r",encoding="utf-8") as a: 
         lista_para_graficar=a.readlines()
-        lista_para_graficar1=[(linea.strip().split(';')[0], linea.strip().split(';')[1],linea.strip().split(';')[2]) for linea in lista_para_graficar]
+        lista_para_graficar1=[(linea.strip().split(',')[0], linea.strip().split(',')[1],linea.strip().split(',')[2]) for linea in lista_para_graficar]
 except FileNotFoundError:
-    with open ("./data/resultados_historicos_graficas.txt", "w",encoding="utf-8") as a: 
-        lista_para_graficar=a.write()
+    with open ("./data/resultados_historicos.txt", "w",encoding="utf-8") as a: 
+        pass
 
 @app.route("/",methods=["GET", "POST"]) 
 def home():
@@ -89,6 +89,7 @@ def respuestas():
 @app.route("/resultados", methods=["GET", "POST"])
 def ver_resultados():
     global advertencia, archivo_vacio, resultados_partidas
+    resultados_partidas = []
     advertencia = "No hay resultados para mostrar ya que todavía no empezó la trivia"
     #Manejo de excepciones en el caso de que el archivo no se encuentre creado.
     try: 
