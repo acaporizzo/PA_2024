@@ -1,5 +1,4 @@
-import datetime
-import matplotlib
+import datetime, matplotlib
 matplotlib.use('Agg') #se usa cuando se guardan gráficas en un archivo (matplot no interactivo)
 from flask import Flask, render_template, redirect, url_for, send_file, request
 from modules.modulo1 import trivia, guardar_datos_del_juego, mostrar_lista_peliculas, generar_grafica, generar_grafica_circular, generar_graficas_pdf
@@ -67,7 +66,7 @@ def jugar_trivia():
     
 @app.route("/respuestas", methods=["GET", "POST"])
 def respuestas():
-    global aciertos, calificacion,fecha_hora_dt, numero_de_opciones, opcion_elegida, respuesta,valores
+    global aciertos, calificacion, numero_de_opciones, opcion_elegida, respuesta,valores
     if request.method == 'POST':
         opcion_elegida = request.form['opcion_elegida']
     
@@ -121,6 +120,7 @@ def listar_peliculas():
 
 @app.route('/mostrar_graficas_pdf')
 def mostrar_graficas_pdf():
+    global lista_para_graficar1
     generar_graficas_pdf(lista_para_graficar)  # Genera las gráficas y luego las guarda en un archivo PDF.
     return send_file("graficas.pdf", as_attachment=True) #Se envia el archivo cuando el usuario seleccione el botón
 
