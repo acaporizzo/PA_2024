@@ -1,4 +1,5 @@
-import datetime, matplotlib
+import matplotlib
+import datetime
 matplotlib.use('Agg') #se usa cuando se guardan gráficas en un archivo (matplot no interactivo)
 from flask import Flask, render_template, redirect, url_for, send_file, request
 from modules.modulo1 import trivia, guardar_datos_del_juego, mostrar_lista_peliculas, generar_grafica, generar_grafica_circular, generar_graficas_pdf
@@ -26,14 +27,14 @@ with open (DIRECCION, "r",encoding="utf-8") as f: # lee el archivo con frases y 
 try:
     with open ("./data/resultados_historicos.txt", "r",encoding="utf-8") as a: 
         lista_para_graficar=a.readlines()
-        lista_para_graficar1=[(linea.strip().split(',')[0], linea.strip().split(',')[1],linea.strip().split(',')[2]) for linea in lista_para_graficar]
+        lista_para_graficar1=[(linea.strip().split(',')[0], linea.strip().split(',')[1],datetime.datetime.strptime(linea.strip().split(',')[2], '%Y-%m-%d %H:%M:%S')) for linea in lista_para_graficar]
 except FileNotFoundError:
     with open ("./data/resultados_historicos.txt", "w",encoding="utf-8") as a: 
         pass
 
 @app.route("/",methods=["GET", "POST"]) 
 def home():
-    global aciertos, contador_repeticiones, fecha_hora, fecha_hora_dt, archivo_vacio, mensaje, nombre_de_usuario, numero_de_opciones
+    global aciertos, contador_repeticiones, fecha_hora, archivo_vacio, mensaje, nombre_de_usuario, numero_de_opciones
     mensaje = "El número de opciones debe estar entre 3 y 10."
 
     if request.method == 'POST':
@@ -80,9 +81,8 @@ def respuestas():
         respuesta=(f"¡Incorrecta!, la respuesta correcta es: {lista[1]}.")
 
     if contador_repeticiones == numero_de_opciones: #Cuando se termina la trivia se guardan los datos en un archivo .txt
-        #valores=[aciertos,numero_de_opciones-aciertos,fecha_hora]
         #Se guardan los datos necesarios para graficar.
-        guardar_datos_del_juego(nombre_de_usuario, calificacion, fecha_hora)#, valores)
+        guardar_datos_del_juego(nombre_de_usuario, calificacion, fecha_hora)
     return render_template("respuestas.html", respuesta=respuesta,calificacion=calificacion, contador_repeticiones=contador_repeticiones, numero_de_opciones=numero_de_opciones)
 
 @app.route("/resultados", methods=["GET", "POST"])
@@ -104,8 +104,15 @@ def ver_resultados():
 
 @app.route("/graficas", methods=["GET", "POST"])
 def ver_resultados_graficos():
-    global grafica, grafica_circular, lista_para_graficar1
-    if lista_para_graficar: #Si la lista no se encuentra vacía se van a utilizar las funciones para graficar.
+    global grafica, grafica_circular
+    try:
+        with open ("./data/resultados_historicos.txt", "r",encoding="utf-8") as a: 
+            lista_para_graficar=a.readlines()
+            lista_para_graficar1=[(linea.strip().split(',')[0], linea.strip().split(',')[1],datetime.datetime.strptime(linea.strip().split(',')[2], '%Y-%m-%d %H:%M:%S')) for linea in lista_para_graficar]
+    except FileNotFoundError:
+        with open ("./data/resultados_historicos.txt", "w",encoding="utf-8") as a: 
+            pass
+    if lista_para_graficar1: #Si la lista no se encuentra vacía se van a utilizar las funciones para graficar.
         grafica = generar_grafica(lista_para_graficar1)
         grafica_circular = generar_grafica_circular(lista_para_graficar1)
         return render_template("graficas.html", grafica=grafica, grafica_circular=grafica_circular)
@@ -121,7 +128,7 @@ def listar_peliculas():
 @app.route('/mostrar_graficas_pdf')
 def mostrar_graficas_pdf():
     global lista_para_graficar1
-    generar_graficas_pdf(lista_para_graficar)  # Genera las gráficas y luego las guarda en un archivo PDF.
+    generar_graficas_pdf(lista_para_graficar1)  # Genera las gráficas y luego las guarda en un archivo PDF.
     return send_file("graficas.pdf", as_attachment=True) #Se envia el archivo cuando el usuario seleccione el botón
 
 if __name__=="__main__":

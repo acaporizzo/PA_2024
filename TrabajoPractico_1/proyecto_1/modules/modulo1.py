@@ -2,10 +2,7 @@
 import matplotlib.pyplot as plt
 import io, base64, datetime
 from matplotlib.backends.backend_pdf import PdfPages
-
-def lista_grafica(archivo):
-    with open ("./data/archivo.txt","r", encoding="utf-8")as a:
-        lista_para_graficar= a.readlines
+from datetime import datetime
 
 def mostrar_lista_peliculas (lista_de_pelis_y_frases):
     """
@@ -81,11 +78,11 @@ def generar_grafica(lista_de_valores):
     Returns:
         str: imagen codificada en base64 de la gráfica lineal de aciertos y desaciertos según la fecha.
     """
-    # Crear un diccionario para almacenar los aciertos y desaciertos acumulados por fecha
     resultados_por_fecha = {}
 
     for valor in lista_de_valores:
-        fecha = datetime.datetime.strptime(valor[2], '%Y-%m-%d %H:%M:%S').date()  # Obtener solo la fecha (sin la hora)
+        #fecha, hora = valor[2].split(" ")  # Obtener solo la fecha (sin la hora)
+        fecha = valor[2].date() #datetime.strptime(fecha, '%Y-%m-%d').date()
         aciertos, total_partidas = map(int, valor[1].split('/'))
         desaciertos = total_partidas - aciertos
         
@@ -120,7 +117,6 @@ def generar_grafica(lista_de_valores):
     plt.close()  
 
     return (imagen_base64)
-
 
 def generar_grafica_circular(lista_de_valores):
     """
@@ -160,12 +156,14 @@ def generar_graficas_pdf(lista_de_valores):
         número de aciertos (int), en segundo lugar el número de desaciertos (int), y en tercer lugar la fecha
         en la que se llevó a cabo esa partida en formato datetime.datetime.now().
     """
-# Crear un diccionario para almacenar los aciertos y desaciertos acumulados por fecha
+
     resultados_por_fecha = {}
+
 
     for valor in lista_de_valores:
         
-        fecha = datetime.datetime.strptime(valor[2], '%Y-%m-%d %H:%M:%S').date()  # Obtener solo la fecha (sin la hora)
+        #fecha, hora = valor[2].split(" ")  # Obtener solo la fecha (sin la hora)
+        fecha = valor[2].date()#datetime.strptime(fecha, '%Y-%m-%d').date()
         aciertos, total_partidas = map(int, valor[1].split('/'))
         desaciertos = total_partidas - aciertos
         
@@ -180,7 +178,7 @@ def generar_graficas_pdf(lista_de_valores):
     aciertos_acumulados = [resultados_por_fecha[fecha][0] for fecha in fechas]
     desaciertos_acumulados = [resultados_por_fecha[fecha][1] for fecha in fechas]
     # Formatear las fechas para mostrar solo el día y el mes
-    fechas_formateadas = [fecha.strftime('%d-%m-%Y') for fecha in fechas]  
+    fechas_formateadas = [fecha.strftime('%d-%m-%Y') for fecha in fechas] 
     # Generar gráfica de líneas.
     fig1 = plt.figure(figsize=(10, 5))
     plt.plot(fechas_formateadas, aciertos_acumulados, label='Aciertos', marker='o', color='blue')
@@ -203,8 +201,11 @@ def generar_graficas_pdf(lista_de_valores):
     desaciertos_totales = sum(desaciertos)
     ax.pie([aciertos_totales, desaciertos_totales], labels=['Correcto', 'Incorrecto'], autopct='%1.1f%%')
     # Guardar ambas gráficas en el archivo PDF.
+
+    # Guardar ambas gráficas en el archivo PDF.
     with PdfPages("graficas.pdf") as pdf:
         pdf.savefig(fig2)  # Guardar gráfica circular.
-        plt.close(fig2)
         pdf.savefig(fig1)  # Guardar gráfica lineal.
-        plt.close(fig1)
+    # Cerrar las figuras antes de guardarlas en el PDF.
+    plt.close(fig2)
+    plt.close(fig1)
