@@ -64,7 +64,6 @@ def guardar_datos_del_juego(nombre_de_usuario, calificacion, fecha_hora):
     with open("./data/resultados_historicos.txt", "a") as f:
         f.write(f"{nombre_de_usuario},{calificacion},{fecha_hora}\n")
 
-    
 def generar_grafica(lista_de_valores):
     """
     Genera una gráfica lineal de aciertos y desaciertos en función de la fecha.
