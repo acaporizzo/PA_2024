@@ -8,13 +8,12 @@ aciertos = 0
 app = Flask("server")
 archivo_vacio = False #Se inicializa en false porque el archivo tiene que mostrarse.
 contador_repeticiones = 0 #Contador de cuantas preguntas lleva jugando.
-frases_utilizadas = [] #Lista donde se guardan las frases que se utilizaron en una trivia.
+frases_utilizadas = [] #Lista donde se guardan las frases que ya se utilizaron en una trivia.
 lista = [] #Donde se guardan los datos de la función trivia [frase, peli ganadora, opciones de peli].
 nombre_de_usuario = "" 
 numero_de_opciones = 3 #Lo inicializamos en 3 para que no nos muestre el mensaje.
 respuesta = None  #Es la respuesta que se muestra para cada opcion.
- #Guarda una línea con los resultados de la trivia.
-valores=[]
+valores=[] #Guarda una línea con los resultados de la trivia.
 
 RUTA ="./data/"
 DIRECCION = RUTA + "frases_de_peliculas.txt"
@@ -23,10 +22,10 @@ with open (DIRECCION, "r",encoding="utf-8") as f: # lee el archivo con frases y 
                                                   # va a pasar como parametro de la función trivia.
     lista1=f.readlines()
     frases_y_pelis=[(linea.strip().split(';')[0], linea.strip().split(';')[1]) for linea in lista1]
-
 try:
     with open ("./data/resultados_historicos.txt", "r",encoding="utf-8") as a: 
         lista_para_graficar=a.readlines()
+        #Separamos por comas los valores para poder usarlos más fácil en las funciones:
         lista_para_graficar1=[(linea.strip().split(',')[0], linea.strip().split(',')[1],datetime.datetime.strptime(linea.strip().split(',')[2], '%Y-%m-%d %H:%M:%S')) for linea in lista_para_graficar]
 except FileNotFoundError:
     with open ("./data/resultados_historicos.txt", "w",encoding="utf-8") as a: 
@@ -50,7 +49,7 @@ def home():
             return render_template("home.html", mensaje=mensaje, numero_de_opciones=numero_de_opciones)
         
     aciertos = 0
-    archivo_vacio=False #Se dstablece que el archivo no está vacío.
+    archivo_vacio=False #Se establece que el archivo no está vacío.
     contador_repeticiones = 0
     frases_utilizadas.clear() #Se eliminan los elementos de la lista.
     return render_template("home.html", mensaje=mensaje, numero_de_opciones=numero_de_opciones)
@@ -70,7 +69,6 @@ def respuestas():
     global aciertos, calificacion, numero_de_opciones, opcion_elegida, respuesta,valores
     if request.method == 'POST':
         opcion_elegida = request.form['opcion_elegida']
-    
     #Se compara la opción elegida con la correcta.
     if opcion_elegida == lista[1]:
         aciertos+=1
@@ -79,8 +77,8 @@ def respuestas():
     else:
         calificacion=(f"{aciertos}/{numero_de_opciones}")
         respuesta=(f"¡Incorrecta!, la respuesta correcta es: {lista[1]}.")
-
-    if contador_repeticiones == numero_de_opciones: #Cuando se termina la trivia se guardan los datos en un archivo .txt
+    #Cuando se termina la trivia se guardan los datos en un archivo .txt
+    if contador_repeticiones == numero_de_opciones:
         #Se guardan los datos necesarios para graficar.
         guardar_datos_del_juego(nombre_de_usuario, calificacion, fecha_hora)
     return render_template("respuestas.html", respuesta=respuesta,calificacion=calificacion, contador_repeticiones=contador_repeticiones, numero_de_opciones=numero_de_opciones)
@@ -95,8 +93,8 @@ def ver_resultados():
         with open ("./data/resultados_historicos.txt", "r") as f:
             for linea in f:
                 resultados_partidas.append(linea.split(","))
-            if not resultados_partidas: #Si la lista de info de la partida esta vacía  
-                archivo_vacio = True    #cambia a True y se muestra la advertiencia.
+            if not resultados_partidas: #Si la lista de info de la partida esta vacía.
+                archivo_vacio = True    #Cambia a True y se muestra la advertiencia.
                 advertencia = "No hay resultados para mostrar ya que todavía no empezó la trivia"
     except FileNotFoundError: #Si el archivo no fue creado todavía, se cambia a True.
         archivo_vacio = True
@@ -106,7 +104,7 @@ def ver_resultados():
 def ver_resultados_graficos():
     global grafica, grafica_circular
     try:
-        with open ("./data/resultados_historicos.txt", "r",encoding="utf-8") as a: 
+        with open ("./data/resultados_historicos.txt", "r",encoding="utf-8") as a: #Leemos el archivo otra vez para actualizar con los nuevos resultados
             lista_para_graficar=a.readlines()
             lista_para_graficar1=[(linea.strip().split(',')[0], linea.strip().split(',')[1],datetime.datetime.strptime(linea.strip().split(',')[2], '%Y-%m-%d %H:%M:%S')) for linea in lista_para_graficar]
     except FileNotFoundError:
@@ -116,7 +114,7 @@ def ver_resultados_graficos():
         grafica = generar_grafica(lista_para_graficar1)
         grafica_circular = generar_grafica_circular(lista_para_graficar1)
         return render_template("graficas.html", grafica=grafica, grafica_circular=grafica_circular)
-    else: #Si no se muestra el siguiente mensaje.
+    else: #Si no hay lista aún se muestra el siguiente mensaje.
         mensaje_error = "No hay datos disponibles para generar gráficas."
         return render_template("graficas.html", mensaje_error=mensaje_error)
 
@@ -128,7 +126,14 @@ def listar_peliculas():
 @app.route('/mostrar_graficas_pdf')
 def mostrar_graficas_pdf():
     global lista_para_graficar1
-    generar_graficas_pdf(lista_para_graficar1)  # Genera las gráficas y luego las guarda en un archivo PDF.
+    try:
+        with open ("./data/resultados_historicos.txt", "r",encoding="utf-8") as a: #Leemos el archivo otra vez para actualizar con los nuevos resultados
+            lista_para_graficar=a.readlines()
+            lista_para_graficar1=[(linea.strip().split(',')[0], linea.strip().split(',')[1],datetime.datetime.strptime(linea.strip().split(',')[2], '%Y-%m-%d %H:%M:%S')) for linea in lista_para_graficar]
+    except FileNotFoundError:
+        with open ("./data/resultados_historicos.txt", "w",encoding="utf-8") as a: 
+            pass
+    generar_graficas_pdf(lista_para_graficar1)  #Genera las gráficas y luego las guarda en un archivo PDF.
     return send_file("graficas.pdf", as_attachment=True) #Se envia el archivo cuando el usuario seleccione el botón
 
 if __name__=="__main__":
