@@ -27,8 +27,3 @@ class Cinta_Transportadora:
             alimento = Zanahoria(peso_alimento)
 
         return(alimento)
-    
-if __name__ == "__main__":
-    cinta=Cinta_Transportadora()
-    alimento=cinta.clasificar_alimento()
-    print(alimento)

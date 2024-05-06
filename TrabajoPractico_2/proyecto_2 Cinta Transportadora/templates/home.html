@@ -25,15 +25,16 @@
             </form>
         </div>
         <p> aw FRUTAS: {{awf if awf else 0}}</p>
-        <p style="{% if awk > 0.95 %} color: #d71e4f ; {% endif %}"> aw KIWIS: {{ awk if awk else 0 }}</p>
-        <p style="{% if awm > 0.95 %} color: #d71e4f ; {% endif %}"> aw MANZANAS: {{awm if awm else 0}}</p>
+        <p style="{% if awk > 0.90 %} color: #d71e4f ; {% endif %}"> aw KIWIS: {{ awk if awk else 0 }}</p>
+        <p style="{% if awm > 0.90 %} color: #d71e4f ; {% endif %}"> aw MANZANAS: {{awm if awm else 0}}</p>
         <p> aw VERDURAS: {{awv if awv else 0}}</p>
-        <p style="{% if awp > 0.95 %} color: #d71e4f; {% endif %}"> aw PAPAS: {{awp if awp else 0}}</p>
-        <p style="{% if awz > 0.95 %} color: #d71e4f; {% endif %}"> aw ZANAHORIAS: {{awz if awz else 0}}</p>
+        <p style="{% if awp > 0.90 %} color: #d71e4f; {% endif %}"> aw PAPAS: {{awp if awp else 0}}</p>
+        <p style="{% if awz > 0.90 %} color: #d71e4f; {% endif %}"> aw ZANAHORIAS: {{awz if awz else 0}}</p>
         <p> aw TOTAL: {{awt if awt else 0}}</p>
+        <p> Peso total del cajón: {{ peso_total }} kg</p>
     </div>
     <div class="center-text">
-        {% if (awk > 0.95) or (awm > 0.95) or (awp > 0.95) or (awz > 0.95) or (awf > 0.95) or (awv > 0.95) or (awt > 0.95) %}
+        {% if (awk > 0.90) or (awm > 0.90) or (awp > 0.90) or (awz > 0.90) or (awf > 0.90) or (awv > 0.90) or (awt > 0.90) %}
         Se recomienda inspección del cajón.
         {% endif %}
     </div>

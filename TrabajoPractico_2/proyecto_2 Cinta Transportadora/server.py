@@ -1,7 +1,7 @@
 from modules.alimentos import Kiwi,Manzana, Papa, Zanahoria, Fruta, Verdura, Alimentos
 from modules.cajon import Cajon
 from modules.cinta_transportadora import Cinta_Transportadora
-from modules.calculador_aw import calcular_aw_promedio
+from modules.calculador import calcular_aw_promedio, calcular_peso
 from flask import Flask, render_template,request
 app = Flask(__name__)
 
@@ -31,8 +31,16 @@ def home():
     "aw_total": round(calcular_aw_promedio(Alimentos,cajon),2),
     }
     
+    peso_total = round(calcular_peso(cajon),2)
 
-    return render_template("home.html",awk=diccionario_de_aw_promedio["aw_kiwi"], awm=diccionario_de_aw_promedio["aw_manzana"], awp=diccionario_de_aw_promedio["aw_papa"], awz=diccionario_de_aw_promedio["aw_zanahoria"], awf=diccionario_de_aw_promedio["aw_frutas"], awv=diccionario_de_aw_promedio["aw_verduras"], awt=diccionario_de_aw_promedio["aw_total"])
+    return render_template("home.html",awk=diccionario_de_aw_promedio["aw_kiwi"], 
+                        awm=diccionario_de_aw_promedio["aw_manzana"],
+                        awp=diccionario_de_aw_promedio["aw_papa"], 
+                        awz=diccionario_de_aw_promedio["aw_zanahoria"], 
+                        awf=diccionario_de_aw_promedio["aw_frutas"], 
+                        awv=diccionario_de_aw_promedio["aw_verduras"], 
+                        awt=diccionario_de_aw_promedio["aw_total"],
+                        peso_total=peso_total)
 
 if __name__ == "__main__":
     app.run(debug=True)
