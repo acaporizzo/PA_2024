@@ -1,5 +1,4 @@
-from modules.alimentos import Kiwi, Manzana, Papa, Zanahoria
-from modules.cinta_transportadora import Cinta_Transportadora
+
 #from modules.calculador_aw import calcular_aw_promedio
 class Cajon:
     def __init__(self):
@@ -31,19 +30,5 @@ class Cajon:
     
     def __len__(self):
         return len(self._alimentos)
-    
-if __name__ == "__main__":
 
-    from modules.calculador_aw import calcular_aw_promedio
-    cinta=Cinta_Transportadora()
-    alimento1=cinta.clasificar_alimento()
-    alimento2=cinta.clasificar_alimento()
-    cajon=Cajon()
-    cajon.agregar_alimento(alimento1)
-    cajon.agregar_alimento(alimento2)
-    contador=cajon.contar_alimentos()
-    for alimento in cajon:
-        print(alimento)
-    print(contador)
-    print(calcular_aw_promedio(Kiwi,cajon))
 
