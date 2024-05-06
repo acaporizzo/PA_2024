@@ -1,89 +1,81 @@
 from modules.curso import Curso
-from modules.facultad import Facultad
+from modules.departamento import Departamento 
 from modules.persona_facultativa import Estudiante, Profesor
+from modules.facultad import Facultad
 
-#instanciamos objetos para probar las relaciones:
-primer_profesor = Profesor("Diana","Vertiz","31287332") 
-facultad = Facultad("FIUNER","Dpto Programación",primer_profesor)
-segundo_profesor = Profesor("Jordán","Insfrán","45387332")
-tercer_profesor = Profesor("Leandro","Escher","45387555")
-cuarto_profesor = Profesor("Liliana","Taborda","45387777")
-primer_estudiante = Estudiante("Agustina","Wiesner","45387444")
-segundo_estudiante = Estudiante("Ana Clara","Polari","45387333")
-primer_curso = Curso("Álgebra")
-segundo_curso = Curso("Programación Avanzada")
-tercer_curso = Curso("Ecuaciones Diferenciales")
+primer_profesor = None
+facultad = None
 
-#creamos otro departamento y mostramos todos los departamentos de la facultad:
-facultad.crear_departamento("Dpto Matemática",cuarto_profesor)
-print("Los departamentos de la facultad son: ")
-for i,depto in enumerate(facultad.departamentos):
-    print(i+1,depto)
+with open("data/datos.txt", 'r') as archi:
+    for linea in archi:
+        datos = linea.strip().split(",")
+        tipo = datos[0]
+        nombre = datos[1]
+        apellido = datos[2]
+        dni = datos[3]
+        if tipo == 'Profesor':
+            profesor = Profesor(nombre, apellido, dni)
+            if primer_profesor is None:
+                primer_profesor = profesor
+                facultad = Facultad("FI UNER", "Dpto Programación", primer_profesor) #preguntar si podemos crear la facu asi
+                facultad.contratar_profesor(profesor)
+            else:
+                facultad.contratar_profesor(profesor)
+        elif tipo == 'Estudiante':
+            estudiante = Estudiante(nombre, apellido, dni)
+            facultad.inscribir_estudiante(estudiante)
 
-#la facultad asigna un departamento a cada profesor:
-facultad.atribuir_dpto_a_profesor(segundo_profesor, "Dpto Programación")
-facultad.atribuir_dpto_a_profesor(tercer_profesor, "Dpto Matemática")
-facultad.atribuir_dpto_a_profesor(cuarto_profesor, "Dpto Matemática")
+texto = """
+########################################
+# Sistema de información universitaria #
+########################################
+Las opciones son:
+1 - Inscribir alumno.
+2 - Contratar profesor.
+3 - Crear departamento nuevo.
+4 - Crear curso nuevo.
+5 - Inscribir estudiante a un curso.
+6 - Salir.
+"""
 
-#mostramos LOS departamentos a los que pertenece UN profesor:
-print(f"El profesor {segundo_profesor} pertenece a el/los siguiente/s departamento/s: ")
-for i,depto in enumerate(segundo_profesor._dptos_del_profesor):
-    print(i+1,depto)
+print(texto)
+opcion = int(input("Elige una opción: "))
+while opcion != 6:
 
-#mostramos LOS profesores que pertenecen a UN departamento:
-print("Los profesores del departamento son: ")
-for i,profesor in enumerate(facultad.devolver_profesores_de_dpto("Dpto Programación")):
-    print(i+1,profesor)
+    if opcion == 1:
+        nombre_estudiante = input("Ingrese el nombre del estudiante: ")
+        apellido_estudiante = input("Ingrese el apellido del estudiante: ")
+        dni_estudiante = input("Ingrese el dni del estudiante: ")
+        estudiante = Estudiante(nombre_estudiante, apellido_estudiante, dni_estudiante)
+        facultad.inscribir_estudiante(estudiante)
+        print("Los estudiantes de la facultad son: ")
+        for i, estudiante in enumerate(facultad.estudiantes):
+            print(i+1, estudiante)
 
-#definimos UN profesor del departamento como director SOLO DE ESE departamento y lo mostramos:
-facultad.atribuir_director_a_dpto(primer_profesor, "Dpto Programación")
-facultad.atribuir_director_a_dpto(segundo_profesor, "Dpto Programación")   #prueba para cambiar el director y que se muestre solo uno
-director = facultad.devolver_director_de_dpto("Dpto Programación")
-print(f"El director es: {director}")
+    if opcion == 2:
+        nombre_profesor = input("Ingrese el nombre del profesor: ")
+        apellido_profesor = input("Ingrese el apellido del profesor: ")
+        dni_profesor = input("Ingrese el dni del profesor: ")
+        profesor = Profesor(nombre_profesor, apellido_profesor, dni_profesor)
+        facultad.contratar_profesor(profesor)
+        print("Los profesores de la facultad son: ")
+        for i, profesor in enumerate(facultad.profesores):
+            print(i+1, profesor)
 
-#inscribimos estudiantes desde la facultad y los mostramos:
-facultad.inscribir_estudiante(primer_estudiante)
-facultad.inscribir_estudiante(segundo_estudiante)
-print("Los estudiantes de la facultad son: ")
-for i,estudiante in enumerate(facultad.estudiantes):
-    print(i+1,estudiante)
+    if opcion == 3:
+        nombre_dpto = input("Ingrese el nombre del nuevo departamento: ")
+        print("Los profesores de la facultad son: ")
+        for i, profesor in enumerate(facultad.profesores):
+            print(i+1, profesor)
+        num_profesor_elegido = int(input("Ingrese el número que corresponde al director del nuevo departamento: "))
+        profesor_director = facultad.profesores[num_profesor_elegido-1]
+        facultad.crear_departamento(nombre_dpto,profesor_director)
+        facultad.atribuir_director_a_dpto(profesor_director,nombre_dpto) #ver esto
+        print("Los departamentos de la facultad son: ")
+        for i, dpto in enumerate(facultad.departamentos):
+            print(i+1, dpto)
 
-#desde facultad agregamos UNO O MÁS cursos a UN departamento y mostramos los cursos de un dpto:
-facultad.atribuir_curso_al_dpto(primer_curso,"Dpto Matemática")
-facultad.atribuir_curso_al_dpto(tercer_curso,"Dpto Matemática")
-print ("Los cursos del departamento son: ")
-for i,cursos in enumerate(facultad.devolver_cursos_de_dpto("Dpto Matemática")):
-    print(i+1,cursos)
+    #if opcion == 4:
 
-#mostramos el departamento al que pertenece un curso:
-print(f"{primer_curso} pertenece a {primer_curso.dpto_del_curso}")
-
-#agregamos UNO O MÁS estudiantes a UNO O MÁS cursos:
-primer_curso.agregar_estudiante_al_curso(primer_estudiante)
-primer_curso.agregar_estudiante_al_curso(segundo_estudiante)
-segundo_curso.agregar_estudiante_al_curso(primer_estudiante)
-
-#mostramos LOS cursos a los que asiste UN estudiante:
-print(f"Los cursos a los que asiste {primer_estudiante} son: ")
-for i,cursos in enumerate(primer_estudiante.cursos_del_estudiante):
-    print(i+1,cursos)
-
-#mostramos LOS estudiantes de UN curso:
-print(f"Los estudiantes que asisten a {primer_curso} son: ")
-for i,estudiantes in enumerate(primer_curso.estudiantes_del_curso):
-    print(i+1,estudiantes)
-
-#agregamos UNO O MÁS profesores a UNO O MÁS cursos que enseñan:
-primer_curso.agregar_profesor_al_curso(tercer_profesor)
-primer_curso.agregar_profesor_al_curso(cuarto_profesor)
-tercer_curso.agregar_profesor_al_curso(tercer_profesor)
-
-#mostramos LOS cursos en los que enseña UN profesor:
-print(f"Los cursos en los que enseña {tercer_profesor} son: ")
-for i,cursos in enumerate(tercer_profesor.cursos_del_profesor):
-    print(i+1,cursos)
-
-#mostramos LOS profesores que enseñan en UN curso:
-print(f"Los profesores que enseñan en {primer_curso} son: ")
-for i,profesores in enumerate(primer_curso.profesores_del_curso):
-    print(i+1,profesores)
+    opcion = int(input("Elige otra opción entre 1 y 6: "))
+print("Gracias :)")

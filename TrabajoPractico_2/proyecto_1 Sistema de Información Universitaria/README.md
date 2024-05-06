@@ -1,17 +1,75 @@
 ### Plantilla general del proyecto
+segundo_profesor = Profesor("Jordán","Insfrán","45387332")
+tercer_profesor = Profesor("Leandro","Escher","45387555")
+cuarto_profesor = Profesor("Liliana","Taborda","45387777")
+primer_curso = Curso("Álgebra")
+segundo_curso = Curso("Programación Avanzada")
+tercer_curso = Curso("Ecuaciones Diferenciales")
 
-En el Proyecto 1 del Trabajo Práctico 2 nos enfocamos en elaborar un diseño de relaciones estructurales para un Sistema de Información Universitaria. Para ello, utilizando herramientas de Programación Orientada a Objetos, determinamos relaciones de:
+#creamos otro departamento y mostramos todos los departamentos de la facultad:
+#facultad.crear_departamento("Dpto Matemática",cuarto_profesor)
+#print("Los departamentos de la facultad son: ")
+#for i,depto in enumerate(facultad.departamentos):
+    #print(i+1,depto)
 
---Herencia: entre Persona_Facultativa como clase madre, y sus clases hijas, Estudiante y Profesor.
+#la facultad asigna un departamento a cada profesor:
+#facultad.atribuir_dpto_a_profesor(segundo_profesor, "Dpto Programación")
+#facultad.atribuir_dpto_a_profesor(tercer_profesor, "Dpto Matemática")
+#facultad.atribuir_dpto_a_profesor(cuarto_profesor, "Dpto Matemática")
 
---Composición: entre Departamento y Facultad, indicando que no puede crearse un departamento sin una facultad.
+#mostramos LOS departamentos a los que pertenece UN profesor:
+#print(f"El profesor {segundo_profesor} pertenece a el/los siguiente/s departamento/s: ")
+#for i,depto in enumerate(segundo_profesor._dptos_del_profesor):
+    #print(i+1,depto)
 
---Agregación: entre Facultad y Estudiante, determinando que facultad contiene objetos de la claase Estudiante, estudiantes.
+#mostramos LOS profesores que pertenecen a UN departamento:
+#print("Los profesores del departamento son: ")
+#for i,profesor in enumerate(facultad.devolver_profesores_de_dpto("Dpto Programación")):
+    #print(i+1,profesor)
 
---Asociación: 
-----entre Departamento y Profesor: dos relaciones, una que determina los profesores de ese departamento, y otra que relaciona a un profesor como director de ese departamento.
-----entre Profesor y Curso: determina los cursos en los que enseña un profesor, y los profesores de un curso.
-----entre Estudiante y Curso: determina los cursos a los que asiste un estudiante, y los estudiantes en un curso.
-----entre Departamento y Curso: determina los cursos que pertenecen a un departamento, y el departamento al que pertenece un curso. 
+#definimos UN profesor del departamento como director SOLO DE ESE departamento y lo mostramos:
+#facultad.atribuir_director_a_dpto(primer_profesor, "Dpto Programación")
+#facultad.atribuir_director_a_dpto(segundo_profesor, "Dpto Programación")   #prueba para cambiar el director y que se muestre solo uno
+#director = facultad.devolver_director_de_dpto("Dpto Programación")
+#print(f"El director es: {director}")
 
-Para establecer dichas relaciones, empleamos los métodos y atributos necesarios para definir las acciones que puede llevar a cabo cada clase. Todo esto está expresado en un gráfico UML, en la carpeta static.
+
+#desde facultad agregamos UNO O MÁS cursos a UN departamento y mostramos los cursos de un dpto:
+#facultad.atribuir_curso_al_dpto(primer_curso,"Dpto Matemática")
+#facultad.atribuir_curso_al_dpto(tercer_curso,"Dpto Matemática")
+#print ("Los cursos del departamento son: ")
+#for i,cursos in enumerate(facultad.devolver_cursos_de_dpto("Dpto Matemática")):
+    #print(i+1,cursos)
+
+#mostramos el departamento al que pertenece un curso:
+#print(f"{primer_curso} pertenece a {primer_curso.dpto_del_curso}")
+
+#agregamos UNO O MÁS estudiantes a UNO O MÁS cursos:
+#primer_curso.agregar_estudiante_al_curso(primer_estudiante)
+#primer_curso.agregar_estudiante_al_curso(segundo_estudiante)
+#segundo_curso.agregar_estudiante_al_curso(primer_estudiante)
+
+#mostramos LOS cursos a los que asiste UN estudiante:
+#print(f"Los cursos a los que asiste {primer_estudiante} son: ")
+#for i,cursos in enumerate(primer_estudiante.cursos_del_estudiante):
+    #print(i+1,cursos)
+
+#mostramos LOS estudiantes de UN curso:
+#print(f"Los estudiantes que asisten a {primer_curso} son: ")
+#for i,estudiantes in enumerate(primer_curso.estudiantes_del_curso):
+ #   print(i+1,estudiantes)
+
+#agregamos UNO O MÁS profesores a UNO O MÁS cursos que enseñan:
+#primer_curso.agregar_profesor_al_curso(tercer_profesor)
+#primer_curso.agregar_profesor_al_curso(cuarto_profesor)
+#tercer_curso.agregar_profesor_al_curso(tercer_profesor)
+
+#mostramos LOS cursos en los que enseña UN profesor:
+#print(f"Los cursos en los que enseña {tercer_profesor} son: ")
+#for i,cursos in enumerate(tercer_profesor.cursos_del_profesor):
+    #print(i+1,cursos)
+
+#mostramos LOS profesores que enseñan en UN curso:
+#print(f"Los profesores que enseñan en {primer_curso} son: ")
+#for i,profesores in enumerate(primer_curso.profesores_del_curso):
+    #print(i+1,profesores)

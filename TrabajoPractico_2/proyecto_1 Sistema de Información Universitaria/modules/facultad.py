@@ -4,24 +4,29 @@ from modules.persona_facultativa import Profesor
 
 class Facultad:
     def __init__(self, p_nombre_facu, p_nombre_dpto_inicial, p_primer_profesor): 
-        """ método constructor en el cual al crear una facultad se crea SI O SI un departamento
+        """ Método constructor en el cual al crear una facultad se crea SI O SI un departamento
         """
-        self._departamentos = [Departamento (p_nombre_dpto_inicial, p_primer_profesor)]
-        self._estudiantes = []
+        self._departamentos = [Departamento(p_nombre_dpto_inicial, p_primer_profesor)]
+        self._estudiantes = [] 
         self._nombre_facu = p_nombre_facu
-        
+        self._profesores = []
+
     @property
-    def departamentos (self):
-        return (self._departamentos)
+    def departamentos(self):
+        return self._departamentos
     
     @property
-    def estudiantes (self):
-        return (self._estudiantes)
+    def estudiantes(self):
+        return self._estudiantes
     
     @property
-    def nombre_facu (self):
-        return (self._nombre_facu)
+    def profesores(self):
+        return self._profesores
     
+    @property
+    def nombre_facu(self):
+        return self._nombre_facu
+   
     def atribuir_curso_al_dpto(self, p_nombre_del_curso, p_nombre_dpto):
         """método para agregar un curso a un departamento
         """
@@ -75,10 +80,16 @@ class Facultad:
                 break
         return(profesores_de_dpto)
 
-    def inscribir_estudiante (self, p_nombre_de_estudiante):
+    def inscribir_estudiante(self, estudiante):
         """método para agregar un nuevo estudiante a la facultad
         """
-        self._estudiantes.append(p_nombre_de_estudiante)
+        self._estudiantes.append(estudiante)
+
+    def contratar_profesor(self, profesor):
+        """método para agregar un nuevo profesor a la facultad
+        """
+        self._profesores.append(profesor)
+
 
     def __repr__(self):
         """método para definir la representación de cadena de una instancia de una clase

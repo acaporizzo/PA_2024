@@ -1,0 +1,8 @@
+Profesor,Liliana,Taborda,30591284
+Profesor,Gustavo,Pita,25107832
+Profesor,Diana,Vertiz,38492154
+Profesor,Jordan,Insfran,55201366
+Estudiante,Agustina,Wiesner,45387555
+Estudiante,Ana Clara,Polari,45387332
+Estudiante,Ana Clara,Evequoz,45396744
+Estudiante,Juan,Perez,44756299
