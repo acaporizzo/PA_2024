@@ -5,7 +5,8 @@ from modules.facultad import Facultad
 
 primer_profesor = None
 facultad = None
-
+profesores=[]
+alumnos=[]
 with open("data/datos.txt", 'r') as archi:
     for linea in archi:
         datos = linea.strip().split(",")
@@ -19,11 +20,14 @@ with open("data/datos.txt", 'r') as archi:
                 primer_profesor = profesor
                 facultad = Facultad("FI UNER", "Dpto Programación", primer_profesor) #preguntar si podemos crear la facu asi
                 facultad.contratar_profesor(profesor)
+                profesores.append(primer_profesor)
             else:
                 facultad.contratar_profesor(profesor)
+                profesores.append(profesor)
         elif tipo == 'Estudiante':
             estudiante = Estudiante(nombre, apellido, dni)
             facultad.inscribir_estudiante(estudiante)
+            alumnos.append(estudiante)
 
 texto = """
 ########################################
@@ -48,6 +52,9 @@ while opcion != 6:
         dni_estudiante = input("Ingrese el dni del estudiante: ")
         estudiante = Estudiante(nombre_estudiante, apellido_estudiante, dni_estudiante)
         facultad.inscribir_estudiante(estudiante)
+        alumnos.append(estudiante)
+        with open("data/datos.txt", 'a') as archi:  # Abre el archivo en modo 'append'
+            archi.write(f"Estudiante,{nombre_estudiante},{apellido_estudiante},{dni_estudiante}\n")  # Añade el nuevo estudiante al archivo
         print("Los estudiantes de la facultad son: ")
         for i, estudiante in enumerate(facultad.estudiantes):
             print(i+1, estudiante)
@@ -58,9 +65,13 @@ while opcion != 6:
         dni_profesor = input("Ingrese el dni del profesor: ")
         profesor = Profesor(nombre_profesor, apellido_profesor, dni_profesor)
         facultad.contratar_profesor(profesor)
+        profesores.append(profesor)
+        with open("data/datos.txt", 'a') as archi:  # Abre el archivo en modo 'append'
+            archi.write(f"Profesor,{nombre_profesor},{apellido_profesor},{dni_profesor}\n")  # Añade el nuevo profesor al archivo
         print("Los profesores de la facultad son: ")
         for i, profesor in enumerate(facultad.profesores):
             print(i+1, profesor)
+
 
     if opcion == 3:
         nombre_dpto = input("Ingrese el nombre del nuevo departamento: ")

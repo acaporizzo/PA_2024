@@ -6,3 +6,8 @@ Estudiante,Agustina,Wiesner,45387555
 Estudiante,Ana Clara,Polari,45387332
 Estudiante,Ana Clara,Evequoz,45396744
 Estudiante,Juan,Perez,44756299
+Estudiante,violetta,castillo,4546984
+Profesor,omar,martinez,23654789
+Estudiante,patricia,maisl,23657865
+Profesor,adriana,gomez,36125949
+Estudiante,liliana,gimenez,48626533
