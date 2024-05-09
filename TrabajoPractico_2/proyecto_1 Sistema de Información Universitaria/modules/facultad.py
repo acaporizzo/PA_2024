@@ -6,11 +6,16 @@ class Facultad:
     def __init__(self, p_nombre_facu, p_nombre_dpto_inicial, p_primer_profesor): 
         """ Método constructor en el cual al crear una facultad se crea SI O SI un departamento
         """
+        self._cursos = []
         self._departamentos = [Departamento(p_nombre_dpto_inicial, p_primer_profesor)]
         self._estudiantes = [] 
         self._nombre_facu = p_nombre_facu
         self._profesores = []
 
+    @property
+    def cursos(self):
+        return self._cursos
+    
     @property
     def departamentos(self):
         return self._departamentos
@@ -50,6 +55,11 @@ class Facultad:
                 if p_nombre_dpto == dpto.nombre_dpto:
                     dpto.agregar_profesor_a_dpto(p_nuevo_profesor) #en departamento.py
 
+    def crear_curso(self, p_nombre_curso, p_profesor):
+        """método para crear un nuevo curso y agregarlo a la lista
+        """
+        self._cursos.append(Curso(p_nombre_curso, p_profesor))
+
     def crear_departamento (self, p_nombre_dpto, p_profesor):
         """método para crear un nuevo dpto y agregarlo a la lista
         """
@@ -61,24 +71,31 @@ class Facultad:
         for dpto in self._departamentos:
             if p_nombre_dpto == dpto.nombre_dpto:
                 return(dpto.cursos)
-
-    def devolver_director_de_dpto (self, p_nombre_dpto):
-        """método para mostrar el director de un dpto (se define en departamento.py)
-        """
-        for dpto in self._departamentos:
-            if p_nombre_dpto == dpto.nombre_dpto:
-                return(dpto.director_de_dpto)
             
-    def devolver_profesores_de_dpto(self, p_nombre_dpto):
-        """método para mostrar los profesores de un dpto (la lista de profesores 
-        está definida en departamento.py)
+    def devolver_estudiantes_de_curso(self, p_nombre_curso):
+        """método para mostrar los estudiantes de un curso en específico
         """
-        profesores_de_dpto = []
-        for dpto in self._departamentos:
-            if dpto.nombre_dpto == p_nombre_dpto:
-                profesores_de_dpto = dpto.profesores
-                break
-        return(profesores_de_dpto)
+        for curso in self._cursos:
+            if p_nombre_curso == curso.nombre_curso:
+                return(curso.estudiantes_del_curso)
+            
+#    def devolver_director_de_dpto (self, p_nombre_dpto):
+#        """método para mostrar el director de un dpto (se define en departamento.py)
+#        """
+#        for dpto in self._departamentos:
+#            if p_nombre_dpto == dpto.nombre_dpto:
+#                return(dpto.director_de_dpto)
+            
+#    def devolver_profesores_de_dpto(self, p_nombre_dpto):
+#        """método para mostrar los profesores de un dpto (la lista de profesores 
+#        está definida en departamento.py)
+#        """
+#        profesores_de_dpto = []
+#        for dpto in self._departamentos:
+#            if dpto.nombre_dpto == p_nombre_dpto:
+#                profesores_de_dpto = dpto.profesores
+#                break
+#        return(profesores_de_dpto)
 
     def inscribir_estudiante(self, estudiante):
         """método para agregar un nuevo estudiante a la facultad
@@ -89,7 +106,6 @@ class Facultad:
         """método para agregar un nuevo profesor a la facultad
         """
         self._profesores.append(profesor)
-
 
     def __repr__(self):
         """método para definir la representación de cadena de una instancia de una clase

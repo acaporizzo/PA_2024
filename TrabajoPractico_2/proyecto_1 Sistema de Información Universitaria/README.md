@@ -1,4 +1,4 @@
-### Plantilla general del proyecto
+#Para probar
 segundo_profesor = Profesor("Jordán","Insfrán","45387332")
 tercer_profesor = Profesor("Leandro","Escher","45387555")
 cuarto_profesor = Profesor("Liliana","Taborda","45387777")
@@ -57,7 +57,7 @@ tercer_curso = Curso("Ecuaciones Diferenciales")
 #mostramos LOS estudiantes de UN curso:
 #print(f"Los estudiantes que asisten a {primer_curso} son: ")
 #for i,estudiantes in enumerate(primer_curso.estudiantes_del_curso):
- #   print(i+1,estudiantes)
+   #print(i+1,estudiantes)
 
 #agregamos UNO O MÁS profesores a UNO O MÁS cursos que enseñan:
 #primer_curso.agregar_profesor_al_curso(tercer_profesor)

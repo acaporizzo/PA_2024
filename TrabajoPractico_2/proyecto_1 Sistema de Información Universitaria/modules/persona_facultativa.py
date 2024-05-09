@@ -23,7 +23,7 @@ class Persona_Facultativa:
     @property
     def nombre(self):
         return(self._nombre)
-    
+
 
 class Estudiante (Persona_Facultativa):
     def __init__(self,p_nombre, p_apellido,p_dni):
@@ -56,6 +56,7 @@ class Profesor (Persona_Facultativa):
         self._cursos_del_profesor = []
         self._dptos_del_profesor = []
         self._es_director = False #booleano que cambia en la clase Departamento
+        self._es_titular = False #booleano que cambia en la clase Curso
 
     @property
     def cursos_del_profesor (self):
@@ -72,6 +73,10 @@ class Profesor (Persona_Facultativa):
     @es_director.setter
     def es_director (self, cambio_de_director):
         self._es_director = cambio_de_director
+
+    @property
+    def es_titular (self):
+        return (self._es_titular)
 
     def agregar_dpto_a_profesor(self, p_nombre_dpto):
         """método para agregar un dpto a la lista de dptos de un profesor en específico
