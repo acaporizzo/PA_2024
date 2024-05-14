@@ -24,13 +24,13 @@ class Departamento:
         return (self._director_de_dpto)
     
     @property
+    def nombre_dpto (self):
+        return (self._nombre_dpto)
+    
+    @property
     def profesores (self):
         return (self._profesores) 
     
-    @property
-    def nombre_dpto (self):
-        return (self._nombre_dpto)
-
     def agregar_profesor_a_dpto(self, p_nuevo_profesor):
         """método para agregar un profesor a la lista de profesores de un departamento
         """

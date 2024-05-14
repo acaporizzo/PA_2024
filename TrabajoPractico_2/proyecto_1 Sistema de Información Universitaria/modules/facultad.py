@@ -54,6 +54,11 @@ class Facultad:
             for dpto in self._departamentos:
                 if p_nombre_dpto == dpto.nombre_dpto:
                     dpto.agregar_profesor_a_dpto(p_nuevo_profesor) #en departamento.py
+                    
+    def contratar_profesor(self, profesor):
+        """método para agregar un nuevo profesor a la facultad
+        """
+        self._profesores.append(profesor)
 
     def crear_curso(self, p_nombre_curso, p_profesor):
         """método para crear un nuevo curso y agregarlo a la lista
@@ -101,11 +106,6 @@ class Facultad:
         """método para agregar un nuevo estudiante a la facultad
         """
         self._estudiantes.append(estudiante)
-
-    def contratar_profesor(self, profesor):
-        """método para agregar un nuevo profesor a la facultad
-        """
-        self._profesores.append(profesor)
 
     def __repr__(self):
         """método para definir la representación de cadena de una instancia de una clase

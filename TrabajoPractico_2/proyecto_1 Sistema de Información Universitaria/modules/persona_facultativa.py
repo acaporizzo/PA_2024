@@ -24,7 +24,6 @@ class Persona_Facultativa:
     def nombre(self):
         return(self._nombre)
 
-
 class Estudiante (Persona_Facultativa):
     def __init__(self,p_nombre, p_apellido,p_dni):
         """los atributos serán heredados de la clase Persona_Facultativa
@@ -77,6 +76,10 @@ class Profesor (Persona_Facultativa):
     @property
     def es_titular (self):
         return (self._es_titular)
+    
+    @es_titular.setter
+    def es_titular (self, cambio_de_titular):
+        self._es_titular = cambio_de_titular
 
     def agregar_dpto_a_profesor(self, p_nombre_dpto):
         """método para agregar un dpto a la lista de dptos de un profesor en específico
