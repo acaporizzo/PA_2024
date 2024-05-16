@@ -2,8 +2,10 @@ from abc import ABC, abstractmethod
 import math 
 import numpy as np 
 
-"""clases abstractas
-    """
+"""
+clases abstractas
+"""
+
 class Alimentos(ABC):
     def __init__(self, p_peso_del_alimento):
         if 0.05<=p_peso_del_alimento <= 0.6:
@@ -14,7 +16,6 @@ class Alimentos(ABC):
     @property
     def peso_del_alimento(self):
         return(self._peso_del_alimento)
-
 
 class Fruta(Alimentos, ABC):
     def __init__(self, p_peso_del_alimento):
