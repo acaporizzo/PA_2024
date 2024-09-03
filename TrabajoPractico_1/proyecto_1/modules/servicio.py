@@ -2,19 +2,21 @@ from flask import Flask, render_template, redirect, url_for, send_file, request
 import matplotlib.pyplot as plt
 import io, base64, datetime
 from matplotlib.backends.backend_pdf import PdfPages
-from datetime import datetime
 from modules.dominio import trivia
 from modules.persistencia import leer_archivo2, leer_archivo, guardar_datos_del_juego
 frases_utilizadas = [] # Lista donde se guardan las frases que ya se utilizaron en una trivia.
 usuario=[]
-def datos_del_usuario (metodo):
+
+def datos_del_usuario(metodo):
     if request.method == metodo:
         numero_de_opciones = int(request.form['input_numero'])
         nombre_de_usuario = request.form['input_nombre']
-        fecha_hora = datetime.datetime.now().strftime('%d/%m/%y %H:%M')  # Se establece cuando comienza la partida.
+        # Corregir el uso de datetime:
+        fecha_hora = datetime.datetime.now().strftime('%d/%m/%y %H:%M')  # Establece cuando comienza la partida.
         fecha_hora = datetime.datetime.strptime(fecha_hora, '%d/%m/%y %H:%M')
-        usuario = [numero_de_opciones,nombre_de_usuario, fecha_hora]
-        return(usuario)
+        usuario = [numero_de_opciones, nombre_de_usuario, fecha_hora]
+        return usuario
+
 
 def juego_trivia (DIRECCION):
     lista_frases_y_pelis = leer_archivo(DIRECCION)
@@ -22,51 +24,71 @@ def juego_trivia (DIRECCION):
 
     return(lista_para_jugar)
     
-def resultado_de_respuesta (metodo, lista, usuario, contador_repeticiones):
-
+def resultado_de_respuesta(metodo, lista, usuario, contador_repeticiones, aciertos):
     if request.method == metodo:
         opcion_elegida = request.form['opcion_elegida']
-    # Se compara la opción elegida con la correcta.
+    
     if opcion_elegida == lista[1]:
         aciertos += 1
-        calificacion = (f"{aciertos}/{usuario[0]}")
+        calificacion = f"{aciertos}/{usuario[0]}"
         respuesta = "¡Correcta!"  
     else:
-        calificacion = (f"{aciertos}/{usuario[0]}")
-        respuesta = (f"¡Incorrecta!, la respuesta correcta es: {lista[1]}.")
-    # Cuando se termina la trivia se guardan los datos en un archivo .txt
+        calificacion = f"{aciertos}/{usuario[0]}"
+        respuesta = f"¡Incorrecta!, la respuesta correcta es: {lista[1]}."
+    
     if contador_repeticiones == usuario[0]:
-        # Se guardan los datos necesarios para graficar.
         guardar_datos_del_juego(usuario[1], calificacion, usuario[2])
+    
     resultado = [respuesta, calificacion]
-    return(resultado)
+    return resultado, aciertos  # Devuelve 'aciertos' actualizado
 
 def mostrar_resultados(DIRECCION2, resultados_partidas):
-    lista_de_resultados = leer_archivo2 (DIRECCION2)
+    lista_de_resultados = leer_archivo2(DIRECCION2)
     for linea in lista_de_resultados:
-        resultados_partidas.append(linea.split(","))   
-    return (resultados_partidas)
+        resultados_partidas.append(linea)  # 'linea' ya es una tupla, no es necesario usar 'split'
+    return resultados_partidas
 
-def mostrar_lista_peliculas (DIRECCION):
+
+def mostrar_lista_peliculas(DIRECCION):
     """
     Esta función recibe una lista con todos los datos y devuelve una lista de tuplas
 
     Args:
-        lista_de_pelis_y_frases (lista): es una lista de tuplas en la cual cada tupla contiene 
-        una frase y su pelicula, esta lista se obtuvo de abrir el archivo, leerlo.
+        DIRECCION (str): Ruta del archivo que contiene las frases y películas.
 
     Returns:
-        lista: contiene todas las peliculas ordenadas alfabéticamente donde se eliminaron las repetidas
+        lista: contiene todas las películas ordenadas alfabéticamente donde se eliminaron las repetidas
         y se indexaron.
     """
-    lista_de_pelis_y_frases= leer_archivo (DIRECCION)
+    lista_de_pelis_y_frases = leer_archivo(DIRECCION)
     lista_sin_repetir = []
-    for linea in lista_de_pelis_y_frases:
-        frase,pelicula=linea.rstrip("\n").split(";") # Separamos la frase y la película.
-        lista_sin_repetir.append(pelicula.lower()) # Agregamos las frases en minúscula.
 
-    lista_sin_repetir = sorted(set(lista_sin_repetir)) # Se ordenan alfabéticamente y se eliminan las repetidas.
-    return [(i+1, pelicula.capitalize()) for i, pelicula in enumerate(lista_sin_repetir)] #Se indexan las frases.
+    for frase, pelicula in lista_de_pelis_y_frases:
+        lista_sin_repetir.append(pelicula.lower())  # Agregamos las películas en minúscula.
+
+    lista_sin_repetir = sorted(set(lista_sin_repetir))  # Ordenar alfabéticamente y eliminar duplicados.
+    return [(i + 1, pelicula.capitalize()) for i, pelicula in enumerate(lista_sin_repetir)]  # Indexar las películas.
+
+# servicio.py
+
+from modules.persistencia import leer_archivo2
+
+def obtener_datos_graficas(direccion):
+    """
+    Obtiene los datos necesarios para generar las gráficas de resultados.
+
+    Args:
+        direccion (str): Ruta al archivo de resultados históricos.
+
+    Returns:
+        list: Lista de tuplas con los datos de los resultados históricos.
+    """
+    try:
+        lista_para_graficar1 = leer_archivo2(direccion)
+        return lista_para_graficar1
+    except FileNotFoundError:
+        # Retorna una lista vacía si el archivo no existe
+        return []
 
 def generar_grafica_lineal (DIRECCION2):
     """

@@ -1,7 +1,6 @@
 import datetime
 from flask import Flask, render_template, redirect, url_for, send_file, request
-#from modules.modulo1 import trivia, guardar_datos_del_juego, mostrar_lista_peliculas, generar_grafica, generar_grafica_circular, generar_graficas_pdf
-from modules.servicio import mostrar_lista_peliculas, mostrar_resultados, datos_del_usuario, juego_trivia, resultado_de_respuesta, generar_grafica_lineal, generar_grafica_circular, generar_graficas_pdf
+from modules.servicio import mostrar_lista_peliculas, obtener_datos_graficas, mostrar_resultados, datos_del_usuario, juego_trivia, resultado_de_respuesta, generar_grafica_lineal, generar_grafica_circular, generar_graficas_pdf
 
 aciertos = 0
 app = Flask("server")
@@ -22,17 +21,19 @@ def home():
     global aciertos, contador_repeticiones, usuario, archivo_vacio, mensaje, metodo, numero_de_opciones
     mensaje = "El número de opciones debe estar entre 3 y 10."
     metodo = "POST"
+    aciertos = 0
+    contador_repeticiones = 0
     if numero_de_opciones >= 3 and numero_de_opciones <= 10:
-        usuario = datos_del_usuario (metodo) 
-        redirect(url_for('jugar_trivia'))
-        return render_template("home.html", mensaje=mensaje, numero_de_opciones=usuario[0])
+        usuario = datos_del_usuario(metodo)
+        if usuario is not None and len(usuario) > 0:
+            return redirect(url_for('jugar_trivia'))  # Redirige a la ruta de jugar trivia
+        else:
+            # Manejo cuando `usuario` es None o está vacío
+            mensaje = "Error: Datos del usuario no disponibles."
+            return render_template("home.html", mensaje=mensaje, numero_de_opciones=0)
     else:
         numero_de_opciones = 0 
-        return render_template("home.html", mensaje=mensaje, numero_de_opciones=usuario[0])
-        
-aciertos = 0
-archivo_vacio = False # Se establece que el archivo no está vacío.
-contador_repeticiones = 0
+        return render_template("home.html", mensaje=mensaje, numero_de_opciones=0)
 
 @app.route("/trivia", methods=["GET", "POST"])
 def jugar_trivia():
@@ -47,7 +48,7 @@ def jugar_trivia():
 @app.route("/respuestas", methods=["GET", "POST"])
 def respuestas():
     global aciertos, respuesta
-    resultado = resultado_de_respuesta(metodo, lista, usuario, contador_repeticiones)
+    resultado, aciertos = resultado_de_respuesta(metodo, lista, usuario, contador_repeticiones, aciertos)
     return render_template("respuestas.html", respuesta=resultado[0], calificacion=resultado[1], contador_repeticiones=contador_repeticiones, numero_de_opciones=usuario[0])
 
 @app.route("/resultados", methods=["GET", "POST"])
@@ -55,24 +56,29 @@ def ver_resultados():
     global advertencia, archivo_vacio, resultados_partidas
     resultados_partidas = []
     advertencia = "No hay resultados para mostrar ya que todavía no empezó la trivia"
-    # Manejo de excepciones en el caso de que el archivo no se encuentre creado.
+    
     try: 
-        resultados_partidas1 = mostrar_resultados (DIRECCION2, resultados_partidas)
-        if not resultados_partidas: # Si la lista de info de la partida está vacía.
+        resultados_partidas = mostrar_resultados(DIRECCION2, resultados_partidas)
+        if not resultados_partidas:  # Si la lista de info de la partida está vacía.
             archivo_vacio = True    # Cambia a True y se muestra la advertencia.
             advertencia = "No hay resultados para mostrar ya que todavía no empezó la trivia"
-    except FileNotFoundError: # Si el archivo no fue creado todavía, se cambia a True.
+    except FileNotFoundError:  # Si el archivo no fue creado todavía, se cambia a True.
         archivo_vacio = True
-    return render_template("resultados.html", resultados_partidas1=resultados_partidas1, advertencia=advertencia, archivo_vacio=archivo_vacio)  
+    
+    return render_template("resultados.html", resultados_partidas1=resultados_partidas, advertencia=advertencia, archivo_vacio=archivo_vacio)
 
 @app.route("/graficas", methods=["GET", "POST"])
 def ver_resultados_graficos():
-    global grafica, grafica_circular
-    if lista_para_graficar1: # Si la lista no se encuentra vacía se van a utilizar las funciones para graficar.
-        grafica = generar_grafica_lineal(lista_para_graficar1)
-        grafica_circular = generar_grafica_circular(lista_para_graficar1)
+    global grafica, grafica_circular, lista_para_graficar1
+    
+    # Usa la función del módulo `servicio` para obtener los datos
+    lista_para_graficar1 = obtener_datos_graficas(DIRECCION2)
+
+    if lista_para_graficar1:  # Si la lista no se encuentra vacía, generar las gráficas
+        grafica = generar_grafica_lineal(DIRECCION2)
+        grafica_circular = generar_grafica_circular(DIRECCION2)
         return render_template("graficas.html", grafica=grafica, grafica_circular=grafica_circular)
-    else: # Si no hay lista aún se muestra el siguiente mensaje.
+    else:  # Si no hay lista aún, muestra el siguiente mensaje
         mensaje_error = "No hay datos disponibles para generar gráficas."
         return render_template("graficas.html", mensaje_error=mensaje_error)
 

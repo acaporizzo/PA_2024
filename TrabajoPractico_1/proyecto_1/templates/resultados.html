@@ -13,24 +13,42 @@
     </head>
 
     <body>
-        <div class="center-text">
+        <div class="center-text"></div>
+            <h1>Resultados de la Trivia</h1>
+        
             {% if archivo_vacio %}
                 <p>{{ advertencia }}</p>
-
             {% else %}
-                <ul>
-                    {% for i1, i2, i3 in resultados_partidas %}
-                        <li>Hola, {{ i1 }} . Su calificación es: {{ i2 }} y su partida inició el: {{ i3 }} </li>
-                    {% endfor %}
-                </ul>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre del Usuario</th>
+                            <th>Calificación</th>
+                            <th>Fecha y Hora</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for resultado in resultados_partidas1 %}
+                            <tr>
+                                <td>{{ resultado[0] }}</td>
+                                <td>{{ resultado[1] }}</td>
+                                <td>{{ resultado[2] }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             {% endif %}
         </div>
-
-        <div class="center-button">
-            <a href="{{ url_for('home') }}" class="btn btn-primary">Volver al inicio</a>
-        </div>
-        <div class="center-button">
-            <a href="{{ url_for('ver_resultados_graficos') }}" class="btn btn-primary">Ver resultados de forma gráfica</a>
-        </div>
+        
+            <!-- Botón para ver los resultados en forma gráfica -->
+            <form action="{{ url_for('ver_resultados_graficos') }}" method="get">
+                <button type="submit">Ver resultados en forma gráfica</button>
+            </form>
+        
+            <!-- Botón para volver al inicio -->
+            <form action="{{ url_for('home') }}" method="get">
+                <button type="submit">Volver al inicio</button>
+            </form>
+        
     </body>
 </html>
