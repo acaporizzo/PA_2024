@@ -22,7 +22,6 @@
             <h3>Adivine de qué película proviene la siguiente frase: </h3>
             <p>"{{ lista[0] }}"</p>
         
-
             <form action="{{ url_for('respuestas') }}" method= "post">
                 <input type="radio" id="{{lista[2][0]}}" name="opcion_elegida" value="{{lista[2][0]}}" required>
                 <label for="{{lista[2][0]}}">{{lista[2][0]}}</label><br>

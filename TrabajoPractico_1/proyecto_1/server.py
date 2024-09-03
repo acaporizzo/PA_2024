@@ -16,6 +16,10 @@ RUTA = "./data/"
 DIRECCION = RUTA + "frases_de_peliculas.txt"
 DIRECCION2 = RUTA + "resultados_historicos.txt"
 
+# server.py
+
+# server.py
+
 @app.route("/", methods=["GET", "POST"]) 
 def home():
     global aciertos, contador_repeticiones, usuario, archivo_vacio, mensaje, metodo, numero_de_opciones
@@ -23,17 +27,22 @@ def home():
     metodo = "POST"
     aciertos = 0
     contador_repeticiones = 0
-    if numero_de_opciones >= 3 and numero_de_opciones <= 10:
+
+    if request.method == "POST":
         usuario = datos_del_usuario(metodo)
-        if usuario is not None and len(usuario) > 0:
+        
+        # Verificar si el usuario ha ingresado un número válido de repeticiones
+        if usuario and 3 <= usuario[0] <= 10:
+            numero_de_opciones = usuario[0]
             return redirect(url_for('jugar_trivia'))  # Redirige a la ruta de jugar trivia
         else:
-            # Manejo cuando `usuario` es None o está vacío
-            mensaje = "Error: Datos del usuario no disponibles."
+            # Muestra un mensaje de error si el número de repeticiones está fuera del rango permitido
+            mensaje = "Error: El número de opciones debe estar entre 3 y 10."
             return render_template("home.html", mensaje=mensaje, numero_de_opciones=0)
-    else:
-        numero_de_opciones = 0 
-        return render_template("home.html", mensaje=mensaje, numero_de_opciones=0)
+
+    # Mostrar la página inicial sin errores para solicitudes GET
+    return render_template("home.html", mensaje="", numero_de_opciones=numero_de_opciones)
+
 
 @app.route("/trivia", methods=["GET", "POST"])
 def jugar_trivia():
@@ -51,6 +60,8 @@ def respuestas():
     resultado, aciertos = resultado_de_respuesta(metodo, lista, usuario, contador_repeticiones, aciertos)
     return render_template("respuestas.html", respuesta=resultado[0], calificacion=resultado[1], contador_repeticiones=contador_repeticiones, numero_de_opciones=usuario[0])
 
+# server.py
+
 @app.route("/resultados", methods=["GET", "POST"])
 def ver_resultados():
     global advertencia, archivo_vacio, resultados_partidas
@@ -66,6 +77,7 @@ def ver_resultados():
         archivo_vacio = True
     
     return render_template("resultados.html", resultados_partidas1=resultados_partidas, advertencia=advertencia, archivo_vacio=archivo_vacio)
+
 
 @app.route("/graficas", methods=["GET", "POST"])
 def ver_resultados_graficos():
@@ -87,18 +99,25 @@ def listar_peliculas():
     lista_peliculas = mostrar_lista_peliculas(DIRECCION)
     return render_template("listar_peliculas.html", lista_peliculas=lista_peliculas)
 
+# server.py
+
 @app.route('/mostrar_graficas_pdf')
 def mostrar_graficas_pdf():
     global lista_para_graficar1
-    try:
-        with open("./data/resultados_historicos.txt", "r", encoding="utf-8") as a: # Leemos el archivo otra vez para actualizar con los nuevos resultados
-            lista_para_graficar = a.readlines()
-            lista_para_graficar1 = [(linea.strip().split(',')[0], linea.strip().split(',')[1], datetime.datetime.strptime(linea.strip().split(',')[2], '%d-%m-%y %H:%M:%S')) for linea in lista_para_graficar]
-    except FileNotFoundError:
-        with open("./data/resultados_historicos.txt", "w", encoding="utf-8") as a: 
-            pass
-    generar_graficas_pdf(lista_para_graficar1)  # Genera las gráficas y luego las guarda en un archivo PDF.
-    return send_file("graficas.pdf", as_attachment=True) # Se envía el archivo cuando el usuario seleccione el botón
+
+    # Verificar y generar el PDF utilizando la función en servicio
+    pdf_path = generar_graficas_pdf(lista_para_graficar1)
+
+    if pdf_path:
+        try:
+            # Asegúrate de que la ruta es correcta y envía el archivo
+            return send_file(pdf_path, as_attachment=True, download_name="graficas.pdf")
+        except FileNotFoundError:
+            # Manejo de error si el archivo no se encuentra
+            return "El archivo PDF no se pudo encontrar o generar.", 404
+    else:
+        return "No hay datos disponibles para generar el PDF.", 400
+
 
 if __name__=="__main__":
     app.run(debug=True, host='0.0.0.0')

@@ -5,10 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Resultados Gráficos</title>
     <style>
-        .center-text {text-align: center; font-size: 20px}
-        .center-button {text-align: center;background-color: #f37d0f; color: #fff; 
-        font-size: 20px; padding: 10px 20px; border: none; cursor: pointer; display: block;
-        margin: 20px auto 0;border-radius: 10px;}
+        .center-text {
+            text-align: center;
+            font-size: 20px;
+        }
+        .center-button {
+            text-align: center;
+            background-color: #fff;
+            color: #f37d0f;
+            font-size: 20px;
+            padding: 10px 20px;
+            border: 2px solid #f37d0f;
+            border-radius: 10px;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto 0;
+        }
+        .center-button a {
+            color: #f37d0f;
+            text-decoration: none;
+        }
+        .center-button a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -16,21 +35,17 @@
 
     {% if grafica or grafica_circular %}
         <div class="center-text">
-            <!-- Aquí se muestra la gráfica lineal -->
             <img src="data:image/png;base64,{{ grafica }}" alt="Gráfica" />
         </div>
 
         <div class="center-text">
-            <!-- Aquí se muestra la gráfica circular -->
             <img src="data:image/png;base64,{{ grafica_circular }}" alt="Gráfica Circular" />
         </div>
         <div class="center-button">
-            <h1>Generar Gráficas PDF</h1>
-            <!-- Botón o enlace para generar las gráficas y descargar el PDF -->
-            <a href="/mostrar_graficas_pdf" download="graficas.pdf">Generar Gráficas PDF</a>
+            <h1>Descargar gráficas como PDF</h1>
+            <a href="/mostrar_graficas_pdf" download="graficas.pdf">Descargar gráficas como PDF</a>
         </div>
     {% endif %}
-
     {% if not grafica and not grafica_circular %}
         <div class="center-text">
             <p>{{ mensaje_error }}</p>

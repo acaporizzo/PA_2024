@@ -12,12 +12,10 @@
             border-radius: 10px}
         </style>
     </head>
-
     <body>
         <div class="center-image">
             <img src="static\Trivia de películas.jpg" alt="" width="650">
         </div>
-
         <div class="center-text">
             <p>Instrucciones: debajo encontrará dos casillas para completar. Debe ingresar el 
             número de veces que desea jugar (entre 3 y 10) y su nombre.Luego podrá acceder a dos 
@@ -26,7 +24,6 @@
             {%if numero_de_opciones < 3 or numero_de_opciones > 10%}
                 <ul>{{mensaje}}</ul>
             {% endif %}
-
 
             <form action="{{ url_for('home') }}" method="post">
                 <label for="input_numero">Número de opciones:</label>
@@ -42,6 +39,5 @@
         <form action="{{ url_for('listar_peliculas') }}" method="post"> 
             <button type="submit">Listar películas</button>
         </form>
-
     </body>
 </html>

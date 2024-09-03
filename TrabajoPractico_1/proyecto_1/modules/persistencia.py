@@ -6,24 +6,26 @@ def leer_archivo(DIRECCION):
         lista1 = f.readlines()
         frases_y_pelis = [(linea.strip().split(';')[0], linea.strip().split(';')[1]) for linea in lista1]
     return (frases_y_pelis)
-    
+
 def leer_archivo2(DIRECCION2):
     try:
         with open(DIRECCION2, "r", encoding="utf-8") as a: 
             lista_de_resultados = a.readlines()
-            # Ajusta el formato de fecha para que coincida con los datos en el archivo
             lista_de_resultados1 = [
-                (linea.strip().split(',')[0], 
-                 linea.strip().split(',')[1], 
-                 datetime.datetime.strptime(linea.strip().split(',')[2], '%Y-%m-%d %H:%M:%S'))  # Ajustado para coincidir con el formato de los datos
+                (
+                    linea.strip().split(',')[0], 
+                    linea.strip().split(',')[1], 
+                    # Mantener el formato como objeto datetime
+                    datetime.datetime.strptime(linea.strip().split(',')[2], '%Y-%m-%d %H:%M:%S')
+                ) 
                 for linea in lista_de_resultados
             ]
             return lista_de_resultados1
-        
     except FileNotFoundError:
         with open(DIRECCION2, "w", encoding="utf-8") as a: 
             pass
         return []  # Devuelve una lista vacía si no se encuentra el archivo
+
 
 
 def guardar_datos_del_juego(nombre_de_usuario, calificacion, fecha_hora):
