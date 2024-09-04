@@ -8,6 +8,16 @@ def leer_archivo(DIRECCION):
     return (frases_y_pelis)
 
 def leer_archivo_resultados(DIRECCION2):
+    """
+    Lee un archivo de resultados, organizando los datos en una lista de tuplas con nombre, calificación y fecha.
+
+    Args:
+        DIRECCION2 (str): Ruta del archivo a leer, que contiene resultados separados por comas.
+
+    Returns:
+        list: Lista de tuplas con los resultados, cada una contiene el nombre (str), calificación (str) 
+              y fecha (datetime). Si el archivo no existe, lo crea y retorna una lista vacía.
+    """
     try:
         with open(DIRECCION2, "r", encoding="utf-8") as a: 
             lista_de_resultados = a.readlines()
@@ -17,18 +27,8 @@ def leer_archivo_resultados(DIRECCION2):
     except FileNotFoundError:
         with open(DIRECCION2, "w", encoding="utf-8") as a: 
             pass
-        return []  # Devuelve una lista vacía si no se encuentra el archivo
+        return []
 
 def guardar_datos_del_juego(nombre_de_usuario, calificacion, fecha_hora):
-    """Función que toma estos tres parámetros y escribe linea por linea
-
-    Args:
-        nombre_de_usuario (text): nombre dado por la persona
-        calificacion (str): es una cadena que muestra aciertos/N (N=veces que se juega la trivia)
-        fecha_hora (str): fecha y hora en la que se inicializa la trivia
-    """
     with open("./data/resultados_historicos.txt", "a") as f:
         f.write(f"{nombre_de_usuario},{calificacion},{fecha_hora}\n")
-
-
-

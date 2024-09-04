@@ -38,7 +38,6 @@ def home():
     # Mostrar la página inicial sin errores para solicitudes GET
     return render_template("home.html", mensaje="", numero_de_opciones=numero_de_opciones)
 
-
 @app.route("/trivia", methods=["GET", "POST"])
 def jugar_trivia():
     global contador_repeticiones, lista, usuario
@@ -60,7 +59,6 @@ def ver_resultados():
     global advertencia, archivo_vacio, resultados_partidas
     resultados_partidas = []
     advertencia = "No hay resultados para mostrar ya que todavía no empezó la trivia"
-    
     try: 
         resultados_partidas = mostrar_resultados(DIRECCION2, resultados_partidas)
         if not resultados_partidas:  # Si la lista de info de la partida está vacía.
@@ -93,10 +91,8 @@ def listar_peliculas():
 @app.route('/mostrar_graficas_pdf')
 def mostrar_graficas_pdf():
     global lista_para_graficar1
-
     # Verificar y generar el PDF utilizando la función en servicio
     graficas_pdf = generar_graficas_pdf(lista_para_graficar1)
-
     if graficas_pdf:
         try:
             # Asegúrate de que la ruta es correcta y envía el archivo
@@ -106,7 +102,6 @@ def mostrar_graficas_pdf():
             return "El archivo PDF no se pudo encontrar o generar.", 404
     else:
         return "No hay datos disponibles para generar el PDF.", 400
-
 
 if __name__=="__main__":
     app.run(debug=True, host='0.0.0.0')
