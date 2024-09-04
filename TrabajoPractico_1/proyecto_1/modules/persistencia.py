@@ -7,26 +7,17 @@ def leer_archivo(DIRECCION):
         frases_y_pelis = [(linea.strip().split(';')[0], linea.strip().split(';')[1]) for linea in lista1]
     return (frases_y_pelis)
 
-def leer_archivo2(DIRECCION2):
+def leer_archivo_resultados(DIRECCION2):
     try:
         with open(DIRECCION2, "r", encoding="utf-8") as a: 
             lista_de_resultados = a.readlines()
-            lista_de_resultados1 = [
-                (
-                    linea.strip().split(',')[0], 
-                    linea.strip().split(',')[1], 
-                    # Mantener el formato como objeto datetime
-                    datetime.datetime.strptime(linea.strip().split(',')[2], '%Y-%m-%d %H:%M:%S')
-                ) 
-                for linea in lista_de_resultados
-            ]
-            return lista_de_resultados1
+            lista_de_resultados1 = [(linea.strip().split(',')[0], linea.strip().split(',')[1], 
+                 datetime.datetime.strptime(linea.strip().split(',')[2], '%Y-%m-%d %H:%M:%S')) for linea in lista_de_resultados]
+            return (lista_de_resultados1)
     except FileNotFoundError:
         with open(DIRECCION2, "w", encoding="utf-8") as a: 
             pass
         return []  # Devuelve una lista vacía si no se encuentra el archivo
-
-
 
 def guardar_datos_del_juego(nombre_de_usuario, calificacion, fecha_hora):
     """Función que toma estos tres parámetros y escribe linea por linea

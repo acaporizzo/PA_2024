@@ -1,9 +1,8 @@
-import datetime
-from flask import Flask, render_template, redirect, url_for, send_file, request
-from modules.servicio import mostrar_lista_peliculas, obtener_datos_graficas, mostrar_resultados, datos_del_usuario, juego_trivia, resultado_de_respuesta, generar_grafica_lineal, generar_grafica_circular, generar_graficas_pdf
-
+from flask import render_template, redirect, url_for, send_file, request
+from modules.servicio import mostrar_lista_peliculas, obtener_datos_graficas, mostrar_resultados, jugar_juego_trivia, generar_grafica_lineal, generar_grafica_circular, generar_graficas_pdf
+from modules.auxiliar import obtener_datos_del_usuario, devolver_resultado_de_respuesta
+from modules.config import app
 aciertos = 0
-app = Flask("server")
 archivo_vacio = False # Se inicializa en false porque el archivo tiene que mostrarse.
 contador_repeticiones = 0 # Contador de cuantas preguntas lleva jugando.
 
@@ -25,7 +24,7 @@ def home():
     contador_repeticiones = 0
 
     if request.method == "POST":
-        usuario = datos_del_usuario(metodo)
+        usuario = obtener_datos_del_usuario(metodo)
         
         # Verificar si el usuario ha ingresado un número válido de repeticiones
         if usuario and 3 <= usuario[0] <= 10:
@@ -44,7 +43,7 @@ def home():
 def jugar_trivia():
     global contador_repeticiones, lista, usuario
     if contador_repeticiones <= usuario[0]:
-        lista = juego_trivia(DIRECCION)
+        lista = jugar_juego_trivia(DIRECCION)
         contador_repeticiones += 1
         return render_template("trivia.html", lista=lista)
     else:
@@ -53,7 +52,7 @@ def jugar_trivia():
 @app.route("/respuestas", methods=["GET", "POST"])
 def respuestas():
     global aciertos, respuesta
-    resultado, aciertos = resultado_de_respuesta(metodo, lista, usuario, contador_repeticiones, aciertos)
+    resultado, aciertos = devolver_resultado_de_respuesta (metodo, lista, usuario, contador_repeticiones, aciertos)
     return render_template("respuestas.html", respuesta=resultado[0], calificacion=resultado[1], contador_repeticiones=contador_repeticiones, numero_de_opciones=usuario[0])
 
 @app.route("/resultados", methods=["GET", "POST"])
@@ -64,7 +63,6 @@ def ver_resultados():
     
     try: 
         resultados_partidas = mostrar_resultados(DIRECCION2, resultados_partidas)
-        print(f"Resultados obtenidos: {resultados_partidas}")
         if not resultados_partidas:  # Si la lista de info de la partida está vacía.
             archivo_vacio = True    # Cambia a True y se muestra la advertencia.
             advertencia = "No hay resultados para mostrar ya que todavía no empezó la trivia"
@@ -72,7 +70,6 @@ def ver_resultados():
         archivo_vacio = True
     
     return render_template("resultados.html", resultados_partidas1=resultados_partidas, advertencia=advertencia, archivo_vacio=archivo_vacio)
-
 
 @app.route("/graficas", methods=["GET", "POST"])
 def ver_resultados_graficos():

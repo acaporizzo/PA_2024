@@ -1,56 +1,25 @@
-from flask import Flask, render_template, redirect, url_for, send_file, request
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-import io, base64, datetime
+import io, base64
 from matplotlib.backends.backend_pdf import PdfPages
 from modules.dominio import trivia
-from modules.persistencia import leer_archivo2, leer_archivo, guardar_datos_del_juego
+from modules.persistencia import leer_archivo_resultados, leer_archivo
+
 frases_utilizadas = [] # Lista donde se guardan las frases que ya se utilizaron en una trivia.
 usuario=[]
 
-def datos_del_usuario(metodo):
-    
-    if request.method == metodo:
-        numero_de_opciones = int(request.form['input_numero'])
-        nombre_de_usuario = request.form['input_nombre']
-        fecha_hora = datetime.datetime.now().strftime('%d/%m/%y %H:%M')  # Establece cuando comienza la partida.
-        fecha_hora = datetime.datetime.strptime(fecha_hora, '%d/%m/%y %H:%M')
-        usuario = [numero_de_opciones, nombre_de_usuario, fecha_hora]
-        return (usuario)
-
-def juego_trivia (DIRECCION):
+def jugar_juego_trivia (DIRECCION):
     lista_frases_y_pelis = leer_archivo(DIRECCION)
     lista_para_jugar = trivia(lista_frases_y_pelis,frases_utilizadas)
     return(lista_para_jugar)
-    
-def resultado_de_respuesta(metodo, lista, usuario, contador_repeticiones, aciertos):
-    if request.method == metodo:
-        opcion_elegida = request.form['opcion_elegida']
-    
-    if opcion_elegida == lista[1]:
-        aciertos += 1
-        calificacion = f"{aciertos}/{usuario[0]}"
-        respuesta = "¡Correcta!"  
-    else:
-        calificacion = f"{aciertos}/{usuario[0]}"
-        respuesta = f"¡Incorrecta!, la respuesta correcta es: {lista[1]}."
-    
-    if contador_repeticiones == usuario[0]:
-        guardar_datos_del_juego(usuario[1], calificacion, usuario[2])
-    
-    resultado = [respuesta, calificacion]
-    return (resultado, aciertos)  # Devuelve 'aciertos' actualizado
-
-from modules.persistencia import leer_archivo2
 
 def mostrar_resultados(DIRECCION2, resultados_partidas):
-    lista_de_resultados = leer_archivo2(DIRECCION2)
+    lista_de_resultados = leer_archivo_resultados(DIRECCION2)
     # Si la lista no está vacía, llenar `resultados_partidas`
     for linea in lista_de_resultados:
         resultados_partidas.append(linea)
     return (resultados_partidas)
-
 
 def mostrar_lista_peliculas(DIRECCION):
     lista_de_pelis_y_frases = leer_archivo(DIRECCION)
@@ -64,14 +33,14 @@ def mostrar_lista_peliculas(DIRECCION):
 
 def obtener_datos_graficas(direccion):
     try:
-        lista_para_graficar1 = leer_archivo2(direccion)
+        lista_para_graficar1 = leer_archivo_resultados(direccion)
         return lista_para_graficar1
     except FileNotFoundError:
         return ([]) # Retorna una lista vacía si el archivo no existe
 
 def generar_grafica_lineal(DIRECCION2):
     resultados_por_fecha = {}
-    lista_para_graficar1 = leer_archivo2(DIRECCION2)
+    lista_para_graficar1 = leer_archivo_resultados(DIRECCION2)
     
     for valor in lista_para_graficar1:
         fecha = valor[2].date()  # Extrae solo la fecha sin la hora
@@ -89,7 +58,7 @@ def generar_grafica_lineal(DIRECCION2):
     aciertos_acumulados = [resultados_por_fecha[fecha][0] for fecha in fechas]
     desaciertos_acumulados = [resultados_por_fecha[fecha][1] for fecha in fechas]
     
-    # Formatear las fechas para mostrar solo el día y el mes en las gráficas
+    # Formatear las fechas para mostrar solo el día sin la hora en las gráficas
     fechas_formateadas = [fecha.strftime('%d-%m-%Y') for fecha in fechas]  
     
     # Graficar la curva lineal
@@ -114,7 +83,7 @@ def generar_grafica_lineal(DIRECCION2):
     return imagen_base64
 
 def generar_grafica_circular(DIRECCION2):
-    lista_para_graficar1 = leer_archivo2(DIRECCION2)
+    lista_para_graficar1 = leer_archivo_resultados(DIRECCION2)
     calificacion=[valor[1].split('/') for valor in lista_para_graficar1]
     aciertos = [int(i[0]) for i in calificacion]
     desaciertos = [int(i[1])-int(i[0]) for i in calificacion] 
@@ -136,7 +105,6 @@ def generar_graficas_pdf(lista_para_graficar1):
     if not lista_para_graficar1:
         return False  # No generar PDF si no hay datos
 
-    # Código para generar las gráficas y el PDF
     fig1, ax1 = plt.subplots()
 
     # Generar gráfica lineal
