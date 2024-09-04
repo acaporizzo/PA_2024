@@ -16,10 +16,6 @@ RUTA = "./data/"
 DIRECCION = RUTA + "frases_de_peliculas.txt"
 DIRECCION2 = RUTA + "resultados_historicos.txt"
 
-# server.py
-
-# server.py
-
 @app.route("/", methods=["GET", "POST"]) 
 def home():
     global aciertos, contador_repeticiones, usuario, archivo_vacio, mensaje, metodo, numero_de_opciones
@@ -60,8 +56,6 @@ def respuestas():
     resultado, aciertos = resultado_de_respuesta(metodo, lista, usuario, contador_repeticiones, aciertos)
     return render_template("respuestas.html", respuesta=resultado[0], calificacion=resultado[1], contador_repeticiones=contador_repeticiones, numero_de_opciones=usuario[0])
 
-# server.py
-
 @app.route("/resultados", methods=["GET", "POST"])
 def ver_resultados():
     global advertencia, archivo_vacio, resultados_partidas
@@ -70,6 +64,7 @@ def ver_resultados():
     
     try: 
         resultados_partidas = mostrar_resultados(DIRECCION2, resultados_partidas)
+        print(f"Resultados obtenidos: {resultados_partidas}")
         if not resultados_partidas:  # Si la lista de info de la partida está vacía.
             archivo_vacio = True    # Cambia a True y se muestra la advertencia.
             advertencia = "No hay resultados para mostrar ya que todavía no empezó la trivia"
@@ -83,7 +78,6 @@ def ver_resultados():
 def ver_resultados_graficos():
     global grafica, grafica_circular, lista_para_graficar1
     
-    # Usa la función del módulo `servicio` para obtener los datos
     lista_para_graficar1 = obtener_datos_graficas(DIRECCION2)
 
     if lista_para_graficar1:  # Si la lista no se encuentra vacía, generar las gráficas
@@ -99,19 +93,17 @@ def listar_peliculas():
     lista_peliculas = mostrar_lista_peliculas(DIRECCION)
     return render_template("listar_peliculas.html", lista_peliculas=lista_peliculas)
 
-# server.py
-
 @app.route('/mostrar_graficas_pdf')
 def mostrar_graficas_pdf():
     global lista_para_graficar1
 
     # Verificar y generar el PDF utilizando la función en servicio
-    pdf_path = generar_graficas_pdf(lista_para_graficar1)
+    graficas_pdf = generar_graficas_pdf(lista_para_graficar1)
 
-    if pdf_path:
+    if graficas_pdf:
         try:
             # Asegúrate de que la ruta es correcta y envía el archivo
-            return send_file(pdf_path, as_attachment=True, download_name="graficas.pdf")
+            return send_file(graficas_pdf, as_attachment=True, download_name="graficas.pdf")
         except FileNotFoundError:
             # Manejo de error si el archivo no se encuentra
             return "El archivo PDF no se pudo encontrar o generar.", 404

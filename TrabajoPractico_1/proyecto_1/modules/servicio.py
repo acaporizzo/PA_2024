@@ -14,17 +14,14 @@ def datos_del_usuario(metodo):
     if request.method == metodo:
         numero_de_opciones = int(request.form['input_numero'])
         nombre_de_usuario = request.form['input_nombre']
-        # Corregir el uso de datetime:
         fecha_hora = datetime.datetime.now().strftime('%d/%m/%y %H:%M')  # Establece cuando comienza la partida.
         fecha_hora = datetime.datetime.strptime(fecha_hora, '%d/%m/%y %H:%M')
         usuario = [numero_de_opciones, nombre_de_usuario, fecha_hora]
-        return usuario
-
+        return (usuario)
 
 def juego_trivia (DIRECCION):
     lista_frases_y_pelis = leer_archivo(DIRECCION)
     lista_para_jugar = trivia(lista_frases_y_pelis,frases_utilizadas)
-
     return(lista_para_jugar)
     
 def resultado_de_respuesta(metodo, lista, usuario, contador_repeticiones, aciertos):
@@ -43,17 +40,19 @@ def resultado_de_respuesta(metodo, lista, usuario, contador_repeticiones, aciert
         guardar_datos_del_juego(usuario[1], calificacion, usuario[2])
     
     resultado = [respuesta, calificacion]
-    return resultado, aciertos  # Devuelve 'aciertos' actualizado
+    return (resultado, aciertos)  # Devuelve 'aciertos' actualizado
+
+from modules.persistencia import leer_archivo2
 
 def mostrar_resultados(DIRECCION2, resultados_partidas):
     lista_de_resultados = leer_archivo2(DIRECCION2)
+    # Si la lista no está vacía, llenar `resultados_partidas`
     for linea in lista_de_resultados:
-        resultados_partidas.append(linea)  # 'linea' ya es una tupla, no es necesario usar 'split'
-    return resultados_partidas
+        resultados_partidas.append(linea)
+    return (resultados_partidas)
 
 
 def mostrar_lista_peliculas(DIRECCION):
-
     lista_de_pelis_y_frases = leer_archivo(DIRECCION)
     lista_sin_repetir = []
 
@@ -63,26 +62,12 @@ def mostrar_lista_peliculas(DIRECCION):
     lista_sin_repetir = sorted(set(lista_sin_repetir))  # Ordenar alfabéticamente y eliminar duplicados.
     return [(i + 1, pelicula.capitalize()) for i, pelicula in enumerate(lista_sin_repetir)]  # Indexar las películas.
 
-# servicio.py
-
-from modules.persistencia import leer_archivo2
-
-# servicio.py
-
 def obtener_datos_graficas(direccion):
-    """
-    Obtiene los datos necesarios para generar las gráficas de resultados.
-    """
     try:
         lista_para_graficar1 = leer_archivo2(direccion)
-        # Si es necesario, aquí también puedes verificar o ajustar el formato de las fechas
         return lista_para_graficar1
     except FileNotFoundError:
-        # Retorna una lista vacía si el archivo no existe
-        return []
-
-
-# servicio.py
+        return ([]) # Retorna una lista vacía si el archivo no existe
 
 def generar_grafica_lineal(DIRECCION2):
     resultados_por_fecha = {}
@@ -128,9 +113,7 @@ def generar_grafica_lineal(DIRECCION2):
     plt.close()  
     return imagen_base64
 
-
 def generar_grafica_circular(DIRECCION2):
- 
     lista_para_graficar1 = leer_archivo2(DIRECCION2)
     calificacion=[valor[1].split('/') for valor in lista_para_graficar1]
     aciertos = [int(i[0]) for i in calificacion]
@@ -148,8 +131,6 @@ def generar_grafica_circular(DIRECCION2):
     plt.close()
     return(imagen_circular_base64)
 
-# servicio.py
-
 def generar_graficas_pdf(lista_para_graficar1):
     # Verifica que hay datos para graficar
     if not lista_para_graficar1:
@@ -157,6 +138,7 @@ def generar_graficas_pdf(lista_para_graficar1):
 
     # Código para generar las gráficas y el PDF
     fig1, ax1 = plt.subplots()
+
     # Generar gráfica lineal
     resultados_por_fecha = {}
     for valor in lista_para_graficar1:
@@ -190,8 +172,8 @@ def generar_graficas_pdf(lista_para_graficar1):
     ax2.pie([aciertos_totales, desaciertos_totales], labels=['Correcto', 'Incorrecto'], autopct='%1.1f%%')
     
     # Guardar ambas gráficas en un archivo PDF en el directorio correcto
-    pdf_path = "./data/graficas.pdf"
-    with PdfPages(pdf_path) as pdf:
+    DIREECION3 = "./data/graficas.pdf"
+    with PdfPages(DIREECION3) as pdf:
         pdf.savefig(fig1)  # Guardar gráfica lineal
         pdf.savefig(fig2)  # Guardar gráfica circular
 
@@ -199,4 +181,4 @@ def generar_graficas_pdf(lista_para_graficar1):
     plt.close(fig1)
     plt.close(fig2)
 
-    return pdf_path  # Retornar la ruta del archivo PDF generado
+    return (DIREECION3)  # Retornar la ruta del archivo PDF generado
