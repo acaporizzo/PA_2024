@@ -1,9 +1,10 @@
+import webbrowser
 from modules.alimentos import Kiwi,Manzana, Papa, Zanahoria, Fruta, Verdura, Alimentos
 from modules.cajon import Cajon
 from modules.cinta_transportadora import Cinta_Transportadora
 from modules.calculador import calcular_aw_promedio, calcular_peso
 from flask import Flask, render_template,request
-app = Flask(__name__)
+from modules.config import app
 
 @app.route("/", methods=["GET", "POST"])
 def home():
@@ -42,5 +43,7 @@ def home():
                         awt=diccionario_de_aw_promedio["aw_total"],
                         peso_total=peso_total)
 
+
 if __name__ == "__main__":
+    webbrowser.open('http://127.0.0.1:5000')
     app.run(debug=True)
