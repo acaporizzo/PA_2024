@@ -3,7 +3,7 @@ from modules.alimentos import Kiwi,Manzana, Papa, Zanahoria, Fruta, Verdura, Ali
 from modules.cajon import Cajon
 from modules.cinta_transportadora import Cinta_Transportadora
 from modules.calculador import calcular_aw_promedio, calcular_peso
-from flask import Flask, render_template,request
+from flask import render_template,request
 from modules.config import app
 
 @app.route("/", methods=["GET", "POST"])

@@ -17,7 +17,7 @@ with open("data/datos.txt", 'r') as archi:
             profesor = Profesor(nombre, apellido, dni)
             if primer_profesor is None:
                 primer_profesor = profesor
-                facultad = Facultad("FI UNER", "Dpto Programación", primer_profesor)
+                facultad = Facultad("FI UNER", "Dpto Programación", primer_profesor) #la facultad debe tener al menos uno o  mas deptos
                 facultad.contratar_profesor(profesor)
             else:
                 facultad.contratar_profesor(profesor)
@@ -42,7 +42,7 @@ print(texto)
 opcion = int(input("Elige una opción: "))
 while opcion != 6:
 
-    if opcion == 1:
+    if opcion == 1: #inscribir un alumno
         nombre_estudiante = input("Ingrese el nombre del estudiante: ")
         apellido_estudiante = input("Ingrese el apellido del estudiante: ")
         dni_estudiante = input("Ingrese el dni del estudiante: ")
@@ -54,7 +54,7 @@ while opcion != 6:
         for i, estudiante in enumerate(facultad.estudiantes):
             print(i+1, estudiante)
 
-    if opcion == 2:
+    if opcion == 2: #contratar un profesor
         nombre_profesor = input("Ingrese el nombre del profesor: ")
         apellido_profesor = input("Ingrese el apellido del profesor: ")
         dni_profesor = input("Ingrese el dni del profesor: ")
@@ -72,7 +72,7 @@ while opcion != 6:
         for i, profesor in enumerate(facultad.profesores):
             print(i+1, profesor)
 
-    if opcion == 3:
+    if opcion == 3: #crear un dpto nuevo
         nombre_dpto = input("Ingrese el nombre del nuevo departamento: ")
         print("Los profesores de la facultad son: ")
         for i, profesor in enumerate(facultad.profesores):
@@ -80,7 +80,7 @@ while opcion != 6:
         num_profesor_elegido = int(input("Ingrese el número que corresponde al director del nuevo departamento: "))
         profesor_director = facultad.profesores[num_profesor_elegido-1]
         while profesor_director.es_director:
-            print("Este profesor ya es director de un departamento")
+            print("Este profesor ya es director de otro departamento")
             num_profesor_elegido = int(input("Ingrese el número que corresponde al director del nuevo departamento: "))
             profesor_director = facultad.profesores[num_profesor_elegido-1]
         facultad.crear_departamento(nombre_dpto,profesor_director)
@@ -90,7 +90,7 @@ while opcion != 6:
         for i, dpto in enumerate(facultad.departamentos):
             print(i+1, dpto)
 
-    if opcion == 4:
+    if opcion == 4: #crear curso nuevo
         nombre_curso = input("Ingrese el nombre del curso: ")
         print("Los profesores de la facultad son: ")
         for i, profesor in enumerate(facultad.profesores):
@@ -108,7 +108,7 @@ while opcion != 6:
         for i,curso in enumerate(facultad.devolver_cursos_de_dpto(dpto_del_curso.nombre_dpto)):
             print(i+1,curso)
     
-    if opcion == 5:
+    if opcion == 5: #inscribir estudiante a un curso
         print("Los estudiantes de la facultad son: ")
         for i, estudiante in enumerate(facultad.estudiantes):
             print(i+1, estudiante)
@@ -127,8 +127,3 @@ while opcion != 6:
     opcion = int(input("Elige otra opción entre 1 y 6: "))
 
 print("Gracias :)")
-
-#cambiar director de un dpto
-#hacer que un profesor este en mas dptos
-#mostrar lista de profesores en un curso y en un dpto
-#mostrar el director de un dpto

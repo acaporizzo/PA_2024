@@ -68,7 +68,7 @@ class Facultad:
     def crear_departamento (self, p_nombre_dpto, p_profesor):
         """método para crear un nuevo dpto y agregarlo a la lista
         """
-        self._departamentos.append(Departamento (p_nombre_dpto, p_profesor))
+        self._departamentos.append(Departamento(p_nombre_dpto, p_profesor))
 
     def devolver_cursos_de_dpto(self, p_nombre_dpto):
         """método para mostrar los cursos de un departamento en específico
@@ -83,24 +83,6 @@ class Facultad:
         for curso in self._cursos:
             if p_nombre_curso == curso.nombre_curso:
                 return(curso.estudiantes_del_curso)
-            
-#    def devolver_director_de_dpto (self, p_nombre_dpto):
-#        """método para mostrar el director de un dpto (se define en departamento.py)
-#        """
-#        for dpto in self._departamentos:
-#            if p_nombre_dpto == dpto.nombre_dpto:
-#                return(dpto.director_de_dpto)
-            
-#    def devolver_profesores_de_dpto(self, p_nombre_dpto):
-#        """método para mostrar los profesores de un dpto (la lista de profesores 
-#        está definida en departamento.py)
-#        """
-#        profesores_de_dpto = []
-#        for dpto in self._departamentos:
-#            if dpto.nombre_dpto == p_nombre_dpto:
-#                profesores_de_dpto = dpto.profesores
-#                break
-#        return(profesores_de_dpto)
 
     def inscribir_estudiante(self, estudiante):
         """método para agregar un nuevo estudiante a la facultad
@@ -119,3 +101,24 @@ class Facultad:
         """
         salida = self._nombre_facu
         return(salida)
+    
+
+
+                
+#    def devolver_director_de_dpto (self, p_nombre_dpto):
+#        """método para mostrar el director de un dpto (se define en departamento.py)
+#        """
+#        for dpto in self._departamentos:
+#            if p_nombre_dpto == dpto.nombre_dpto:
+#                return(dpto.director_de_dpto)
+            
+#    def devolver_profesores_de_dpto(self, p_nombre_dpto):
+#        """método para mostrar los profesores de un dpto (la lista de profesores 
+#        está definida en departamento.py)
+#        """
+#        profesores_de_dpto = []
+#        for dpto in self._departamentos:
+#            if dpto.nombre_dpto == p_nombre_dpto:
+#                profesores_de_dpto = dpto.profesores
+#                break
+#        return(profesores_de_dpto)
