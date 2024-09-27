@@ -1,30 +1,7 @@
-from modules.alimentos import Kiwi, Manzana, Papa, Zanahoria
 from modules.cajon import Cajon
+from modules.alimentos import calcular_aw
 import math 
 import numpy as np 
-
-def calcular_aw (alimento):
-    """
-    Calcula la actividad acuosa (aw) del alimento proporcionado.
-
-    Args:
-        alimento (Alimento): El alimento del que se va a calcular la actividad acuosa.
-
-    Returns:
-        float: El valor de la actividad acuosa calculada para el alimento.
-
-    Raises:
-        ValueError: Si el tipo de alimento no es compatible con los tipos esperados.
-    """
-    if isinstance(alimento,Kiwi):
-        aw = 0.96 * ((1 - math.exp(-18 * alimento.peso_del_alimento)) / (1 + math.exp(-18 * alimento.peso_del_alimento)))
-    elif isinstance(alimento,Manzana):
-        aw = 0.97 * ((15 * alimento.peso_del_alimento) ** 2) / (1 + (15 * alimento.peso_del_alimento) ** 2)
-    elif isinstance(alimento,Papa):
-        aw = 0.66 * (np.arctan(18 * alimento.peso_del_alimento))
-    elif isinstance(alimento,Zanahoria):
-        aw = 0.96 * ((1 - math.exp(-10 * alimento.peso_del_alimento)))
-    return(aw)
 
 def calcular_aw_promedio(p_clase, cajon: Cajon):
     """
