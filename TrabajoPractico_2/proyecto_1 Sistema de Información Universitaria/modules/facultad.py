@@ -32,6 +32,13 @@ class Facultad:
     def nombre_facu(self):
         return self._nombre_facu
    
+    def crear_departamento_y_asignar_director(self, nombre_dpto, profesor_director):
+        """ Método que crea un departamento nuevo y asigna un director """
+        if isinstance(profesor_director, Profesor):
+            self.crear_departamento(nombre_dpto, profesor_director)
+            self.atribuir_dpto_a_profesor(profesor_director, nombre_dpto)
+            self.atribuir_director_a_dpto(profesor_director, nombre_dpto)
+
     def atribuir_curso_al_dpto(self, p_nombre_del_curso, p_nombre_dpto):
         """método para agregar un curso a un departamento
         """

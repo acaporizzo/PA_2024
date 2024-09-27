@@ -79,16 +79,8 @@ while opcion != 6:
             print(i+1, profesor)
         num_profesor_elegido = int(input("Ingrese el número que corresponde al director del nuevo departamento: "))
         profesor_director = facultad.profesores[num_profesor_elegido-1]
-        while profesor_director.es_director:
-            print("Este profesor ya es director de un departamento")
-            num_profesor_elegido = int(input("Ingrese el número que corresponde al director del nuevo departamento: "))
-            profesor_director = facultad.profesores[num_profesor_elegido-1]
-        facultad.crear_departamento(nombre_dpto,profesor_director)
-        facultad.atribuir_dpto_a_profesor(profesor_director,nombre_dpto)
-        facultad.atribuir_director_a_dpto(profesor_director,nombre_dpto)
-        print("Los departamentos de la facultad son: ")
-        for i, dpto in enumerate(facultad.departamentos):
-            print(i+1, dpto)
+        facultad.crear_departamento_y_asignar_director(nombre_dpto, profesor_director)
+        print("Departamento creado y director asignado.")
 
     if opcion == 4:
         nombre_curso = input("Ingrese el nombre del curso: ")
