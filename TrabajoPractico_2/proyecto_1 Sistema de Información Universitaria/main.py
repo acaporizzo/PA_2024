@@ -105,8 +105,7 @@ while opcion != 6:
         dpto_del_curso = facultad.departamentos[num_dpto_elegido-1]
         facultad.atribuir_curso_al_dpto(Curso(nombre_curso,profesor_titular),dpto_del_curso.nombre_dpto)
         print("Los cursos en el departamento:",dpto_del_curso,"son: ")
-        for i,curso in enumerate(facultad.devolver_cursos_de_dpto(dpto_del_curso.nombre_dpto)):
-            print(i+1,curso)
+     
     
     if opcion == 5: #inscribir estudiante a un curso
         print("Los estudiantes de la facultad son: ")
