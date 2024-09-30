@@ -1,6 +1,6 @@
 from modules.curso import Curso
 from modules.departamento import Departamento 
-from modules.persona_facultativa import Profesor
+from modules.persona_facultativa import Estudiante, Profesor
 
 class Facultad:
     def __init__(self, p_nombre_facu, p_nombre_dpto_inicial, p_primer_profesor): 
@@ -31,7 +31,23 @@ class Facultad:
     @property
     def nombre_facu(self):
         return self._nombre_facu
-   
+    
+    @classmethod
+    def inicializar_desde_archivo(cls, ruta_archivo):
+        """Clase método para inicializar una instancia de Facultad desde un archivo"""
+        try:
+            with open(ruta_archivo, 'r') as archivo:
+                nombre_facu = archivo.readline().strip()
+                nombre_dpto_inicial = archivo.readline().strip()
+                nombre_profesor_inicial = archivo.readline().strip()
+                # Crea la facultad con los datos iniciales
+                facultad = cls(nombre_facu, nombre_dpto_inicial, Profesor(nombre_profesor_inicial))
+                return facultad
+        except FileNotFoundError:
+            print(f"Error: El archivo '{ruta_archivo}' no fue encontrado.")
+        except Exception as e:
+            print(f"Error: {e}")
+
     def crear_departamento_y_asignar_director(self, nombre_dpto, profesor_director):
         """ Método que crea un departamento nuevo y asigna un director """
         if isinstance(profesor_director, Profesor):
@@ -61,21 +77,29 @@ class Facultad:
             for dpto in self._departamentos:
                 if p_nombre_dpto == dpto.nombre_dpto:
                     dpto.agregar_profesor_a_dpto(p_nuevo_profesor) #en departamento.py
+    
+    
                     
-    def contratar_profesor(self, profesor):
+    def contratar_profesor(self, nombre, apellido, dni):
         """método para agregar un nuevo profesor a la facultad
         """
+        profesor = Profesor(nombre, apellido, dni)
         self._profesores.append(profesor)
+        return profesor
 
     def crear_curso(self, p_nombre_curso, p_profesor):
         """método para crear un nuevo curso y agregarlo a la lista
         """
+        curso = Curso(p_nombre_curso, p_profesor)
         self._cursos.append(Curso(p_nombre_curso, p_profesor))
+        return curso
 
     def crear_departamento (self, p_nombre_dpto, p_profesor):
         """método para crear un nuevo dpto y agregarlo a la lista
         """
+        departamento = Departamento(p_nombre_dpto, p_profesor)
         self._departamentos.append(Departamento(p_nombre_dpto, p_profesor))
+        return departamento
 
     def devolver_cursos_de_dpto(self, p_nombre_dpto):
         """método para mostrar los cursos de un departamento en específico
@@ -91,23 +115,23 @@ class Facultad:
             if p_nombre_curso == curso.nombre_curso:
                 return(curso.estudiantes_del_curso)
 
-    def inscribir_estudiante(self, estudiante):
+    def inscribir_estudiante(self, nombre, apellido, dni):
         """método para agregar un nuevo estudiante a la facultad
         """
+        estudiante = Estudiante(nombre, apellido, dni)
         self._estudiantes.append(estudiante)
+        return estudiante
 
     def __repr__(self):
         """método para definir la representación de cadena de una instancia de una clase
         """
-        salida = self._nombre_facu
-        return(salida)
+        return self._nombre_facu
     
     def __str__(self):
         """para definir una representación legible de una instancia de una clase o 
         cuando se intenta imprimir la instancia
         """
-        salida = self._nombre_facu
-        return(salida)
+        return self._nombre_facu
     
 
 
