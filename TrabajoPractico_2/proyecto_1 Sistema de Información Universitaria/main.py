@@ -1,12 +1,24 @@
 from modules.facultad import Facultad
 
-# Inicialización de la facultad con un primer profesor
-facultad = Facultad.inicializar_desde_archivo("data/datos.txt")
-if facultad is None:
-    print("Error al inicializar la facultad desde el archivo")
-else:
-    facultad.inscribir_alumno()
-    
+primer_profesor=None
+facultad=None
+
+with open("data/datos.txt", 'r') as archi:
+    for linea in archi:
+        datos = linea.strip().split(",")
+        tipo = datos[0]
+        nombre = datos[1]
+        apellido = datos[2]
+        dni = datos[3]
+        if tipo == "Profesor":
+            if primer_profesor is None:
+                facultad = Facultad("FI UNER", "Dpto Programación", nombre, apellido, dni)  # Crear facultad con el primer profesor
+                primer_profesor = True
+            else:
+                facultad.contratar_profesor(nombre, apellido, dni)
+        elif tipo == 'Estudiante':
+            facultad.inscribir_estudiante(nombre, apellido, dni)
+
 texto = """
 ########################################
 # Sistema de información universitaria #
@@ -21,22 +33,109 @@ Las opciones son:
 """
 
 print(texto)
-opcion = int(input("Elige una opción: "))
+while True:
+    try:
+        opcion = int(input("Elige una opción: "))  # Solicita la opción al usuario
+        break  # Si la conversión es exitosa, salimos del bucle
+    except ValueError:
+        print("Por favor, ingresa un número válido.")  # Mensaje de error amigable
+        
+
 while opcion != 6:
-    if opcion == 1:  # Inscribir un alumno
-        facultad.inscribir_alumno()
 
-    elif opcion == 2:  # Contratar un profesor
-        facultad.contratar_profesor()
+    if opcion == 1: #inscribir un alumno
+        nombre_estudiante = input("Ingrese el nombre del estudiante: ")
+        apellido_estudiante = input("Ingrese el apellido del estudiante: ")
+        dni_estudiante = input("Ingrese el dni del estudiante: ")
+        facultad.inscribir_estudiante(nombre_estudiante, apellido_estudiante, dni_estudiante)
+        with open("data/datos.txt", 'a') as archi:  # Abre el archivo en modo 'append'
+            archi.write(f"Estudiante,{nombre_estudiante},{apellido_estudiante},{dni_estudiante}\n")  # Añade el nuevo estudiante al archivo
+        print("Los estudiantes de la facultad son: ")
+        facultad.mostrar_estudiantes()
 
-    elif opcion == 3:  # Crear un departamento nuevo
-        facultad.crear_departamento()
+    if opcion == 2: #contratar un profesor
+        nombre_profesor = input("Ingrese el nombre del profesor: ")
+        apellido_profesor = input("Ingrese el apellido del profesor: ")
+        dni_profesor = input("Ingrese el dni del profesor: ")
+        facultad.contratar_profesor(nombre_profesor, apellido_profesor, dni_profesor)
+        with open("data/datos.txt", 'a') as archi:
+            archi.write(f"Profesor,{nombre_profesor},{apellido_profesor},{dni_profesor}\n")
+        facultad.mostrar_profesores()
+        with open("data/datos.txt", 'a') as archi:  # Abre el archivo en modo 'append'
+            archi.write(f"Profesor,{nombre_profesor},{apellido_profesor},{dni_profesor}\n")  # Añade el nuevo profesor al archivo
+        facultad.mostrar_profesores()
 
-    elif opcion == 4:  # Crear un curso nuevo
-        facultad.crear_curso()
+    if opcion == 3: #crear un dpto nuevo
+        nombre_dpto = input("Ingrese el nombre del nuevo departamento: ")
+        facultad.mostrar_profesores()
+        print("Profesores disponibles:")
+        for idx, profesor in enumerate(facultad.profesores):
+            print(f"{idx}: {profesor.nombre} {profesor.apellido}")
+        while True:  # Bucle para solicitar un número de profesor hasta que sea válido
+            try:
+                num_profesor_elegido = int(input("Selecciona el número de profesor: "))
+                
+                # Verifica que el índice esté dentro del rango
+                if 0 <= num_profesor_elegido < len(facultad.profesores):
+                    profesor_director = facultad.obtener_profesor(num_profesor_elegido)
+                    break  # Sale del bucle si el número es válido
+                else:
+                    print("Número de profesor no válido. Por favor, selecciona un número entre 0 y", len(facultad.profesores) - 1)
+            except ValueError:
+                print("Por favor, ingresa un número válido.")
 
-    elif opcion == 5:  # Inscribir estudiante a un curso
-        facultad.inscribir_estudiante_a_curso()
+        facultad.crear_departamento(nombre_dpto, profesor_director)
+        facultad.mostrar_departamentos()
+
+    if opcion == 4: #crear curso nuevo
+        nombre_curso = input("Ingrese el nombre del curso: ")
+        facultad.mostrar_profesores()
+        print("Profesores disponibles:")
+        for idx, profesor in enumerate(facultad.profesores):
+            print(f"{idx}: {profesor.nombre} {profesor.apellido}")
+        while True:  # Bucle para solicitar un número de profesor hasta que sea válido
+            try:
+                num_profesor_elegido = int(input("Selecciona el número de profesor: "))
+                
+                # Verifica que el índice esté dentro del rango
+                if 0 <= num_profesor_elegido < len(facultad.profesores):
+                    profesor_director = facultad.obtener_profesor(num_profesor_elegido)
+                    break  # Sale del bucle si el número es válido
+                else:
+                    print("Número de profesor no válido. Por favor, selecciona un número entre 0 y", len(facultad.profesores) - 1)
+            except ValueError:
+                print("Por favor, ingresa un número válido.")
+
+    facultad.crear_curso(nombre_curso, profesor_director)
+    facultad.mostrar_departamentos()
+    while True:  # Bucle para seleccionar un departamento válido
+        try:
+            print("Departamentos disponibles:")
+            for idx, dpto in enumerate(facultad.departamentos):
+                print(f"{idx}: {dpto.nombre_dpto}")  # Asegúrate de que `nombre` sea un atributo de la clase Departamento
+            
+            num_dpto_elegido = int(input("Ingrese el número que corresponde al departamento que pertenece el curso: "))
+            
+            # Intenta obtener el departamento
+            if 0 <= num_dpto_elegido < len(facultad.departamentos):
+                dpto_del_curso = facultad.obtener_departamento(num_dpto_elegido)
+                facultad.atribuir_curso_al_dpto(nombre_curso, dpto_del_curso)
+                break  # Sale del bucle si se obtiene correctamente
+            else:
+                print("Número de departamento no válido. Por favor, selecciona un número que esté en la lista.")
+        
+        except ValueError:
+            print("Por favor, ingresa un número válido.")
+
+    if opcion == 5: #inscribir estudiante a un curso
+        facultad.mostrar_estudiantes()
+        num_estudiante_elegido = int(input("Ingrese el número que corresponde al estudiante que se inscribirá: "))
+        estudiante_elegido = facultad.obtener_estudiante(num_estudiante_elegido)
+        facultad.mostrar_cursos()
+        num_curso_elegido = int(input("Ingrese el número que corresponde al curso donde se va a inscribir: "))
+        curso_elegido = facultad.obtener_curso(num_curso_elegido)
+        curso_elegido.agregar_estudiante_al_curso(estudiante_elegido)
+        curso_elegido.mostrar_estudiantes()
 
     opcion = int(input("Elige otra opción entre 1 y 6: "))
 

@@ -6,3 +6,11 @@ Estudiante,Agustina,Wiesner,45387555
 Estudiante,Ana Clara,Polari,45387332
 Estudiante,Ana Clara,Evequoz,45396744
 Estudiante,Juan,Perez,44756299
+Estudiante,Emi,Paz,41735891
+Estudiante,Ema,Gomez,40759684
+Estudiante,Dante,Perez,30472654
+Profesor,Sergio,López,35417256
+Profesor,Elena,Diaz,42123469
+Profesor,Elena,Diaz,42123469
+Estudiante,Paula,Re,12476985
+Estudiante,Fer,De,14742145
