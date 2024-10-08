@@ -45,13 +45,17 @@ class Facultad:
             print("Índice de departamento no válido. Por favor, elige uno de la lista.")
             return None  # Devuelve None si el índice es inválido
             
-    def atribuir_curso_al_dpto(self, p_nombre_del_curso, p_nombre_dpto):
-        """método para agregar un curso a un departamento
-        """
-        if isinstance(p_nombre_del_curso, Curso):
+    def atribuir_curso_al_dpto(self, curso, p_nombre_dpto):
+        """método para agregar un curso a un departamento"""
+        if isinstance(curso, Curso):
             for dpto in self._departamentos:
                 if p_nombre_dpto == dpto.nombre_dpto:
-                    dpto.atribuir_curso(p_nombre_del_curso)
+                    dpto.atribuir_curso(curso)
+                    
+    def guardar_profesor(self, profesor):
+        """Este método guarda al profesor en la lista de profesores."""
+        self.profesores.append(profesor)
+        print(f"Profesor {profesor['nombre']} {profesor['apellido']} guardado con éxito.")
 
     def atribuir_director_a_dpto (self, p_profesor, p_nombre_dpto):
         """método para asignar a un profesor como director de un dpto
@@ -75,12 +79,18 @@ class Facultad:
         profesor = Profesor(nombre, apellido, dni)
         self._profesores.append(profesor)
         return profesor
+    
+    def listar_profesores(self):
+        """Este método lista todos los profesores contratados."""
+        for profesor in self.profesores:
+            print(f"{profesor['nombre']} {profesor['apellido']} - DNI: {profesor['dni']}")
+
 
     def crear_curso(self, p_nombre_curso, p_profesor):
         """método para crear un nuevo curso y agregarlo a la lista
         """
         curso = Curso(p_nombre_curso, p_profesor)
-        self._cursos.append
+        self._cursos.append(curso)
         return curso
 
     def crear_departamento (self, p_nombre_dpto, p_profesor):
