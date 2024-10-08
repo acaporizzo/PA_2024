@@ -87,45 +87,41 @@ while opcion != 6:
         facultad.crear_departamento(nombre_dpto, profesor_director)
         facultad.mostrar_departamentos()
 
-    if opcion == 4: #crear curso nuevo
+    if opcion == 4:  # crear curso nuevo
         nombre_curso = input("Ingrese el nombre del curso: ")
-        facultad.mostrar_profesores()
-        print("Profesores disponibles:")
-        for idx, profesor in enumerate(facultad.profesores):
-            print(f"{idx}: {profesor.nombre} {profesor.apellido}")
+        facultad.mostrar_profesores()  # Mostrar profesores asignados
+
         while True:  # Bucle para solicitar un número de profesor hasta que sea válido
             try:
                 num_profesor_elegido = int(input("Selecciona el número de profesor: "))
-                
-                # Verifica que el índice esté dentro del rango
                 if 0 <= num_profesor_elegido < len(facultad.profesores):
-                    profesor_director = facultad.obtener_profesor(num_profesor_elegido)
+                    profesor_asignado = facultad.obtener_profesor(num_profesor_elegido)
                     break  # Sale del bucle si el número es válido
                 else:
                     print("Número de profesor no válido. Por favor, selecciona un número entre 0 y", len(facultad.profesores) - 1)
             except ValueError:
                 print("Por favor, ingresa un número válido.")
 
-    facultad.crear_curso(nombre_curso, profesor_director)
-    facultad.mostrar_departamentos()
-    while True:  # Bucle para seleccionar un departamento válido
-        try:
-            print("Departamentos disponibles:")
-            for idx, dpto in enumerate(facultad.departamentos):
-                print(f"{idx}: {dpto.nombre_dpto}")  # Asegúrate de que `nombre` sea un atributo de la clase Departamento
+        # Creación del curso
+        nuevo_curso = facultad.crear_curso(nombre_curso, profesor_asignado)
+
+        # Asignación del curso a un departamento
+        facultad.mostrar_departamentos()  # Mostrar departamentos existentes
+
+        while True:  # Bucle para seleccionar un departamento válido
+            try:
+                num_dpto_elegido = int(input("Ingrese el número que corresponde al departamento que pertenece el curso: "))
+
+                # Verifica que el índice esté dentro del rango
+                if 0 <= num_dpto_elegido < len(facultad.departamentos):
+                    dpto_del_curso = facultad.obtener_departamento(num_dpto_elegido)
+                    facultad.atribuir_curso_al_dpto(nuevo_curso, dpto_del_curso.nombre_dpto)
+                    break  # Sale del bucle si se obtiene correctamente
+                else:
+                    print("Número de departamento no válido. Por favor, selecciona un número que esté en la lista.")
             
-            num_dpto_elegido = int(input("Ingrese el número que corresponde al departamento que pertenece el curso: "))
-            
-            # Intenta obtener el departamento
-            if 0 <= num_dpto_elegido < len(facultad.departamentos):
-                dpto_del_curso = facultad.obtener_departamento(num_dpto_elegido)
-                facultad.atribuir_curso_al_dpto(nombre_curso, dpto_del_curso)
-                break  # Sale del bucle si se obtiene correctamente
-            else:
-                print("Número de departamento no válido. Por favor, selecciona un número que esté en la lista.")
-        
-        except ValueError:
-            print("Por favor, ingresa un número válido.")
+            except ValueError:
+                print("Por favor, ingresa un número válido.")
 
     if opcion == 5: #inscribir estudiante a un curso
         facultad.mostrar_estudiantes()

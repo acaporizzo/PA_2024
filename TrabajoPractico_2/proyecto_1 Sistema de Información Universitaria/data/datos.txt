@@ -14,3 +14,4 @@ Profesor,Elena,Diaz,42123469
 Profesor,Elena,Diaz,42123469
 Estudiante,Paula,Re,12476985
 Estudiante,Fer,De,14742145
+Estudiante,Eli,Re,12345678
