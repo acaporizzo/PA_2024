@@ -9,7 +9,7 @@ class Facultad:
         self._cursos = []
         primer_profesor = Profesor(nombre_profesor, apellido_profesor, dni_profesor)
         self._departamentos = [Departamento(p_nombre_dpto_inicial, primer_profesor)]
-        self._estudiantes = [] 
+        self._estudiantes = []
         self._nombre_facu = p_nombre_facu
         self._profesores = [primer_profesor]
 
@@ -87,44 +87,39 @@ class Facultad:
         self.profesores.append(profesor)
         print(f"Profesor {profesor['nombre']} {profesor['apellido']} guardado con éxito.")
 
-    def crear_departamento(self):
-        """Método que solicita seleccionar un profesor y lo asigna como director de un departamento."""
+    def verificar_nombre_departamento(self, nombre_dpto):
+        """Verifica si el nombre del departamento ya existe."""
+        if any(departamento.nombre_dpto == nombre_dpto for departamento in self.departamentos):
+            print(f"El departamento {nombre_dpto} ya existe. Por favor, ingresa un nombre diferente.")
+            return False
+        return True
 
-        while True:
-            nombre_dpto = input("Ingrese el nombre del nuevo departamento: ")
-            
-            # Verificar si el departamento ya existe
-            if any(departamento.nombre_dpto == nombre_dpto for departamento in self.departamentos):
-                print(f"El departamento {nombre_dpto} ya existe. Por favor, ingresa un nombre diferente.")
-            else:
-                break  # Sale del bucle si el nombre es válido
-        
-        # Mostrar los profesores disponibles una sola vez
+    def crear_departamento(self, nombre_dpto, profesor_director):
+        """Crea un nuevo departamento con el profesor seleccionado como director."""
+        if self.verificar_nombre_departamento(nombre_dpto):
+            nuevo_departamento = Departamento(nombre_dpto, profesor_director)
+            self.departamentos.append(nuevo_departamento)
+            profesor_director.es_director = True
+            print(f"El departamento {nombre_dpto} ha sido creado y {profesor_director.nombre} ha sido asignado como director.")
+
+    def asignar_director(self, nombre_dpto):
+        """Selecciona y retorna un profesor para ser asignado como director."""
         self.mostrar_profesores()
-
-        # Solicitar selección válida del profesor, y verificar que no sea director de otro departamento
         while True:
             try:
                 num_profesor_elegido = int(input("Selecciona el número de profesor para asignar como director: "))
-                
-                if 1 <= num_profesor_elegido <= len(self.profesores):  # Validación para el rango de selección (de 1 a N)
-                    profesor_director = self.obtener_profesor(num_profesor_elegido - 1)  # Restar 1 para el índice correcto
-                    
-                    # Verificar si el profesor ya es director de algún departamento
+                if 1 <= num_profesor_elegido <= len(self.profesores):
+                    profesor_director = self.obtener_profesor(num_profesor_elegido - 1)
+                    # Verificar si el profesor ya es director
                     if profesor_director.es_director:
-                        print(f"El profesor {profesor_director.nombre} ya es director de otro departamento.")
+                        print(f"El profesor {profesor_director.nombre} ya es director de otro departamento. Elige otro profesor.")
                     else:
-                        # Crear el departamento con el profesor como director
-                        self.crear_departamento(nombre_dpto, profesor_director)
-                        profesor_director.es_director = True  # Marcar al profesor como director
-                        print(f"{profesor_director.nombre} ha sido asignado como director del departamento {nombre_dpto}.")
-                        break  # Sale del bucle si todo es correcto
+                        return profesor_director  # Se retorna un profesor que no es director
                 else:
                     print("Número de profesor no válido. Por favor, ingresa un número válido.")
-            
             except ValueError:
                 print("Por favor, ingresa un número válido.")
-
+                
     def atribuir_dpto_a_profesor (self, p_nuevo_profesor, p_nombre_dpto):
         """método para inscribir a un profesor en un dpto
         """
@@ -146,12 +141,12 @@ class Facultad:
         self._cursos.append(curso)
         return curso
 
-    def crear_departamento (self, p_nombre_dpto, p_profesor):
-        """método para crear un nuevo dpto y agregarlo a la lista
-        """
-        departamento = Departamento(p_nombre_dpto, p_profesor)
-        self._departamentos.append(Departamento(p_nombre_dpto, p_profesor))
-        return departamento
+    #def crear_departamento (self, p_nombre_dpto, p_profesor):
+        #"""método para crear un nuevo dpto y agregarlo a la lista
+        #"""
+        #departamento = Departamento(p_nombre_dpto, p_profesor)
+        #self._departamentos.append(Departamento(p_nombre_dpto, p_profesor))
+        #return departamento
 
     def devolver_cursos_de_dpto(self, p_nombre_dpto):
         """método para mostrar los cursos de un departamento en específico

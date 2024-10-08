@@ -62,10 +62,12 @@ while opcion != 6:
         facultad.mostrar_profesores()
 
     if opcion == 3:  # Crear un departamento nuevo
-
-        profesor_director = facultad.crear_departamento()
-        facultad.mostrar_departamentos()
-
+        nombre_dpto = input("Ingrese el nombre del nuevo departamento: ")
+        if facultad.verificar_nombre_departamento(nombre_dpto):
+            profesor_director = facultad.asignar_director(nombre_dpto)
+            if profesor_director:  # Verifica que se ha asignado un director válido
+                facultad.crear_departamento(nombre_dpto, profesor_director)
+                facultad.mostrar_departamentos()
 
     if opcion == 4:  # Crear curso nuevo
         nombre_curso = input("Ingrese el nombre del curso: ")
@@ -102,7 +104,6 @@ while opcion != 6:
                 
         except ValueError:
             print("Por favor, ingresa un número válido.")
-
 
     if opcion == 5: #inscribir estudiante a un curso
         facultad.mostrar_estudiantes()
