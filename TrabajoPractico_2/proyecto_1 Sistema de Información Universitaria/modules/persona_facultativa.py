@@ -13,17 +13,17 @@ class Persona_Facultativa:
         self._nombre = p_nombre
 
     @property
+    def nombre(self):
+        return(self._nombre)
+
+    @property
     def apellido(self):
         return(self._apellido)
     
     @property
     def dni (self):
-        return(self._nombre)
+        return(self._dni)
     
-    @property
-    def nombre(self):
-        return(self._nombre)
-
 class Estudiante (Persona_Facultativa):
     def __init__(self,p_nombre, p_apellido,p_dni):
         """los atributos serán heredados de la clase Persona_Facultativa

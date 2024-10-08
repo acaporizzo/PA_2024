@@ -33,6 +33,36 @@ class Facultad:
     def nombre_facu(self):
         return self._nombre_facu
     
+    def inscribir_estudiante(self, nombre, apellido, dni):
+        """Método para agregar un nuevo estudiante a la facultad
+        """
+        estudiante = Estudiante(nombre, apellido, dni)
+        self._estudiantes.append(estudiante)
+        return estudiante
+    
+    def mostrar_estudiantes(self):
+        """ Método para mostrar todos los estudiantes inscriptos en la facultad """
+        if not self._estudiantes:
+            print("No hay estudiantes inscriptos.")
+        else:
+            for idx, estudiante in enumerate(self._estudiantes, start=1):
+                print(f"{idx}: {estudiante.nombre} {estudiante.apellido}")
+
+    def contratar_profesor(self,  nombre, apellido, dni):
+        """método para agregar un nuevo profesor a la facultad
+        """
+        profesor = Profesor(nombre, apellido, dni)
+        self._profesores.append(profesor)
+        return profesor
+    
+    def mostrar_profesores(self):
+        """ Método para mostrar todos los profesores contratados en la facultad """
+        if not self._profesores:  # Verifica si la lista de profesores está vacía
+            print("No hay profesores contratados.")
+        else:
+            for idx, profesor in enumerate(self._profesores, start=1):
+                print(f"{idx}: {profesor.nombre} {profesor.apellido}")
+
     def agregar_departamento(self, departamento):
         """Método para agregar un departamento a la facultad."""
         self._departamentos.append(departamento)
@@ -57,13 +87,43 @@ class Facultad:
         self.profesores.append(profesor)
         print(f"Profesor {profesor['nombre']} {profesor['apellido']} guardado con éxito.")
 
-    def atribuir_director_a_dpto (self, p_profesor, p_nombre_dpto):
-        """método para asignar a un profesor como director de un dpto
-        """
-        for depto in self._departamentos:
-            if p_nombre_dpto == depto.nombre_dpto:
-                depto.atribuir_director(p_profesor) #en departamento.py
-                p_profesor.es_director = True
+    def crear_departamento(self):
+        """Método que solicita seleccionar un profesor y lo asigna como director de un departamento."""
+
+        while True:
+            nombre_dpto = input("Ingrese el nombre del nuevo departamento: ")
+            
+            # Verificar si el departamento ya existe
+            if any(departamento.nombre_dpto == nombre_dpto for departamento in self.departamentos):
+                print(f"El departamento {nombre_dpto} ya existe. Por favor, ingresa un nombre diferente.")
+            else:
+                break  # Sale del bucle si el nombre es válido
+        
+        # Mostrar los profesores disponibles una sola vez
+        self.mostrar_profesores()
+
+        # Solicitar selección válida del profesor, y verificar que no sea director de otro departamento
+        while True:
+            try:
+                num_profesor_elegido = int(input("Selecciona el número de profesor para asignar como director: "))
+                
+                if 1 <= num_profesor_elegido <= len(self.profesores):  # Validación para el rango de selección (de 1 a N)
+                    profesor_director = self.obtener_profesor(num_profesor_elegido - 1)  # Restar 1 para el índice correcto
+                    
+                    # Verificar si el profesor ya es director de algún departamento
+                    if profesor_director.es_director:
+                        print(f"El profesor {profesor_director.nombre} ya es director de otro departamento.")
+                    else:
+                        # Crear el departamento con el profesor como director
+                        self.crear_departamento(nombre_dpto, profesor_director)
+                        profesor_director.es_director = True  # Marcar al profesor como director
+                        print(f"{profesor_director.nombre} ha sido asignado como director del departamento {nombre_dpto}.")
+                        break  # Sale del bucle si todo es correcto
+                else:
+                    print("Número de profesor no válido. Por favor, ingresa un número válido.")
+            
+            except ValueError:
+                print("Por favor, ingresa un número válido.")
 
     def atribuir_dpto_a_profesor (self, p_nuevo_profesor, p_nombre_dpto):
         """método para inscribir a un profesor en un dpto
@@ -72,13 +132,6 @@ class Facultad:
             for dpto in self._departamentos:
                 if p_nombre_dpto == dpto.nombre_dpto:
                     dpto.agregar_profesor_a_dpto(p_nuevo_profesor) #en departamento.py
-                    
-    def contratar_profesor(self,  nombre, apellido, dni):
-        """método para agregar un nuevo profesor a la facultad
-        """
-        profesor = Profesor(nombre, apellido, dni)
-        self._profesores.append(profesor)
-        return profesor
     
     def listar_profesores(self):
         """Este método lista todos los profesores contratados."""
@@ -114,30 +167,9 @@ class Facultad:
             if p_nombre_curso == curso.nombre_curso:
                 return curso.estudiantes_del_curso
 
-    def inscribir_estudiante(self, nombre, apellido, dni):
-        """método para agregar un nuevo estudiante a la facultad
-        """
-        estudiante = Estudiante(nombre, apellido, dni)
-        self._estudiantes.append(estudiante)
-        return estudiante
-    
     def inscribir_estudiante_a_curso(self, estudiante, curso):
         """ Método para inscribir un estudiante a un curso """
         curso.agregar_estudiante_al_curso(estudiante)
-
-    def mostrar_estudiantes(self):
-        """ Método para mostrar todos los estudiantes inscritos en la facultad """
-        for estudiante in self._estudiantes:
-            print(f"Nombre: {estudiante.nombre}, Apellido: {estudiante.apellido}, DNI: {estudiante.dni}")
-
-    def mostrar_profesores(self):
-        """ Método para mostrar todos los profesores contratados en la facultad """
-        if not self._profesores:  # Verifica si la lista de profesores está vacía
-            print("No hay profesores contratados.")
-        else:
-            print("Profesores contratados:")
-            for idx, profesor in enumerate(self._profesores):
-                print(f"{idx}: Nombre: {profesor.nombre}, Apellido: {profesor.apellido}, DNI: {profesor.dni}")
     
     def obtener_profesor(self, num_profesor):
         """ Método para obtener un profesor según su índice en la lista de profesores """
@@ -152,8 +184,27 @@ class Facultad:
             print("No hay departamentos disponibles.")
         else:
             print("Departamentos disponibles:")
-            for idx, departamento in enumerate(self.departamentos):
+            for idx, departamento in enumerate(self.departamentos, start=1):
                 print(f"{idx}: {departamento.nombre_dpto}")
+
+    def obtener_estudiante(self, num_estudiante):
+        """ Método para obtener un estudiante según su índice """
+        try:
+            return self._estudiantes[num_estudiante - 1]  # Restamos 1 porque la enumeración inicia en 1
+        except IndexError:
+            print(f"Error: El número de estudiante proporcionado ({num_estudiante}) no es válido.")
+            return None
+        
+    def mostrar_cursos(self):
+        """ Método para mostrar todos los cursos disponibles """
+        if not self._cursos:
+            print("No hay cursos disponibles.")
+        else:
+            print("Cursos disponibles:")
+            for idx, curso in enumerate(self._cursos, start=1):
+                print(f"{idx}: {curso.nombre_curso}")
+
+
 
     def __repr__(self):
         """método para definir la representación de cadena de una instancia de una clase

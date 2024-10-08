@@ -9,9 +9,11 @@ Estudiante,Juan,Perez,44756299
 Estudiante,Emi,Paz,41735891
 Estudiante,Ema,Gomez,40759684
 Estudiante,Dante,Perez,30472654
-Profesor,Sergio,López,35417256
-Profesor,Elena,Diaz,42123469
+Profesor,Sergio,Lï¿½pez,35417256
 Profesor,Elena,Diaz,42123469
 Estudiante,Paula,Re,12476985
-Estudiante,Fer,De,14742145
-Estudiante,Eli,Re,12345678
+Estudiante,Maria,Perez,58963214
+Profesor,Claudia,Villanueva,17852963
+Estudiante,Agostina,Gomez,8954723
+Estudiante,Maria,Perez,58963214
+Profesor,Jose,Martinez,5784123
