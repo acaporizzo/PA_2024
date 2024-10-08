@@ -1,7 +1,4 @@
 from modules.cajon import Cajon
-from modules.alimentos import calcular_aw
-import math 
-import numpy as np 
 
 def calcular_aw_promedio(p_clase, cajon: Cajon):
     """
@@ -12,7 +9,7 @@ def calcular_aw_promedio(p_clase, cajon: Cajon):
     
     for alimento in cajon:
         if isinstance(alimento,p_clase):
-            total_aw += calcular_aw(alimento)
+            total_aw += alimento.calcular_aw()
             contador += 1
     
     if contador == 0:

@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 import math 
 import numpy as np 
 
-"""clases abstractas
-    """
+"""clases abstractas"""
+
 class Alimentos(ABC):
     def __init__(self, p_peso_del_alimento):
         if 0.05<=p_peso_del_alimento <= 0.6:
@@ -15,7 +15,6 @@ class Alimentos(ABC):
     def peso_del_alimento(self):
         return(self._peso_del_alimento)
     
-
     @abstractmethod 
     def calcular_aw(self):
         pass 
@@ -35,6 +34,7 @@ class Verdura(Alimentos, ABC):
     @abstractmethod
     def calcular_aw(self):
         pass
+
 class Kiwi(Fruta):
     def __init__(self, p_peso_del_alimento):
         """clase que hereda sus atributos de Fruta que a la vez hereda sus atributos de Alimentos 
@@ -46,6 +46,7 @@ class Kiwi(Fruta):
         """
         awk = 0.96 * ((1 - math.exp(-18 * self._peso_del_alimento)) / (1 + math.exp(-18 * self._peso_del_alimento)))
         return(awk)
+    
     def __str__(self):
         """método que devuelve una cadena de texto que incluye el nombre y el peso del alimento
         """
@@ -56,6 +57,7 @@ class Manzana(Fruta):
         """Clase que hereda sus atributos de Fruta que a la vez hereda sus atributos de Alimentos 
         """
         super().__init__(p_peso_del_alimento)
+        
     def calcular_aw(self):
         """método que calcula la actividad acuosa de la Manzana
         """

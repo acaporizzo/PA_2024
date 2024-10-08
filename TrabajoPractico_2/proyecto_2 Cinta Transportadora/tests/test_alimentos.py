@@ -1,4 +1,3 @@
-# Archivo de test para realizar pruebas unitarias del modulo1
 import unittest
 from modules.alimentos import Kiwi, Manzana, Papa, Zanahoria
 
@@ -6,9 +5,9 @@ class TestAlimentos(unittest.TestCase):
 
     def test_kiwi_calcular_aw(self):
         kiwi1 = Kiwi(0.07)  # instanciamos un kiwi
-        
         resultado_de_aw = kiwi1.calcular_aw()
         self.assertAlmostEqual(resultado_de_aw, 0.5357, places=3) 
+        
     def test_kiwi_excepciones(self):
         self.assertRaises(ValueError, Kiwi, -0.6)
         self.assertRaises(ValueError, Kiwi, 0.04)
@@ -28,6 +27,7 @@ class TestAlimentos(unittest.TestCase):
         papa = Papa(0.15)  # instanciamos una papa
         resultado_de_aw = papa.calcular_aw()
         self.assertAlmostEqual(resultado_de_aw, 0.803, places=3)
+        
     def test_papa_excepciones(self):
         self.assertRaises(ValueError, Papa, -0.6) 
         self.assertRaises(ValueError, Papa, 0.04)
@@ -45,5 +45,3 @@ class TestAlimentos(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
-
