@@ -22,7 +22,6 @@ def home():
             cajon.agregar_alimento(alimento)
 
     # Calculamos el aw promedio de cada clase: 
-
     diccionario_de_aw_promedio={"aw_kiwi": round(calcular_aw_promedio(Kiwi,cajon),2),
     "aw_manzana": round(calcular_aw_promedio(Manzana,cajon),2),
     "aw_papa": round(calcular_aw_promedio(Papa,cajon),2),

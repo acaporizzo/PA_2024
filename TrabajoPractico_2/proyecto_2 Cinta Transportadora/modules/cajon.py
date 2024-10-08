@@ -11,7 +11,6 @@ class Cajon:
         Este método añade una instancia de un alimento a la lista de alimentos de la clase.
         El alimento debe ser una instancia de una clase que represente un tipo de alimento.
         """
-
         self._alimentos.append(alimento)
     
     def __iter__(self):
@@ -29,7 +28,6 @@ class Cajon:
         Este método especial permite utilizar la función `len()` en una instancia de la clase
         para obtener el número de alimentos que contiene.
         """
-
         return len(self._alimentos)
     
     def __next__(self):
