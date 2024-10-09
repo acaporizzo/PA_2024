@@ -110,7 +110,6 @@ class Facultad:
         if not self.departamentos:
             print("No hay departamentos disponibles.")
         else:
-            print("Departamentos disponibles:")
             for idx, departamento in enumerate(self.departamentos, start=1):
                 print(f"{idx}: {departamento.nombre_dpto}")
 
@@ -146,6 +145,13 @@ class Facultad:
                 if p_nombre_dpto == dpto.nombre_dpto:
                     dpto.atribuir_curso(curso)
 
+    def devolver_cursos_de_dpto(self, p_nombre_dpto):
+        """método para mostrar los cursos de un departamento en específico
+        """
+        for dpto in self._departamentos:
+            if p_nombre_dpto == dpto.nombre_dpto:
+                return(dpto.cursos)
+            
     def seleccionar_departamento(self):
         """Selecciona un departamento por su número, validando el rango."""
         try:
@@ -164,6 +170,7 @@ class Facultad:
         except IndexError:
             print("Índice de departamento no válido. Por favor, elige uno de la lista.")
             return None  # Devuelve None si el índice es inválido
+
 
 
     def seleccionar_estudiante(self):
@@ -189,7 +196,6 @@ class Facultad:
         if not self._cursos:
             print("No hay cursos disponibles.")
         else:
-            print("Cursos disponibles:")
             for idx, curso in enumerate(self._cursos, start=1):
                 print(f"{idx}: {curso.nombre_curso}")
 

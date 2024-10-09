@@ -83,8 +83,9 @@ while opcion != 6:
             if profesor_director:
                 facultad.crear_departamento(nombre_dpto, profesor_director)
                 print(f"El departamento '{nombre_dpto}' ha sido creado y {profesor_director.nombre} ha sido asignado como director.")
+                print("Los departamentos de la facultad son: ")
+                facultad.mostrar_departamentos()
                 break
-
             print("El profesor ya es director de otro departamento. Selecciona un profesor válido.")
 
 
@@ -109,12 +110,19 @@ while opcion != 6:
                 continue  #vuelve al inicio si no se seleccionó un departamento válido
 
             nuevo_curso = facultad.crear_curso(nombre_curso, profesor_asignado)
+
             if nuevo_curso:
                 facultad.atribuir_curso_al_dpto(nuevo_curso, departamento_asignado.nombre_dpto)
                 print(f"Curso '{nombre_curso}' asignado al departamento '{departamento_asignado.nombre_dpto}'.")
-                break  #si está todo bien sale del bucle
-            else:
-                print(f"El curso '{nombre_curso}' ya existe. Intenta con otro nombre.")
+                cursos = facultad.devolver_cursos_de_dpto(departamento_asignado.nombre_dpto)
+                if cursos:
+                    print(f"Los cursos del departamento '{departamento_asignado.nombre_dpto}' son:")
+                    for curso in cursos:
+                        print(f"- {curso.nombre_curso}")
+                else:
+                    print(f"No hay cursos registrados en el departamento '{departamento_asignado.nombre_dpto}'.")
+                break
+            else: print(f"El curso '{nombre_curso}' ya existe. Intenta con otro nombre.")
 
 
     if opcion == 5:  # Inscribir estudiante en un curso

@@ -16,11 +16,3 @@ Estudiante,Maria,Perez,58963214
 Profesor,Claudia,Villanueva,17852963
 Estudiante,Agostina,Gomez,8954723
 Estudiante,Maria,Perez,58963214
-Profesor,Jose,Martinez,5784123
-Estudiante,Juana,Fernandez,32546875
-Estudiante,Elena,Nuges,45236842
-Profesor,Sofia,Mendez,25634897
-Estudiante,martina,gonzalez,465934583
-Profesor,Juan,Perez,84593374
-Estudiante,Pedro,Perez,3335872389
-Profesor,juan,djies,3278951
