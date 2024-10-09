@@ -152,7 +152,8 @@ class Facultad:
             num_dpto_elegido = int(input("Selecciona el número de departamento: "))
             if num_dpto_elegido < 1 or num_dpto_elegido > len(self._departamentos):
                 return None  # Retorna None si el número está fuera de rango
-            return self.obtener_departamento(num_dpto_elegido - 1)
+            dpto = self.obtener_departamento(num_dpto_elegido - 1)
+            return dpto
         except (ValueError, IndexError):
             return None  # Retorna None si hay un error en la entrada
 
