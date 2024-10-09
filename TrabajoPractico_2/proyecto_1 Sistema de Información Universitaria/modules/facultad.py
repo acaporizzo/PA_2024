@@ -143,6 +143,30 @@ class Facultad:
 
 
 
+    def seleccionar_estudiante(self):
+        """Selecciona un estudiante por su número, validando el rango."""
+        try:
+            num_estudiante_elegido = int(input("Selecciona el número de estudiante: "))
+            if num_estudiante_elegido < 1 or num_estudiante_elegido > len(self._estudiantes):
+                return None  # Retorna None si el número está fuera de rango
+            return self.obtener_estudiante(num_estudiante_elegido)
+        except (ValueError, IndexError):
+            return None  # Retorna None si hay un error en la entrada
+        
+    def seleccionar_curso(self):
+        """Selecciona un curso por su número, validando el rango."""
+        try:
+            num_curso_elegido = int(input("Selecciona el número de curso: "))
+            if num_curso_elegido < 1 or num_curso_elegido > len(self._cursos):
+                return None  # Retorna None si el número está fuera de rango
+            return self._cursos[num_curso_elegido - 1]
+        except (ValueError, IndexError):
+            return None  # Retorna None si hay un error en la entrada
+
+    def inscribir_estudiante_a_curso(self, estudiante, curso):
+        """Método para inscribir un estudiante a un curso."""
+        curso.agregar_estudiante_al_curso(estudiante)
+
 
     def agregar_departamento(self, departamento):
         """Método para agregar un departamento a la facultad."""

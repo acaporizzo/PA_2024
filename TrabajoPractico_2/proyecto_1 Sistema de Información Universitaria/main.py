@@ -126,15 +126,28 @@ while opcion != 6:
                 print(f"El curso '{nombre_curso}' ya existe. Intenta con otro nombre.")
 
 
-    if opcion == 5: #inscribir estudiante a un curso
+    if opcion == 5:  # Inscribir estudiante en un curso
+        # Mostrar estudiantes antes de la selección
         facultad.mostrar_estudiantes()
-        num_estudiante_elegido = int(input("Ingrese el número que corresponde al estudiante que se inscribirá: "))
-        estudiante_elegido = facultad.obtener_estudiante(num_estudiante_elegido)
+
+        # Seleccionar estudiante
+        estudiante = facultad.seleccionar_estudiante()
+        if not estudiante:
+            print("Selecciona un estudiante válido.")
+            continue  # Vuelve al inicio si no se seleccionó un estudiante válido
+
+        # Mostrar cursos antes de la selección
         facultad.mostrar_cursos()
-        num_curso_elegido = int(input("Ingrese el número que corresponde al curso donde se va a inscribir: "))
-        curso_elegido = facultad.obtener_curso(num_curso_elegido)
-        curso_elegido.inscribir_estudiante_a_curso(estudiante_elegido)
-        curso_elegido.mostrar_estudiantes()
+
+        # Seleccionar curso
+        curso = facultad.seleccionar_curso()
+        if not curso:
+            print("Selecciona un curso válido.")
+            continue  # Vuelve al inicio si no se seleccionó un curso válido
+
+        # Inscribir estudiante al curso
+        facultad.inscribir_estudiante_a_curso(estudiante, curso)
+        print(f"El estudiante {estudiante.nombre} {estudiante.apellido} ha sido inscrito en el curso {curso.nombre_curso}.")
 
     opcion = int(input("Elige otra opción entre 1 y 6: "))
 
