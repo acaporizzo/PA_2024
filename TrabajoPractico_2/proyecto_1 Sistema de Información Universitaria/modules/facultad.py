@@ -83,13 +83,28 @@ class Facultad:
             return None  # Si el profesor ya es director, devuelve None
         except (ValueError, IndexError):
             return None  # Devuelve None si el índice es inválido o si se ingresa un valor no numérico
+        
+    def obtener_profesor(self, num_profesor):
+        """ Método para obtener un profesor según su índice en la lista de profesores """
+        try:
+            return self._profesores[num_profesor]
+        except IndexError:
+            print(f"Error: El número de profesor proporcionado ({num_profesor}) no es válido. Debes elegir un número entre 0 y {len(self._profesores) - 1}.")
+            return None  # O puedes decidir lanzar nuevamente la excepción si prefieres
 
     def crear_departamento(self, nombre_dpto, profesor_director):
         """Crea un nuevo departamento con el profesor seleccionado como director."""
         nuevo_departamento = Departamento(nombre_dpto, profesor_director)
         self._departamentos.append(nuevo_departamento)
-        profesor_director.es_director = True  # Actualiza el estado del profesor
-        return nuevo_departamento  # Retorna el departamento creado
+        nuevo_departamento.atribuir_director(profesor_director)
+        #profesor_director.es_director = True  # Actualiza el estado del profesor
+
+        if isinstance(profesor_director, Profesor):
+            for dpto in self._departamentos:
+                if nombre_dpto == dpto.nombre_dpto:
+                    dpto.agregar_profesor_a_dpto(profesor_director) #en departamento.py
+
+        return nuevo_departamento  # devuelve el departamento creado
     
     def mostrar_departamentos(self):
         if not self.departamentos:
@@ -104,22 +119,7 @@ class Facultad:
     def verificar_nombre_curso(self, nombre_curso):
         """Verifica si un curso con el mismo nombre ya existe."""
         return any(curso.nombre_curso == nombre_curso for curso in self._cursos)
-
-    def crear_curso(self, p_nombre_curso, p_profesor):
-        """Crea un curso si el nombre no está duplicado."""
-        if self.verificar_nombre_curso(p_nombre_curso):
-            return None  # Retorna None si el curso ya existe
-        curso = Curso(p_nombre_curso, p_profesor)
-        self._cursos.append(curso)
-        return curso
-
-    def atribuir_curso_al_dpto(self, curso, p_nombre_dpto):
-        """Método para agregar un curso a un departamento."""
-        if isinstance(curso, Curso):
-            for dpto in self._departamentos:
-                if p_nombre_dpto == dpto.nombre_dpto:
-                    dpto.atribuir_curso(curso)
-
+    
     def seleccionar_profesor(self):
         """Selecciona un profesor por su número, validando el rango."""
         try:
@@ -129,6 +129,22 @@ class Facultad:
             return self.obtener_profesor(num_profesor_elegido - 1)
         except (ValueError, IndexError):
             return None  # Retorna None si hay un error en la entrada
+
+    def crear_curso(self, p_nombre_curso, p_profesor):
+        """Crea un curso si el nombre no está duplicado."""
+        if self.verificar_nombre_curso(p_nombre_curso):
+            return None  # Retorna None si el curso ya existe
+        curso = Curso(p_nombre_curso, p_profesor)
+        self._cursos.append(curso)
+        curso.atribuir_titular(p_profesor)
+        return curso
+
+    def atribuir_curso_al_dpto(self, curso, p_nombre_dpto):
+        """Método para agregar un curso a un departamento."""
+        if isinstance(curso, Curso):
+            for dpto in self._departamentos:
+                if p_nombre_dpto == dpto.nombre_dpto:
+                    dpto.atribuir_curso(curso)
 
     def seleccionar_departamento(self):
         """Selecciona un departamento por su número, validando el rango."""
@@ -140,7 +156,13 @@ class Facultad:
         except (ValueError, IndexError):
             return None  # Retorna None si hay un error en la entrada
 
-
+    def obtener_departamento(self, indice):
+        """Método para obtener un departamento por su índice."""
+        try:
+            return self._departamentos[indice]  # Retorna el departamento correspondiente al índice
+        except IndexError:
+            print("Índice de departamento no válido. Por favor, elige uno de la lista.")
+            return None  # Devuelve None si el índice es inválido
 
 
     def seleccionar_estudiante(self):
@@ -152,75 +174,7 @@ class Facultad:
             return self.obtener_estudiante(num_estudiante_elegido)
         except (ValueError, IndexError):
             return None  # Retorna None si hay un error en la entrada
-        
-    def seleccionar_curso(self):
-        """Selecciona un curso por su número, validando el rango."""
-        try:
-            num_curso_elegido = int(input("Selecciona el número de curso: "))
-            if num_curso_elegido < 1 or num_curso_elegido > len(self._cursos):
-                return None  # Retorna None si el número está fuera de rango
-            return self._cursos[num_curso_elegido - 1]
-        except (ValueError, IndexError):
-            return None  # Retorna None si hay un error en la entrada
 
-    def inscribir_estudiante_a_curso(self, estudiante, curso):
-        """Método para inscribir un estudiante a un curso."""
-        curso.agregar_estudiante_al_curso(estudiante)
-
-
-    def agregar_departamento(self, departamento):
-        """Método para agregar un departamento a la facultad."""
-        self._departamentos.append(departamento)
-
-    def obtener_departamento(self, indice):
-        """Método para obtener un departamento por su índice."""
-        try:
-            return self._departamentos[indice]  # Retorna el departamento correspondiente al índice
-        except IndexError:
-            print("Índice de departamento no válido. Por favor, elige uno de la lista.")
-            return None  # Devuelve None si el índice es inválido
-            
-    
-                    
-    def guardar_profesor(self, profesor):
-        """Este método guarda al profesor en la lista de profesores."""
-        self.profesores.append(profesor)
-        print(f"Profesor {profesor['nombre']} {profesor['apellido']} guardado con éxito.")
-      
-    def atribuir_dpto_a_profesor (self, p_nuevo_profesor, p_nombre_dpto):
-        """método para inscribir a un profesor en un dpto
-        """
-        if isinstance(p_nuevo_profesor, Profesor):
-            for dpto in self._departamentos:
-                if p_nombre_dpto == dpto.nombre_dpto:
-                    dpto.agregar_profesor_a_dpto(p_nuevo_profesor) #en departamento.py
-    
-    def listar_profesores(self):
-        """Este método lista todos los profesores contratados."""
-        for profesor in self.profesores:
-            print(f"{profesor['nombre']} {profesor['apellido']} - DNI: {profesor['dni']}")
-
-
-  
-            
-    def devolver_estudiantes_de_curso(self, p_nombre_curso):
-        """método para mostrar los estudiantes de un curso en específico
-        """
-        for curso in self._cursos:
-            if p_nombre_curso == curso.nombre_curso:
-                return curso.estudiantes_del_curso
-
-
-    
-    def obtener_profesor(self, num_profesor):
-        """ Método para obtener un profesor según su índice en la lista de profesores """
-        try:
-            return self._profesores[num_profesor]
-        except IndexError:
-            print(f"Error: El número de profesor proporcionado ({num_profesor}) no es válido. Debes elegir un número entre 0 y {len(self._profesores) - 1}.")
-            return None  # O puedes decidir lanzar nuevamente la excepción si prefieres
-
-    
     def obtener_estudiante(self, num_estudiante):
         """ Método para obtener un estudiante según su índice """
         try:
@@ -238,6 +192,20 @@ class Facultad:
             for idx, curso in enumerate(self._cursos, start=1):
                 print(f"{idx}: {curso.nombre_curso}")
 
+    def seleccionar_curso(self):
+        """Selecciona un curso por su número, validando el rango."""
+        try:
+            num_curso_elegido = int(input("Selecciona el número de curso: "))
+            if num_curso_elegido < 1 or num_curso_elegido > len(self._cursos):
+                return None  # Retorna None si el número está fuera de rango
+            return self._cursos[num_curso_elegido - 1]
+        except (ValueError, IndexError):
+            return None  # Retorna None si hay un error en la entrada
+
+    def inscribir_estudiante_a_curso(self, estudiante, curso):
+        """Método para inscribir un estudiante a un curso."""
+        curso.agregar_estudiante_al_curso(estudiante)
+
 
 
     def __repr__(self):
@@ -245,38 +213,32 @@ class Facultad:
         """
         return self._nombre_facu
         
-    
     def __str__(self):
         """para definir una representación legible de una instancia de una clase o 
         cuando se intenta imprimir la instancia
         """
         return self._nombre_facu
-        
+
+
+
+
+
+
+
+
+
+      
+
     
+#    def listar_profesores(self):
+#        """Este método lista todos los profesores contratados."""
+#        for profesor in self.profesores:
+#            print(f"{profesor['nombre']} {profesor['apellido']} - DNI: {profesor['dni']}")
 
-
-    #def crear_departamento (self, p_nombre_dpto, p_profesor):
-        #"""método para crear un nuevo dpto y agregarlo a la lista
-        #"""
-        #departamento = Departamento(p_nombre_dpto, p_profesor)
-        #self._departamentos.append(Departamento(p_nombre_dpto, p_profesor))
-        #return departamento
-
-                
-#    def devolver_director_de_dpto (self, p_nombre_dpto):
-#        """método para mostrar el director de un dpto (se define en departamento.py)
-#        """
-#        for dpto in self._departamentos:
-#            if p_nombre_dpto == dpto.nombre_dpto:
-#                return(dpto.director_de_dpto)
             
-#    def devolver_profesores_de_dpto(self, p_nombre_dpto):
-#        """método para mostrar los profesores de un dpto (la lista de profesores 
-#        está definida en departamento.py)
+#    def devolver_estudiantes_de_curso(self, p_nombre_curso):
+#        """método para mostrar los estudiantes de un curso en específico
 #        """
-#        profesores_de_dpto = []
-#        for dpto in self._departamentos:
-#            if dpto.nombre_dpto == p_nombre_dpto:
-#                profesores_de_dpto = dpto.profesores
-#                break
-#        return(profesores_de_dpto)
+#        for curso in self._cursos:
+#            if p_nombre_curso == curso.nombre_curso:
+#                return curso.estudiantes_del_curso

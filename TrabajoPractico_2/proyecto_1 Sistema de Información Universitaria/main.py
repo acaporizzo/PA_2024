@@ -50,6 +50,7 @@ while opcion != 6:
         print("Los estudiantes de la facultad son: ")
         facultad.mostrar_estudiantes()
 
+
     if opcion == 2: #contratar un profesor
         nombre_profesor = input("Ingrese el nombre del profesor: ")
         apellido_profesor = input("Ingrese el apellido del profesor: ")
@@ -63,91 +64,79 @@ while opcion != 6:
         print("Los profesores de la facultad son: ")
         facultad.mostrar_profesores()
 
-    if opcion == 3:  # Crear un departamento nuevo
+
+    if opcion == 3:  #crear un departamento nuevo
         while True:
             nombre_dpto = input("Ingrese el nombre del nuevo departamento: ")
 
-            # Verificar si el nombre del departamento ya existe
+            if facultad.verificar_nombre_departamento(nombre_dpto): #verifica si el nombre del departamento ya existe
+                break
+            print(f"El departamento '{nombre_dpto}' ya existe. Por favor, ingresa un nombre diferente.")
 
-            if not facultad.verificar_nombre_departamento(nombre_dpto):
-                print(f"El departamento '{nombre_dpto}' ya existe. Por favor, ingresa un nombre diferente.")
-                continue  # Volver a pedir un nuevo nombre de departamento
+        print("Los profesores son: ")
+        facultad.mostrar_profesores()
 
-            # Mostrar profesores antes de la selección
-            print("Los profesores son: ")
-            facultad.mostrar_profesores()
-
-            # Asignar director
+        while True:
             num_profesor_elegido = int(input("Selecciona el número de profesor para asignar como director: "))
-            
             profesor_director = facultad.asignar_director(num_profesor_elegido)
 
             if profesor_director:
                 facultad.crear_departamento(nombre_dpto, profesor_director)
                 print(f"El departamento '{nombre_dpto}' ha sido creado y {profesor_director.nombre} ha sido asignado como director.")
-                break  # Salir del bucle cuando se complete la creación
-            else:
-                print("No se pudo asignar el director. Selecciona un profesor válido.")
+                break
+
+            print("El profesor ya es director de otro departamento. Selecciona un profesor válido.")
+
 
     if opcion == 4:  # Crear un curso nuevo
         while True:
             nombre_curso = input("Ingrese el nombre del curso: ")
 
-            # Verificar si el nombre del curso ya existe
-            if facultad.verificar_nombre_curso(nombre_curso):
+            if facultad.verificar_nombre_curso(nombre_curso): # verifica si el nombre del curso ya existe
                 print(f"El curso '{nombre_curso}' ya existe. Por favor, ingresa un nombre diferente.")
-                continue  # Volver a pedir si el curso ya existe
+                continue  #volver a pedir si el curso ya existe
 
-            # Mostrar profesores antes de la selección
             facultad.mostrar_profesores()
-
-            # Seleccionar profesor
             profesor_asignado = facultad.seleccionar_profesor()
             if not profesor_asignado:
                 print("Selecciona un profesor válido.")
-                continue  # Vuelve al inicio si no se seleccionó un profesor válido
+                continue  #vuelve al inicio si no se seleccionó un profesor válido
 
-            # Mostrar departamentos antes de la selección
             facultad.mostrar_departamentos()
-
-            # Seleccionar departamento
             departamento_asignado = facultad.seleccionar_departamento()
             if not departamento_asignado:
                 print("Selecciona un departamento válido.")
-                continue  # Vuelve al inicio si no se seleccionó un departamento válido
+                continue  #vuelve al inicio si no se seleccionó un departamento válido
 
-            # Crear el curso
             nuevo_curso = facultad.crear_curso(nombre_curso, profesor_asignado)
             if nuevo_curso:
                 facultad.atribuir_curso_al_dpto(nuevo_curso, departamento_asignado.nombre_dpto)
                 print(f"Curso '{nombre_curso}' asignado al departamento '{departamento_asignado.nombre_dpto}'.")
-                break  # Salir del bucle si todo se creó correctamente
+                break  #si está todo bien sale del bucle
             else:
                 print(f"El curso '{nombre_curso}' ya existe. Intenta con otro nombre.")
 
 
     if opcion == 5:  # Inscribir estudiante en un curso
-        # Mostrar estudiantes antes de la selección
-        facultad.mostrar_estudiantes()
 
-        # Seleccionar estudiante
-        estudiante = facultad.seleccionar_estudiante()
-        if not estudiante:
+        while True: #para seleccionar un estudiante válido
+            facultad.mostrar_estudiantes()
+            estudiante = facultad.seleccionar_estudiante()
+            if estudiante:
+                break  # Sale del bucle si se seleccionó un estudiante válido
             print("Selecciona un estudiante válido.")
-            continue  # Vuelve al inicio si no se seleccionó un estudiante válido
 
-        # Mostrar cursos antes de la selección
-        facultad.mostrar_cursos()
+        while True: #para seleccionar un curso válido
+            facultad.mostrar_cursos()
+            curso = facultad.seleccionar_curso()
 
-        # Seleccionar curso
-        curso = facultad.seleccionar_curso()
-        if not curso:
+            if curso:
+                break  # Sale del bucle si se seleccionó un curso válido
             print("Selecciona un curso válido.")
-            continue  # Vuelve al inicio si no se seleccionó un curso válido
 
-        # Inscribir estudiante al curso
         facultad.inscribir_estudiante_a_curso(estudiante, curso)
-        print(f"El estudiante {estudiante.nombre} {estudiante.apellido} ha sido inscrito en el curso {curso.nombre_curso}.")
+        print(f"El estudiante {estudiante.nombre} {estudiante.apellido} ha sido inscripto en el curso {curso.nombre_curso}.")
+
 
     opcion = int(input("Elige otra opción entre 1 y 6: "))
 

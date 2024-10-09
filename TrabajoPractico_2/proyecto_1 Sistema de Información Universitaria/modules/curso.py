@@ -41,13 +41,6 @@ class Curso:
             self._estudiantes_del_curso.append(p_nombre_de_estudiante)
             p_nombre_de_estudiante.agregar_cursos_del_estudiante(self) #en persona_facultativa.py, clase Estudiante
 
-    def agregar_profesor_al_curso (self, p_nombre_de_profesor):
-        """método para que un nuevo profesor enseñe en el curso
-        """
-        if isinstance(p_nombre_de_profesor, Profesor):
-            self._profesores_del_curso.append(p_nombre_de_profesor)
-            p_nombre_de_profesor.atribuir_curso_al_profesor(self) #en persona_facultativa.py, clase Profesor
-
     def atribuir_dpto_al_curso (self,p_nombre_dpto):
         """método que asigna un único dpto al que pertenece el curso en un str
         """
