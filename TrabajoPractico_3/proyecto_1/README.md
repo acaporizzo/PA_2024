@@ -1,1 +1,0 @@
-### Plantilla general del proyecto
