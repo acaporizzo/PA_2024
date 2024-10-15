@@ -16,3 +16,5 @@ Estudiante,Maria,Perez,58963214
 Profesor,Claudia,Villanueva,17852963
 Estudiante,Agostina,Gomez,8954723
 Estudiante,Maria,Perez,58963214
+Estudiante,agustina,perez,4375692
+Profesor,jose,gomez,42780240

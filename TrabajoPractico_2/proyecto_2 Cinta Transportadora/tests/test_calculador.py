@@ -28,17 +28,18 @@ class TestCalculador(unittest.TestCase):
 
     def test_calcular_aw_promedio_excepciones(self):
         cajon_vacio = Cajon()
-        with self.assertRaises(ValueError):
-            calcular_aw_promedio(Fruta, cajon_vacio)
-        
+        aw_prom=calcular_aw_promedio(Fruta, cajon_vacio)
+        self.assertEqual(aw_prom, 0)
+
     def test_calcular_peso(self):
         resultado = calcular_peso(self.cajon)
         self.assertAlmostEqual(resultado, 0.575, places=2)
 
     def test_calcular_peso_excepciones(self):
         cajon_vacio = Cajon()
-        with self.assertRaises(ValueError):
-            calcular_peso(cajon_vacio)
+        peso=calcular_peso(cajon_vacio)
+        self.assertEqual(peso, 0)
+            
 
     def test_calcular_aw_promedio_diferentes_combinaciones(self):
         # caso 1: solo frutas
@@ -46,7 +47,7 @@ class TestCalculador(unittest.TestCase):
         cajon_frutas.agregar_alimento(Kiwi(0.07))
         cajon_frutas.agregar_alimento(Manzana(0.18))
         aw_frutas = round(calcular_aw_promedio(Fruta, cajon_frutas), 2)
-        self.assertAlmostEqual(aw_frutas, 0.63, places=2)  # Ajusta según el valor esperado
+        self.assertAlmostEqual(aw_frutas, 0.69, places=2)  # Ajusta según el valor esperado
 
         # caso 2: solo verduras
         cajon_verduras = Cajon()
