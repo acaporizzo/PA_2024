@@ -1,76 +1,78 @@
-from modules.dominio import Libro, Usuario
+from modules.dominio import Reclamo, Usuario
 from modules.repositorio_abstracto import RepositorioAbstracto
-from modules.modelos import ModeloLibro, ModeloUsuario
+from modules.modelos import ModeloReclamo, ModeloUsuario
 
-    
-class RepositorioLibrosSQLAlchemy(RepositorioAbstracto):
-    def _init_(self, session):
+class RepositorioReclamosSQLAlchemy(RepositorioAbstracto):
+    def __init__(self, session):
         self.__session = session
-        tabla_libro = ModeloLibro()
-        tabla_libro.metadata.create_all(self.__session.bind)
+        tabla_reclamo = ModeloReclamo()
+        tabla_reclamo.metadata.create_all(self.__session.bind)
 
-    def guardar_registro(self, libro):
-        if not isinstance(libro, Libro):
-            raise ValueError("El parámetro no es una instancia de la clase Libro")
-        modelo_libro = self.__map_entidad_a_modelo(libro)
-        self.__session.add(modelo_libro)
-        # ------------------------------------------------------------------------------------
-        usuario = self.__session.query(ModeloUsuario).filter_by(id=libro.id_usuario).first()
-        usuario.libros_seguidos.append(modelo_libro) #para desasociar se usa remove
-        # ------------------------------------------------------------------------------------
+    def guardar_registro(self, reclamo):
+        if not isinstance(reclamo, Reclamo):
+            raise ValueError("El parámetro no es una instancia de la clase Reclamo")
+        modelo_reclamo = self._map_entidad_a_modelo(reclamo)
+        self.__session.add(modelo_reclamo)
         self.__session.commit()
 
-    def obtener_todos_los_registros(self):
-        modelo_libros = self.__session.query(ModeloLibro).all()
-        return [self.__map_modelo_a_entidad(libro) for libro in modelo_libros]   
-    
-    def modificar_registro(self, libro_modificado):
-        if not isinstance(libro_modificado, Libro):
-            raise ValueError("El parámetro no es una instancia de la clase Libro")
-        register = self.__session.query(ModeloLibro).filter_by(id=libro_modificado.id).first()
-        register.nombre = libro_modificado.nombre
-        register.autor = libro_modificado.autor
-        register.calificacion = libro_modificado.calificacion
-        self.__session.commit()
+    def obtener_todos_los_registros(self) -> list:
+        modelo_reclamos = self.__session.query(ModeloReclamo).all()
+        return [self._map_modelo_a_entidad(reclamo) for reclamo in modelo_reclamos]
+
+    def modificar_registro(self, reclamo_modificado):
+        if not isinstance(reclamo_modificado, Reclamo):
+            raise ValueError("El parámetro no es una instancia de la clase Reclamo")
+        registro = self.__session.query(ModeloReclamo).filter_by(id_reclamo=reclamo_modificado.id_reclamo).first()
+        if registro:
+            registro.contenido = reclamo_modificado.contenido
+            registro.departamento = reclamo_modificado.departamento
+            registro.fecha_hora = reclamo_modificado.fecha_hora
+            registro.estado = reclamo_modificado.estado
+            registro.usuarios_adheridos = reclamo_modificado.usuarios_adheridos
+            self.__session.commit()
 
     def obtener_registro_por_filtro(self, filtro, valor):
-        modelo_libro = self.__session.query(ModeloLibro).filter_by({filtro:valor}).first()
-        return self.__map_modelo_a_entidad(modelo_libro) if modelo_libro else None
-    
-    def obtener_registros_segun_filtro(self, filtro, valor):
-        modelo_libros = self.__session.query(ModeloLibro).filter_by({filtro:valor}).all()
-        return [self.__map_modelo_a_entidad(libro) for libro in modelo_libros]
-    
-    def eliminar_registro(self, id):
-        register = self.__session.query(ModeloLibro).filter_by(id=id).first()
-        self.__session.delete(register)
-        self.__session.commit()
+        modelo_reclamo = self.__session.query(ModeloReclamo).filter_by(**{filtro: valor}).first()
+        return self._map_modelo_a_entidad(modelo_reclamo) if modelo_reclamo else None
 
-    # ------------------------------------------------------------------------------------
-    def obtener_registros_seguidos_por_usuario(self, id_usuario):
-        modelo_usuario = self.__session.query(ModeloUsuario).filter_by(id=id_usuario).first()
-        return [self.__map_modelo_a_entidad(libro) for libro in modelo_usuario.libros_seguidos]
-    # ------------------------------------------------------------------------------------
-    
-    def __map_entidad_a_modelo(self, entidad: Libro):
-        return ModeloLibro(
-            nombre=entidad.nombre,
-            autor=entidad.autor,
-            calificacion=entidad.calificacion,
-            id_usuario=entidad.id_usuario
+    def obtener_registros_segun_filtro(self, filtro, valor) -> list:
+        modelo_reclamos = self.__session.query(ModeloReclamo).filter_by(**{filtro: valor}).all()
+        return [self._map_modelo_a_entidad(reclamo) for reclamo in modelo_reclamos]
+
+    def eliminar_registro(self, id_reclamo):
+        registro = self.__session.query(ModeloReclamo).filter_by(id_reclamo=id_reclamo).first()
+        if registro:
+            self.__session.delete(registro)
+            self.__session.commit()
+
+    def obtener_registros_seguidas_por_usuario(self, usuario) -> list:
+        modelo_reclamos = self.__session.query(ModeloReclamo).filter(ModeloReclamo.usuarios_adheridos.contains(usuario)).all()
+        return [self._map_modelo_a_entidad(reclamo) for reclamo in modelo_reclamos]
+
+    def _map_entidad_a_modelo(self, entidad: Reclamo):
+        return ModeloReclamo(
+            id_reclamo=entidad.id_reclamo,
+            usuario=entidad.usuario,
+            contenido=entidad.contenido,
+            departamento=entidad.departamento,
+            fecha_hora=entidad.fecha_hora,
+            estado=entidad.estado,
+            usuarios_adheridos=entidad.usuarios_adheridos
         )
-    
-    def __map_modelo_a_entidad(self, modelo: ModeloLibro):
-        return Libro(
-            modelo.id,
-            modelo.nombre,
-            modelo.autor,
-            modelo.calificacion,
-            modelo.id_usuario 
+
+    def _map_modelo_a_entidad(self, modelo: ModeloReclamo):
+        return Reclamo(
+            id_reclamo=modelo.id_reclamo,
+            usuario=modelo.usuario,
+            contenido=modelo.contenido,
+            departamento=modelo.departamento,
+            fecha_hora=modelo.fecha_hora,
+            estado=modelo.estado,
+            usuarios_adheridos=modelo.usuarios_adheridos
         )
-    
+
 class RepositorioUsuariosSQLAlchemy(RepositorioAbstracto):
-    def _init_(self, session):
+    def __init__(self, session):
         self.__session = session
         tabla_usuario = ModeloUsuario()
         tabla_usuario.metadata.create_all(self.__session.bind)
@@ -84,50 +86,63 @@ class RepositorioUsuariosSQLAlchemy(RepositorioAbstracto):
 
     def obtener_todos_los_registros(self):
         modelo_usuarios = self.__session.query(ModeloUsuario).all()
-        return [self.__map_modelo_a_entidad(usuario) for usuario in modelo_usuarios]   
-    
+        return [self.__map_modelo_a_entidad(usuario) for usuario in modelo_usuarios]
+
     def modificar_registro(self, usuario_modificado):
         if not isinstance(usuario_modificado, Usuario):
             raise ValueError("El parámetro no es una instancia de la clase Usuario")
         register = self.__session.query(ModeloUsuario).filter_by(id=usuario_modificado.id).first()
-        register.nombre = usuario_modificado.nombre
-        register.apellido = usuario_modificado.apellido
-        register.email = usuario_modificado.email
-        register.password = usuario_modificado.password
-        self.__session.commit()
+        if register:
+            register.nombre = usuario_modificado.nombre
+            register.apellido = usuario_modificado.apellido
+            register.email = usuario_modificado.email
+            register.password = usuario_modificado.password
+            register.claustro = usuario_modificado.claustro
+            register.rol = usuario_modificado.rol
+            register.departamento = usuario_modificado.departamento
+            self.__session.commit()
 
-    # ------------------------------------------------------------------------------------
-    def asociar_registro(self, id, id_asociado):
-        register = self.__session.query(ModeloUsuario).filter_by(id=id).first()
-        modelo_libro = self.__session.query(ModeloLibro).filter_by(id=id_asociado).first()
-        register.libros_seguidos.append(modelo_libro)
-        self.__session.commit()
+    def asociar_registro(self, id_usuario, id_asociado):
+        register = self.__session.query(ModeloUsuario).filter_by(id=id_usuario).first()
+        modelo_asociado = self.__session.query(ModeloUsuario).filter_by(id=id_asociado).first()  # Ajusta esto si id_asociado es otro tipo de entidad
+        if register and modelo_asociado:
+            register.usuarios_asociados.append(modelo_asociado)
+            self.__session.commit()
 
     def obtener_seguidores_de_registro_asociado(self, id_asociado):
-        modelo_libro = self.__session.query(ModeloLibro).filter_by(id=id_asociado).first()
-        return [self.__map_modelo_a_entidad(usuario) for usuario in modelo_libro.usuarios_seguidores]
-    # ------------------------------------------------------------------------------------
+        modelo_asociado = self.__session.query(ModeloUsuario).filter_by(id=id_asociado).first()
+        return [self.__map_modelo_a_entidad(usuario) for usuario in modelo_asociado.usuarios_seguidores] if modelo_asociado else []
 
     def obtener_registro_por_filtro(self, filtro, valor):
-        modelo_usuario = self.__session.query(ModeloUsuario).filter_by({filtro:valor}).first()
+        modelo_usuario = self.__session.query(ModeloUsuario).filter_by(**{filtro: valor}).first()
         return self.__map_modelo_a_entidad(modelo_usuario) if modelo_usuario else None
-    
-    def eliminar_registro(self, id):
-        register = self.__session.query(ModeloUsuario).filter_by(id=id).first()
-        self.__session.delete(register)
-        self.__session.commit()
-    
-    def __map_entidad_a_modelo(self, entidad: Usuario):
+
+    def eliminar_registro(self, id_usuario):
+        register = self.__session.query(ModeloUsuario).filter_by(id=id_usuario).first()
+        if register:
+            self.__session.delete(register)
+            self.__session.commit()
+
+    def _map_entidad_a_modelo(self, entidad: Usuario):
         return ModeloUsuario(
+            id=entidad.id,
             nombre=entidad.nombre,
+            apellido=entidad.apellido,
             email=entidad.email,
-            password=entidad.password
+            password=entidad.password,
+            claustro=entidad.claustro,
+            rol=entidad.rol,
+            departamento=entidad.departamento
         )
-    
-    def __map_modelo_a_entidad(self, modelo: ModeloUsuario):
+
+    def _map_modelo_a_entidad(self, modelo: ModeloUsuario):
         return Usuario(
-            modelo.id,
-            modelo.nombre,
-            modelo.email,
-            modelo.password
+            id=modelo.id,
+            nombre=modelo.nombre,
+            apellido=modelo.apellido,
+            email=modelo.email,
+            password=modelo.password,
+            claustro=modelo.claustro,
+            rol=modelo.rol,
+            departamento=modelo.departamento
         )
