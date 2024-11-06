@@ -3,15 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <title>Iniciar Sesión</title>
+    <style>
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            background-color: #ff00a2;
+            border: none;
+            border-radius: 5px;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn:hover {
+            background-color: #ff00a2;
+        }
+    </style>
 </head>
 <body>
     <h1>Iniciar Sesión</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <ul>
+            {% for category, message in messages %}
+                <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    {% endwith %}
+
     <form method="POST" action="{{ url_for('iniciar_sesion') }}">
-        <label>Nombre de Usuario:</label>
-        <input type="text" name="nombre_usuario" required><br>
-        <label>Contraseña:</label>
-        <input type="password" name="contraseña" required><br>
-        <button type="submit">Ingresar</button>
+        <label for="nombre_usuario">Nombre de Usuario:</label>
+        <input type="text" id="nombre_usuario" name="nombre_usuario" required><br>
+
+        <label for="contraseña">Contraseña:</label>
+        <input type="password" id="contraseña" name="contraseña" required><br>
+
+        <button type="submit" class="btn">Ingresar</button>
     </form>
 </body>
 </html>

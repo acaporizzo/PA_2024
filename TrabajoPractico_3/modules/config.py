@@ -16,7 +16,7 @@ def crear_engine():
     Session = sessionmaker(bind=engine)
     return Session
 
-app.config.from_object(_name_)
+#app.config.from_object(_name_)
 app.config["SESSION_TYPE"] = "filesystem"
 app.config["SESSION_FILE_DIR"] = "./flask_session_cache"
 app.config["SESSION_PERMANENT"] = False

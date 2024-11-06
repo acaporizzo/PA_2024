@@ -1,4 +1,4 @@
-from modules.base_datos import bd   #bd es una instancia de la clase basededatos
+#from modules.base_datos import bd   #bd es una instancia de la clase basededatos
 from modules.generador_reporte import GeneradorReporte
 from modules.analizador_estadisticas import AnalizadorEstadisticas
 from datetime import datetime
