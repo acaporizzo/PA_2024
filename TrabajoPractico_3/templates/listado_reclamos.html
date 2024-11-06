@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Listado de Reclamos</title>
+</head>
+<body>
+    <h1>Listado de Reclamos Pendientes</h1>
+    <ul>
+        {% for reclamo in reclamos %}
+            <li>
+                Usuario: {{ reclamo[1] }} - Contenido: {{ reclamo[2] }} - 
+                Departamento: {{ reclamo[4] }} - Fecha: {{ reclamo[5] }}
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Crear Reclamo</title>
+</head>
+<body>
+    <h1>Crear Nuevo Reclamo</h1>
+    <form method="POST" enctype="multipart/form-data" action="{{ url_for('crear_reclamo') }}">
+        <label>Contenido:</label>
+        <textarea name="contenido" required></textarea><br>
+        <label>Departamento:</label>
+        <input type="text" name="departamento" required><br>
+        <label>Adjuntar Foto (opcional):</label>
+        <input type="file" name="foto"><br>
+        <button type="submit">Enviar Reclamo</button>
+    </form>
+</body>
+</html>
