@@ -6,25 +6,45 @@
 </head>
 <body>
     <h1>Registro de Usuario</h1>
+
+    <!-- Mostrar mensajes flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul>
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Formulario de registro -->
     <form method="POST" action="{{ url_for('registrar') }}">
-        <label>Nombre:</label>
-        <input type="text" name="nombre" required><br>
-        <label>Apellido:</label>
-        <input type="text" name="apellido" required><br>
-        <label>Email:</label>
-        <input type="email" name="email" required><br>
-        <label>Nombre de Usuario:</label>
-        <input type="text" name="nombre_usuario" required><br>
-        <label>Claustro:</label>
-        <select name="claustro" required>
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" required><br>
+
+        <label for="apellido">Apellido:</label>
+        <input type="text" id="apellido" name="apellido" required><br>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required><br>
+
+        <label for="nombre_usuario">Nombre de Usuario:</label>
+        <input type="text" id="nombre_usuario" name="nombre_usuario" required><br>
+
+        <label for="claustro">Claustro:</label>
+        <select id="claustro" name="claustro" required>
             <option value="Estudiante">Estudiante</option>
             <option value="Docente">Docente</option>
             <option value="PAyS">PAyS</option>
         </select><br>
-        <label>Contraseña:</label>
-        <input type="password" name="contraseña" required><br>
-        <label>Repetir Contraseña:</label>
-        <input type="password" name="confirmacion" required><br>
+
+        <label for="contraseña">Contraseña:</label>
+        <input type="password" id="contraseña" name="contraseña" required><br>
+
+        <label for="confirmacion">Repetir Contraseña:</label>
+        <input type="password" id="confirmacion" name="confirmacion" required><br>
+
         <button type="submit">Registrar</button>
     </form>
 </body>

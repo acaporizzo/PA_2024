@@ -6,14 +6,32 @@
 </head>
 <body>
     <h1>Crear Nuevo Reclamo</h1>
+
+    <!-- Mostrar mensajes flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul>
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Formulario para crear un nuevo reclamo -->
     <form method="POST" enctype="multipart/form-data" action="{{ url_for('crear_reclamo') }}">
-        <label>Contenido:</label>
-        <textarea name="contenido" required></textarea><br>
-        <label>Departamento:</label>
-        <input type="text" name="departamento" required><br>
-        <label>Adjuntar Foto (opcional):</label>
-        <input type="file" name="foto"><br>
-        <button type="submit">Enviar Reclamo</button>
+        <label for="contenido">Contenido:</label>
+        <textarea id="contenido" name="description" required></textarea><br>
+
+        <label for="departamento">Departamento:</label>
+        <input type="text" id="departamento" name="department" required><br>
+
+        <label for="foto">Adjuntar Foto (opcional):</label>
+        <input type="file" id="foto" name="image"><br>
+
+        <!-- Acción para enviar el formulario -->
+        <button type="submit" name="action" value="crear">Enviar Reclamo</button>
+        <button type="submit" name="action" value="volver_a_usuario">Volver al Panel</button>
     </form>
 </body>
 </html>

@@ -46,13 +46,13 @@ def home():
 def registrar():
     if request.method == 'POST':
         # Obtener datos del formulario
-        nombre = request.form['nombre']
-        apellido = request.form['apellido']
-        email = request.form['email']
-        nombre_usuario = request.form['nombre_usuario']
-        contraseña = request.form['contraseña']
-        confirmacion = request.form['confirmacion']
-        claustro = request.form['claustro']
+        nombre = request.form.get('nombre')
+        apellido = request.form.get('apellido')
+        email = request.form.get('email')
+        nombre_usuario = request.form.get('nombre_usuario')
+        contraseña = request.form.get('contraseña')
+        confirmacion = request.form.get('confirmacion')
+        claustro = request.form.get('claustro')
 
         # Validación de contraseñas
         if contraseña != confirmacion:
@@ -76,11 +76,16 @@ def registrar():
         db.session.add(nuevo_usuario)
         db.session.commit()
 
+        # Agregar print para depuración
+        print("Usuario registrado correctamente, redireccionando a iniciar sesión")
+
         # Redireccionar a la página de inicio de sesión
         flash("Usuario registrado con éxito. Inicia sesión.", "success")
         return redirect(url_for('iniciar_sesion'))
+
+    # Manejar GET
     return render_template('registro.html')
-# Ruta para iniciar sesión
+
 @app.route('/iniciar_sesion', methods=['GET', 'POST'])
 def iniciar_sesion():
     if request.method == 'POST':
@@ -94,6 +99,23 @@ def iniciar_sesion():
             return redirect(url_for('panel_usuario'))
         flash("Credenciales incorrectas", "error")
     return render_template('iniciar_sesion.html')
+
+@app.route('/crear_reclamo', methods=['GET', 'POST'])
+def crear_reclamo():
+    if request.method == 'POST':
+        # Lógica para crear un reclamo (pendiente de implementar)
+        pass
+    return render_template('crear_reclamo.html')
+
+@app.route('/listar_reclamos')
+def listar_reclamos():
+    # Lógica para listar reclamos (pendiente de implementar)
+    return render_template('listar_reclamos.html')
+
+@app.route('/mis_reclamos')
+def mis_reclamos():
+    # Lógica para mostrar los reclamos del usuario (pendiente de implementar)
+    return render_template('mis_reclamos.html')
 
 # Ruta para cerrar sesión
 @app.route('/cerrar_sesion')
