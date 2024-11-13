@@ -5,8 +5,16 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from modules.modelos import db, ModeloReclamo, ModeloUsuario
 import pickle
 import nltk
-nltk.data.path.append('C:/Users/anacl/nltk_data')
-nltk.download('punkt', download_dir='C:/Users/anacl/nltk_data')
+import os
+
+# Cambia el directorio de descarga a un subdirectorio en tu proyecto
+nltk_data_path = os.path.join(os.path.dirname(__file__), 'nltk_data')
+nltk.data.path.append(nltk_data_path)
+
+# Descarga los datos solo si no están disponibles
+if not os.path.exists(os.path.join(nltk_data_path, 'tokenizers/punkt')):
+    nltk.download('punkt', download_dir=nltk_data_path)
+
 
 app = Flask("server")
 app.config['SECRET_KEY'] = 'clave_secreta_para_formularios'

@@ -1,6 +1,4 @@
 import nltk
-nltk.data.path.append('C:/Users/anacl/nltk_data')
-nltk.download('punkt', download_dir='C:/Users/anacl/nltk_data')
 nltk.download("stopwords")
 import numpy as np
 from nltk.tokenize import word_tokenize
