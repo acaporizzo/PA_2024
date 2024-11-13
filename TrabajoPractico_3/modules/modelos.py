@@ -1,8 +1,7 @@
-# archivo: modelos.py
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-
-db = SQLAlchemy()
+from modules.config import db
+from flask_login import UserMixin
 
 class ModeloUsuario(db.Model):
     __tablename__ = 'usuarios'
@@ -11,10 +10,12 @@ class ModeloUsuario(db.Model):
     apellido = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     nombre_usuario = db.Column(db.String(50), unique=True, nullable=False)
-    contraseña = db.Column(db.String(100), nullable=False)
-    claustro = db.Column(db.String(20), nullable=False)
-
+    contraseña = db.Column(db.String(120), nullable=False)
+    claustro = db.Column(db.String(20))
     reclamos_seguidos = db.relationship('ModeloReclamo', backref='usuarios_adheridos')
+
+    def obtener_id(self):
+        return str(self.id)
 
 class ModeloReclamo(db.Model):
     __tablename__ = 'reclamos'

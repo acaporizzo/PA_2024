@@ -11,7 +11,7 @@ from sklearn.metrics import accuracy_score
 class Classifier():
     """
     """
-    def _init_(self, X=np.array, y=np.array, escalado=True):       
+    def __init__(self, X=np.array, y=np.array, escalado=True):       
         self.X= X 
         self.y= y
         self.escalado = escalado

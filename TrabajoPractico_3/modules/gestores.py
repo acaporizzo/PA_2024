@@ -1,4 +1,7 @@
-from modules.dominio import Reclamo
+from modules.dominio import Reclamo, Usuario
+from modules.config import db
+from sqlalchemy.orm.exc import NoResultFound
+from modules.modelos import ModeloReclamo, ModeloUsuario
 from datetime import datetime
 import uuid
 
@@ -24,6 +27,11 @@ class GestorReclamo:
         )
         self.repositorio.guardar_registro(nuevo_reclamo)
         return nuevo_reclamo
+    
+    def clasificar_reclamo(self, claim):
+        """Recibe el reclamo (objeto) y lo clasifica"""
+        depto=self.__clasificador.clasificar([claim.get_descripcion])
+        claim.set_depto(depto[0])
 
     def adherir_a_reclamo(self, id_reclamo, usuario):
         reclamo = self.repositorio.obtener_registro_por_filtro("id_reclamo", id_reclamo)
@@ -48,3 +56,32 @@ class GestorReclamo:
             self.repositorio.modificar_registro(reclamo)
             return reclamo
         return None
+
+class GestorUsuario:
+    def __init__(self, repositorio_usuarios):
+        self.repositorio = repositorio_usuarios
+
+    def registrar_usuario(self, nombre, apellido, nombre_usuario, email, contraseña, claustro, rol, departamento):
+        if any(usuario.nombre_usuario == nombre_usuario for usuario in self.repositorio.obtener_todos_los_registros()):
+            raise ValueError(f"El nombre de usuario '{nombre_usuario}' ya está en uso.")
+        nuevo_usuario = Usuario(
+            id=uuid.uuid4(),
+            nombre=nombre,
+            apellido=apellido,
+            nombre_usuario=nombre_usuario,
+            email=email,
+            contraseña=contraseña,
+            claustro=claustro,
+            rol=rol,
+            departamento=departamento
+        )
+        self.repositorio.guardar_registro(nuevo_usuario)
+        return nuevo_usuario
+    
+class GestorBaseDeDatos:
+    def obtener_usuario_por_nombre(self, nombre_usuario):
+        try:
+            usuario = db.session.query(ModeloUsuario).filtrer_by(nombre_usuario=nombre_usuario).one()
+            return usuario
+        except NoResultFound: 
+            raise Exception("El usuario no fue encontrado")

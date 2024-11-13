@@ -18,7 +18,7 @@ if not os.path.exists(os.path.join(nltk_data_path, 'tokenizers/punkt')):
 
 app = Flask("server")
 app.config['SECRET_KEY'] = 'clave_secreta_para_formularios'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///crm_reclamos.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///base_de_datos.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
