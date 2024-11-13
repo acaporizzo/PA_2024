@@ -23,5 +23,7 @@ class ModeloReclamo(db.Model):
     contenido = db.Column(db.Text, nullable=False)
     departamento = db.Column(db.String(50), nullable=False)
     estado = db.Column(db.String(20), default="pendiente")
+    clasificacion = db.Column(db.String(100), nullable=True)  # Agregar columna clasificacion
+    imagen = db.Column(db.LargeBinary, nullable=True)  # Para almacenar imagen, si es necesario
     fecha = db.Column(db.DateTime, default=datetime.utcnow)
-    adherentes = db.Column(db.Integer, default=0)
+

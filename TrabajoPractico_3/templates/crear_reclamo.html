@@ -7,22 +7,9 @@
 <body>
     <h1>Crear Nuevo Reclamo</h1>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <ul>
-                {% for category, message in messages %}
-                    <li class="{{ category }}">{{ message }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    {% endwith %}
-
     <form method="POST" enctype="multipart/form-data" action="{{ url_for('crear_reclamo') }}">
         <label for="contenido">Contenido:</label>
         <textarea id="contenido" name="description" required></textarea><br>
-
-        <label for="departamento">Departamento:</label>
-        <input type="text" id="departamento" name="department" required><br>
 
         <label for="foto">Adjuntar Foto (opcional):</label>
         <input type="file" id="foto" name="image"><br>

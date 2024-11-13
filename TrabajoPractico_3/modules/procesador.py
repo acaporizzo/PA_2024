@@ -1,4 +1,5 @@
 import nltk
+nltk.data.path.append('C:/Users/anacl/nltk_data')
 nltk.download('punkt', download_dir='C:/Users/anacl/nltk_data')
 nltk.download("stopwords")
 import numpy as np
@@ -67,3 +68,32 @@ if __name__ == "__main__":
     vectorizer = TextVectorizer()
     X_vectorizado = vectorizer.fit_transform(X)
     print(X_vectorizado)    
+
+class Procesador():
+  
+  def _init_(self, direccion,):
+    
+    with open(direccion,'r', encoding='utf-8') as f:
+      datos_entrenamiento = json.load(f)
+
+    textos_entrenamiento = []
+    etiquetas_entrenamiento = []
+    
+    for dato in datos_entrenamiento:
+      texto = dato['reclamo']
+      etiqueta = dato['etiqueta']
+      textos_entrenamiento.append(texto)
+      etiquetas_entrenamiento.append(etiqueta)
+    
+    mapeo_etiquetas = {'secretaría técnica': 0, 'soporte informático': 1, 'maestranza': 2}
+
+    etiquetas_entrenamiento = [mapeo_etiquetas[etiqueta] for etiqueta in etiquetas_entrenamiento]
+      
+    #se unen todos los reclamos en un solo arreglo de nunpy
+    self.x = np.array(textos_entrenamiento , dtype = object)
+    #se crea un arreglo con las etiquetas (areas) correspondientes a cada reclamo
+    self.y = np.array(etiquetas_entrenamiento)
+
+  @property
+  def datosEntrenamiento(self):
+    return self.x,self.y

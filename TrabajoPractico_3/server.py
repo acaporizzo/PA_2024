@@ -4,6 +4,9 @@ from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from modules.modelos import db, ModeloReclamo, ModeloUsuario
 import pickle
+import nltk
+nltk.data.path.append('C:/Users/anacl/nltk_data')
+nltk.download('punkt', download_dir='C:/Users/anacl/nltk_data')
 
 app = Flask("server")
 app.config['SECRET_KEY'] = 'clave_secreta_para_formularios'
@@ -99,7 +102,6 @@ def crear_reclamo():
 
         elif action == 'crear':
             contenido = request.form.get('description')
-            departamento = request.form.get('department')
             imagen = request.files.get('image')
             imagen_data = imagen.read() if imagen else None
 
@@ -129,7 +131,7 @@ def crear_reclamo():
             flash("Reclamo creado exitosamente", "success")
             return redirect(url_for('panel_usuario'))
 
-    return render_template("reclamo.html")
+    return render_template("crear_reclamo.html")
 
 
 @app.route('/adherir_a_reclamo/<int:reclamo_id>', methods=['POST'])
