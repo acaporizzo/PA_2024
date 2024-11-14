@@ -5,18 +5,19 @@ from sqlalchemy.orm import sessionmaker
 from flask_login import LoginManager
 from flask_bootstrap import Bootstrap
 import datetime
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask("server")
 app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///instance/base_datos.db'
 
 URL_BD = 'sqlite:///instance/base_datos.db'
-
 def crear_engine():
     engine = create_engine(URL_BD)
     Session = sessionmaker(bind=engine)
     return Session
 
+app.config.from_object(__name__)
 app.config["SESSION_TYPE"] = "filesystem"
 app.config["SESSION_FILE_DIR"] = "./flask_session_cache"
 app.config["SESSION_PERMANENT"] = False
@@ -28,3 +29,5 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 Bootstrap(app)
+
+db = SQLAlchemy(app)

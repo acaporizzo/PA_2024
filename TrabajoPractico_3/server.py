@@ -1,32 +1,43 @@
 from flask import render_template, request, redirect, url_for, flash, session
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
-from modules.classifier import ClaimsClassifier
 from modules.modelos import ModeloReclamo, ModeloUsuario
-from modules.base_datos import db
-from modules.config import app
-import pickle, nltk, os
+from modules.gestores import GestorReclamo, GestorBaseDeDatos, GestorUsuario
+from modules.factoria import crear_repositorio
+from modules.gestor_login import GestorDeLogin
+from modules.config import app, login_manager, db
+from modules.classifier import ClaimsClassifier
+import nltk, os
 
 nltk_data_path = os.path.join(os.path.dirname(__file__), 'nltk_data')
-nltk.data.path.append(nltk_data_path)
-
+if not os.path.exists(nltk_data_path):
+    os.makedirs(nltk_data_path)
 if not os.path.exists(os.path.join(nltk_data_path, 'tokenizers/punkt')):
-    nltk.download('punkt', download_dir=nltk_data_path)
+    try:
+        nltk.download('punkt', download_dir=nltk_data_path)
+    except Exception as e:
+        print("Error al descargar nltk data:", e)
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(BASE_DIR, "instance/base_datos.db")}'
 
-db.init_app(app)
+admin_list = [1]
+repo_reclamo , repo_usuario = crear_repositorio()
 
-with app.app_context():
-    db.create_all()
+gestor_reclamo = GestorReclamo(repo_reclamo)
+gestor_usuario = GestorUsuario(repo_usuario)
+gestor_login = GestorDeLogin(gestor_usuario, login_manager, admin_list)
 
-with open('./data/claims_clf.pkl', 'rb') as f:
-    classifier = pickle.load(f)
+try:
+    with app.app_context():
+        db.create_all()
+        print("Conexión a la base de datos exitosa y tablas creadas.")
+except Exception as e:
+    print("Error al conectar con la base de datos:", e)
+
 
 @app.route('/')
 def home():
-    if 'usuario' in session: #si el usuario ya inició sesión lo lleva directamente al panel
+    if gestor_login.usuario_autenticado:
         return redirect(url_for('panel_usuario'))
     return render_template('home.html')
 
@@ -40,28 +51,36 @@ def registrar():
         contraseña = request.form.get('contraseña')
         confirmacion = request.form.get('confirmacion')
         claustro = request.form.get('claustro')
-
+        departamento = request.form.get('departamento', 'general')
+        
         if contraseña != confirmacion:
             flash("Las contraseñas no coinciden", "error")
             return redirect(url_for('registrar'))
+        
+        rol = None
+        if claustro == "PAyS":
+            rol = request.form.get('rol')
+            if rol not in ["Jefe de Departamento", "Secretario Técnico"]:
+                flash("Debe seleccionar un rol válido para el claustro PAyS", "error")
+                return redirect(url_for('registrar'))
 
-        if ModeloUsuario.query.filter_by(email=email).first() or ModeloUsuario.query.filter_by(nombre_usuario=nombre_usuario).first():
-            flash("El email o nombre de usuario ya están registrados", "error")
+        try:
+            gestor_usuario.registrar_usuario(
+                nombre=nombre,
+                apellido=apellido,
+                nombre_usuario=nombre_usuario,
+                email=email,
+                contraseña=generate_password_hash(contraseña),
+                claustro=claustro,
+                rol=rol,
+                departamento=departamento
+            )
+            flash("Usuario registrado con éxito. Inicia sesión.", "success")
+            return redirect(url_for('iniciar_sesion'))
+        
+        except ValueError as e:
+            flash(str(e), "error")
             return redirect(url_for('registrar'))
-
-        nuevo_usuario = ModeloUsuario(
-            nombre=nombre,
-            apellido=apellido,
-            email=email,
-            nombre_usuario=nombre_usuario,
-            contraseña=generate_password_hash(contraseña),
-            claustro=claustro
-        )
-        db.session.add(nuevo_usuario)
-        db.session.commit()
-
-        flash("Usuario registrado con éxito. Inicia sesión.", "success")
-        return redirect(url_for('iniciar_sesion'))
 
     return render_template('registro.html')
 

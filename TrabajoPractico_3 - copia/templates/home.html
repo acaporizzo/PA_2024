@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Inicio - CRM Reclamos</title>
+    <style>
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            background-color: #ff00a2;
+            border: none;
+            border-radius: 5px;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn:hover {
+            background-color: #ff00a2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Bienvenido al Sistema de Gestión de Reclamos</h1>
+    <a href="{{ url_for('registrar') }}" class="btn">Registrar Usuario</a><br>
+    <a href="{{ url_for('iniciar_sesion') }}" class="btn">Iniciar Sesión</a><br>
+</body>
+</html>

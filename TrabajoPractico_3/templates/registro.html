@@ -21,6 +21,18 @@
             background-color: #ff00a2;
         }
     </style>
+    <script>
+        // Script para mostrar/ocultar el campo de selección de roles según el claustro seleccionado
+        function mostrarOcultarRol() {
+            const claustro = document.getElementById("claustro").value;
+            const rolDiv = document.getElementById("rolDiv");
+            if (claustro === "PAyS") {
+                rolDiv.style.display = "block";
+            } else {
+                rolDiv.style.display = "none";
+            }
+        }
+    </script>
 </head>
 <body>
     <h1>Registro de Usuario</h1>
@@ -48,11 +60,20 @@
         <input type="text" id="nombre_usuario" name="nombre_usuario" required><br>
 
         <label for="claustro">Claustro:</label>
-        <select id="claustro" name="claustro" required>
+        <select id="claustro" name="claustro" required onchange="mostrarOcultarRol()">
             <option value="Estudiante">Estudiante</option>
             <option value="Docente">Docente</option>
             <option value="PAyS">PAyS</option>
         </select><br>
+
+        <!-- Selector de rol, oculto inicialmente -->
+        <div id="rolDiv" style="display: none;">
+            <label for="rol">Rol:</label>
+            <select id="rol" name="rol">
+                <option value="Jefe de Departamento">Jefe de Departamento</option>
+                <option value="Secretario Técnico">Secretario Técnico</option>
+            </select><br>
+        </div>
 
         <label for="contraseña">Contraseña:</label>
         <input type="password" id="contraseña" name="contraseña" required><br>
