@@ -1,4 +1,4 @@
-#from fpdf import FPDF
+from fpdf import FPDF
 
 class GeneradorReporte:
     def _init_(self, formato):

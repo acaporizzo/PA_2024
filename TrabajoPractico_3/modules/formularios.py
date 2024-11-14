@@ -1,4 +1,3 @@
-# forms.py
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, TextAreaField, SelectField
 from wtforms.validators import DataRequired, EqualTo, Email, Length
@@ -19,7 +18,6 @@ class FormRegistro(FlaskForm):
     )
     confirmacion = PasswordField(label='Repetir Contraseña', validators=[DataRequired()])
     submit = SubmitField(label='Registrar')
-
 
 class FormReclamo(FlaskForm):
     usuario = StringField(label='Nombre de Usuario', validators=[DataRequired()])

@@ -8,6 +8,7 @@ import datetime
 
 app = Flask("server")
 app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///instance/base_datos.db'
 
 URL_BD = 'sqlite:///instance/base_datos.db'
 
@@ -16,15 +17,14 @@ def crear_engine():
     Session = sessionmaker(bind=engine)
     return Session
 
-#app.config.from_object(_name_)
 app.config["SESSION_TYPE"] = "filesystem"
 app.config["SESSION_FILE_DIR"] = "./flask_session_cache"
 app.config["SESSION_PERMANENT"] = False
 app.config["PERMANENT_SESSION_LIFETIME"] = datetime.timedelta(minutes=5)
+
 Session(app)
 
-# Flask Login
 login_manager = LoginManager()
 login_manager.init_app(app)
-# Bootstrap
+
 Bootstrap(app)

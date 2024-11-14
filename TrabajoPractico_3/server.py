@@ -1,25 +1,20 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session
-from flask_sqlalchemy import SQLAlchemy
+from flask import render_template, request, redirect, url_for, flash, session
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
-from modules.modelos import db, ModeloReclamo, ModeloUsuario
-import pickle
-import nltk
-import os
+from modules.classifier import ClaimsClassifier
+from modules.modelos import ModeloReclamo, ModeloUsuario
+from modules.base_datos import db
+from modules.config import app
+import pickle, nltk, os
 
-# Cambia el directorio de descarga a un subdirectorio en tu proyecto
 nltk_data_path = os.path.join(os.path.dirname(__file__), 'nltk_data')
 nltk.data.path.append(nltk_data_path)
 
-# Descarga los datos solo si no están disponibles
 if not os.path.exists(os.path.join(nltk_data_path, 'tokenizers/punkt')):
     nltk.download('punkt', download_dir=nltk_data_path)
 
-
-app = Flask("server")
-app.config['SECRET_KEY'] = 'clave_secreta_para_formularios'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///base_de_datos.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(BASE_DIR, "instance/base_datos.db")}'
 
 db.init_app(app)
 
@@ -113,17 +108,13 @@ def crear_reclamo():
             imagen = request.files.get('image')
             imagen_data = imagen.read() if imagen else None
 
-            # 1. Clasificar el reclamo
             clasificacion = classifier.clasificar([contenido])[0]
 
-            # 2. Buscar reclamos similares
             reclamos_similares = ModeloReclamo.query.filter_by(clasificacion=clasificacion).all()
 
-            # Si existen reclamos similares, mostrar opción para adherirse
             if reclamos_similares:
                 return render_template("seleccionar_reclamo.html", reclamos=reclamos_similares, contenido=contenido, departamento=departamento)
 
-            # 3. Si no existen reclamos similares, crear un reclamo nuevo
             nuevo_reclamo = ModeloReclamo(
                 id_usuario=usuario.id,
                 contenido=contenido,

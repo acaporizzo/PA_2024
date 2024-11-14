@@ -1,4 +1,5 @@
-from modules.procesador import Procesador, TextVectorizer
+from modules.procesador import Procesador
+from modules.text_vectorizer import TextVectorizer
 import pickle
 import numpy as np
 from sklearn.svm import SVC
@@ -8,7 +9,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
 
-class Classifier():
+class ClaimsClassifier():
     """
     """
     def __init__(self, X=np.array, y=np.array, escalado=True):       
@@ -80,7 +81,7 @@ if __name__== "main_":
     procesador = Procesador("frases.json")
 
     X, y = procesador.datosEntrenamiento
-    cls=  Classifier(X,y,escalado=True)
+    cls=  ClaimsClassifier(X,y,escalado=True)
 
     text= ["No puedo enviar mi trabajo por correo electrónico porque la red no funciona.","El piso del aula 5 está muy sucio."]
     print(cls.clasificar(text))  
