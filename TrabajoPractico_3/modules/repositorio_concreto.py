@@ -123,25 +123,46 @@ class RepositorioUsuariosSQLAlchemy(RepositorioAbstracto):
             self.__session.delete(register)
             self.__session.commit()
 
-    def _map_entidad_a_modelo(self, entidad: Usuario):
-        return ModeloUsuario(
+    def obtener_usuario_por_id(self, id_usuario):
+            """Obtiene un usuario de la base de datos por ID."""
+            modelo_usuario = self.__session.query(ModeloUsuario).filter_by(id=id_usuario).first()
+            return self.__map_modelo_a_entidad(modelo_usuario) if modelo_usuario else None
+
+    def obtener_usuario_por_nombre(self, nombre_usuario):
+        """Obtiene un usuario de la base de datos por nombre de usuario."""
+        modelo_usuario = self.__session.query(ModeloUsuario).filter_by(nombre_usuario=nombre_usuario).first()
+        return self.__map_modelo_a_entidad(modelo_usuario) if modelo_usuario else None
+
+    def __map_entidad_a_modelo(self, entidad: Usuario):
+
+        modelo_usuario = ModeloUsuario(
             id=entidad.id,
             nombre=entidad.nombre,
             apellido=entidad.apellido,
             email=entidad.email,
-            password=entidad.password,
-            claustro=entidad.claustro,
-            rol=entidad.rol,
-            departamento=entidad.departamento
+            nombre_usuario=entidad.nombre_usuario,
+            contraseña=entidad.contraseña,
+            claustro=entidad.claustro
         )
+        
+        # Asigna rol solo si el claustro es "PAyS"
+        if entidad.claustro == "PAyS":
+            modelo_usuario.rol = entidad.rol
+            # Solo asigna departamento si el rol es "Jefe de Departamento"
+            if entidad.rol == "Jefe de Departamento":
+                modelo_usuario.departamento = entidad.departamento
+        
+        return modelo_usuario
 
-    def _map_modelo_a_entidad(self, modelo: ModeloUsuario):
+
+    def __map_modelo_a_entidad(self, modelo: ModeloUsuario):
         return Usuario(
             id=modelo.id,
             nombre=modelo.nombre,
             apellido=modelo.apellido,
+            nombre_usuario=modelo.nombre_usuario,
             email=modelo.email,
-            password=modelo.password,
+            contraseña=modelo.contraseña,
             claustro=modelo.claustro,
             rol=modelo.rol,
             departamento=modelo.departamento

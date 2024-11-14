@@ -1,4 +1,6 @@
 from flask import render_template, request, redirect, url_for, flash, session
+from flask_login import login_required
+from flask_login import logout_user
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from modules.modelos import ModeloReclamo, ModeloUsuario
@@ -7,7 +9,7 @@ from modules.factoria import crear_repositorio
 from modules.gestor_login import GestorDeLogin
 from modules.config import app, login_manager, db
 from modules.classifier import ClaimsClassifier
-import nltk, os
+import nltk, os, uuid
 
 nltk_data_path = os.path.join(os.path.dirname(__file__), 'nltk_data')
 if not os.path.exists(nltk_data_path):
@@ -51,29 +53,37 @@ def registrar():
         contraseña = request.form.get('contraseña')
         confirmacion = request.form.get('confirmacion')
         claustro = request.form.get('claustro')
-        departamento = request.form.get('departamento', 'general')
-        
-        if contraseña != confirmacion:
-            flash("Las contraseñas no coinciden", "error")
-            return redirect(url_for('registrar'))
-        
-        rol = None
+        rol = None 
+        departamento = None
+
         if claustro == "PAyS":
             rol = request.form.get('rol')
             if rol not in ["Jefe de Departamento", "Secretario Técnico"]:
                 flash("Debe seleccionar un rol válido para el claustro PAyS", "error")
                 return redirect(url_for('registrar'))
 
+            if rol == "Jefe de Departamento":
+                departamento = request.form.get('departamento')
+                if departamento not in ["maestranza", "soporte informático", "secretaría técnica"]:
+                    flash("Debe seleccionar un departamento válido para el rol de Jefe de Departamento", "error")
+                    return redirect(url_for('registrar'))
+
+        if contraseña != confirmacion:
+            flash("Las contraseñas no coinciden", "error")
+            return redirect(url_for('registrar'))
+        
+        id = str(uuid.uuid4())
         try:
             gestor_usuario.registrar_usuario(
+                id=id,
                 nombre=nombre,
                 apellido=apellido,
                 nombre_usuario=nombre_usuario,
                 email=email,
                 contraseña=generate_password_hash(contraseña),
                 claustro=claustro,
-                rol=rol,
-                departamento=departamento
+                rol=rol,               
+                departamento=departamento  
             )
             flash("Usuario registrado con éxito. Inicia sesión.", "success")
             return redirect(url_for('iniciar_sesion'))
@@ -84,25 +94,37 @@ def registrar():
 
     return render_template('registro.html')
 
+
 @app.route('/iniciar_sesion', methods=['GET', 'POST'])
 def iniciar_sesion():
     if request.method == 'POST':
-        nombre_usuario = request.form['nombre_usuario']
-        contraseña = request.form['contraseña']
-
-        usuario = ModeloUsuario.query.filter_by(nombre_usuario=nombre_usuario).first()
-
-        if usuario and check_password_hash(usuario.contraseña, contraseña):
-            session['usuario'] = usuario.nombre_usuario
-            flash("Inicio de sesión exitoso", "success")
-            return redirect(url_for('panel_usuario'))
+        nombre_usuario = request.form["nombre_usuario"]
+        contraseña = request.form["contraseña"]
         
-        flash("Credenciales incorrectas. Inténtalo de nuevo.", "error")
-        return redirect(url_for('iniciar_sesion'))
+        if not nombre_usuario or not contraseña:
+            flash("Complete ambos campos", "error")
+        else:
+            # Verificar credenciales usando GestorDeLogin
+            usuario_valido = gestor_login.verificar_credenciales(nombre_usuario, contraseña)
+            if usuario_valido:
+                gestor_login.login_usuario(usuario_valido)
+                tipo_usuario = usuario_valido.departamento
 
-    rendered_template = render_template('iniciar_sesion.html')
-    session.pop('_flashes', None)  #borra los mensajes flash historicos
-    return rendered_template
+                if tipo_usuario == "jefe":
+                    return redirect(url_for('panel_jefe'))
+                elif tipo_usuario == "secretario_tecnico":
+                    return redirect(url_for('panel_secretario_tecnico'))
+                else:
+                    return redirect(url_for('panel_usuario'))
+            else:
+                flash("Usuario o contraseña incorrectos", "error")
+
+    return render_template("iniciar_sesion.html")
+
+@app.route('/panel_usuario')
+@login_required
+def panel_usuario():
+    return render_template('panel_usuario.html')
 
 @app.route('/crear_reclamo', methods=['GET', 'POST'])
 def crear_reclamo():
@@ -151,7 +173,6 @@ def crear_reclamo():
 
     return render_template("crear_reclamo.html")
 
-
 @app.route('/adherir_a_reclamo/<int:reclamo_id>', methods=['POST'])
 def adherir_a_reclamo(reclamo_id):
     user = session.get('usuario')
@@ -169,11 +190,10 @@ def adherir_a_reclamo(reclamo_id):
 
 @app.route('/cerrar_sesion')
 def cerrar_sesion():
-    session.pop('usuario', None)
+    logout_user()
     flash("Sesión cerrada", "success")
-    rendered_template = redirect(url_for('home'))
-    session.pop('_flashes', None) 
-    return rendered_template
+    
+    return redirect(url_for('iniciar_sesion'))
 
 @app.route('/listar_reclamos')
 def listar_reclamos():
@@ -183,12 +203,6 @@ def listar_reclamos():
 def mis_reclamos():
     return render_template('mis_reclamos.html')
 
-@app.route('/panel_usuario')
-def panel_usuario():
-    if 'usuario' not in session:
-        flash("Inicia sesión para acceder a esta página", "error")
-        return redirect(url_for('iniciar_sesion'))
-    return render_template('panel_usuario.html')
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,0 +1,43 @@
+<!-- HTML para la selección de rol y departamento -->
+<div id="rolDiv" style="display: none;">
+    <label for="rol">Rol:</label>
+    <select id="rol" name="rol" onchange="mostrarOcultarDepartamento()">
+        <option value="Jefe de Departamento">Jefe de Departamento</option>
+        <option value="Secretario Técnico">Secretario Técnico</option>
+    </select><br>
+</div>
+
+<div id="departamentoDiv" style="display: none;">
+    <label for="departamento">Departamento:</label>
+    <select id="departamento" name="departamento">
+        <option value="maestranza">Maestranza</option>
+        <option value="soporte informático">Soporte Informático</option>
+        <option value="secretaría técnica">Secretaría Técnica</option>
+    </select><br>
+</div>
+
+<script>
+    function mostrarOcultarRol() {
+        const claustro = document.getElementById("claustro").value;
+        const rolDiv = document.getElementById("rolDiv");
+        const departamentoDiv = document.getElementById("departamentoDiv");
+
+        if (claustro === "PAyS") {
+            rolDiv.style.display = "block";
+        } else {
+            rolDiv.style.display = "none";
+            departamentoDiv.style.display = "none";
+        }
+    }
+
+    function mostrarOcultarDepartamento() {
+        const rol = document.getElementById("rol").value;
+        const departamentoDiv = document.getElementById("departamentoDiv");
+
+        if (rol === "Jefe de Departamento") {
+            departamentoDiv.style.display = "block";
+        } else {
+            departamentoDiv.style.display = "none";
+        }
+    }
+</script>

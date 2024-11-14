@@ -1,17 +1,19 @@
-# modules/modelos.py
 from datetime import datetime
+from sqlalchemy import Column, String
 from modules.base_datos import db
 
 class ModeloUsuario(db.Model):
     __tablename__ = 'usuarios'
-    id = db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(50), nullable=False)
-    apellido = db.Column(db.String(50), nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    nombre_usuario = db.Column(db.String(50), unique=True, nullable=False)
-    contraseña = db.Column(db.String(120), nullable=False)
-    claustro = db.Column(db.String(20))
-    reclamos_seguidos = db.relationship('ModeloReclamo', backref='usuarios_adheridos')
+
+    id = Column(String, primary_key=True)
+    nombre = Column(String, nullable=False)
+    apellido = Column(String, nullable=False)
+    email = Column(String, nullable=False, unique=True)
+    nombre_usuario = Column(String, nullable=False, unique=True)
+    contraseña = Column(String, nullable=False)
+    claustro = Column(String, nullable=False)
+    rol = Column(String, nullable=True)         
+    departamento = Column(String, nullable=True)
 
     def obtener_id(self):
         return str(self.id)
