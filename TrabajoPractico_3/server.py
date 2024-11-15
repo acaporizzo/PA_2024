@@ -12,15 +12,6 @@ from modules.classifier import ClaimsClassifier
 from modules.create_csv import crear_csv
 import os, uuid, pickle
 
-#nltk_data_path = os.path.join(os.path.dirname(__file__), 'nltk_data')
-#if not os.path.exists(nltk_data_path):
-    #os.makedirs(nltk_data_path)
-#if not os.path.exists(os.path.join(nltk_data_path, 'tokenizers/punkt')):
-    #try:
-    #    nltk.download('punkt', download_dir=nltk_data_path)
-   # except Exception as e:
-    #    print("Error al descargar nltk data:", e)
-
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 admin_list = [1]
@@ -37,7 +28,6 @@ try:
 except Exception as e:
     print("Error al conectar con la base de datos:", e)
 
-# Cargar el modelo entrenado
 try:
     with open('./data/claims_clf.pkl', 'rb') as archivo:
         clasificador = pickle.load(archivo)
@@ -101,7 +91,6 @@ def registrar():
             return redirect(url_for('registrar'))
 
     return render_template('registro.html')
-
 
 @app.route('/iniciar_sesion', methods=['GET', 'POST'])
 def iniciar_sesion():

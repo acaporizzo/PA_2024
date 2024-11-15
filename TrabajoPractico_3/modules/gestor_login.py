@@ -1,5 +1,3 @@
-# Archivo modules/gestor_login.py
-
 from flask_login import UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import check_password_hash
 from flask import abort
@@ -7,11 +5,10 @@ from functools import wraps
 
 class FlaskLoginUser(UserMixin):
     def __init__(self, usuario):
-        # Asigna atributos del objeto Usuario directamente
         self.id = usuario.id
         self.nombre = usuario.nombre
         self.email = usuario.email
-        self.password = usuario.contraseña  # Asegúrate de que este campo coincide con el objeto Usuario
+        self.password = usuario.contraseña
         self.depto = usuario.departamento
 
 class GestorDeLogin:
@@ -25,7 +22,7 @@ class GestorDeLogin:
         try:
             usuario = self.__gestor_usuarios.cargar_usuario_por_nombre(nombre_usuario)
             if usuario and check_password_hash(usuario.contraseña, contraseña):
-                return usuario  # Retorna el objeto Usuario directamente
+                return usuario
         except Exception as e:
             print(f"Error al verificar credenciales: {e}")
         return None

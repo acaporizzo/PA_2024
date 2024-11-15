@@ -59,7 +59,25 @@ class GestorReclamo:
 class GestorUsuario:
     def __init__(self, repo_usuario):
         self.__repo_usuario = repo_usuario
-
+    def registrar_usuario(self, id, nombre, apellido, nombre_usuario, email, contraseña, claustro, rol, departamento):
+        
+        if any(usuario.nombre_usuario == nombre_usuario for usuario in self.__repo_usuario.obtener_todos_los_registros()):
+            raise ValueError(f"El nombre de usuario '{nombre_usuario}' ya está en uso.")
+        
+        nuevo_usuario = Usuario(
+        id=str(uuid.uuid4()),  #convertimos el UUID a cadena
+        nombre=nombre,
+        apellido=apellido,
+        nombre_usuario=nombre_usuario,
+        email=email,
+        contraseña=contraseña,
+        claustro=claustro,
+        rol=rol,
+        departamento=departamento
+    )
+        self.__repo_usuario.guardar_registro(nuevo_usuario)
+        return nuevo_usuario
+    
     def cargar_usuario_por_nombre(self, nombre_usuario):
         """Carga el usuario desde el repositorio por su nombre de usuario."""
         return self.__repo_usuario.obtener_usuario_por_nombre(nombre_usuario)

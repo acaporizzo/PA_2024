@@ -145,25 +145,23 @@ class RepositorioUsuariosSQLAlchemy(RepositorioAbstracto):
             claustro=entidad.claustro
         )
         
-        # Asigna rol solo si el claustro es "PAyS"
         if entidad.claustro == "PAyS":
             modelo_usuario.rol = entidad.rol
-            # Solo asigna departamento si el rol es "Jefe de Departamento"
             if entidad.rol == "Jefe de Departamento":
                 modelo_usuario.departamento = entidad.departamento
         
         return modelo_usuario
 
-
     def __map_modelo_a_entidad(self, modelo: ModeloUsuario):
         return Usuario(
-            id=modelo.id,
-            nombre=modelo.nombre,
-            apellido=modelo.apellido,
-            nombre_usuario=modelo.nombre_usuario,
-            email=modelo.email,
-            contraseña=modelo.contraseña,
-            claustro=modelo.claustro,
-            rol=modelo.rol,
-            departamento=modelo.departamento
-        )
+        id=modelo.id,
+        nombre=modelo.nombre,
+        apellido=modelo.apellido,
+        nombre_usuario=modelo.nombre_usuario,
+        email=modelo.email,
+        contraseña=modelo.contraseña,
+        claustro=modelo.claustro,
+        rol=modelo.rol if modelo.claustro == "PAyS" else None,
+        departamento=modelo.departamento if modelo.rol == "Jefe de Departamento" else None
+    )
+
