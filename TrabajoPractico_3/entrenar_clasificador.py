@@ -1,19 +1,17 @@
 from modules.classifier import ClaimsClassifier
+from modules.create_csv import crear_csv
 import pickle
-import os
 
-# Define los datos de entrenamiento en X e y (debes reemplazarlos con datos reales)
-X = ["Ejemplo de texto para clasificar", "Otro ejemplo de reclamo"]  # Lista de textos de reclamos
-y = [0, 1]  # Etiquetas correspondientes (por ejemplo, 0 para 'secretaría técnica', 1 para 'soporte informático')
+# Cargar los datos de entrenamiento
+datos = crear_csv("./data/frases.json")
+X = datos['reclamo']  # Textos de los reclamos
+y = datos['etiqueta']  # Etiquetas de clasificación (departamentos)
 
-# Crea una instancia de Classifier y entrena el modelo
-classifier = ClaimsClassifier(X, y, escalado=True)
+# Entrenar el clasificador
+clasificador = ClaimsClassifier(X=X, y=y, escalado=True)
 
-# Verifica que la carpeta `data` exista, y si no, créala
-if not os.path.exists('./data'):
-    os.makedirs('./data')
+# Guardar el modelo entrenado
+with open('./data/claims_clf.pkl', 'wb') as archivo:
+    pickle.dump(clasificador, archivo)
 
-# Guarda el modelo entrenado en `claims_clf.pkl`
-with open('./data/claims_clf.pkl', 'wb') as f:
-    pickle.dump(classifier, f)
-print("Modelo guardado exitosamente en './data/claims_clf.pkl'")
+print("Clasificador entrenado y guardado en './data/claims_clf.pkl'")

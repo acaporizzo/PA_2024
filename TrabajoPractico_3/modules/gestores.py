@@ -2,6 +2,8 @@ from modules.dominio import Reclamo, Usuario
 from modules.config import db
 from sqlalchemy.orm.exc import NoResultFound
 from modules.modelos import ModeloReclamo, ModeloUsuario
+from modules.classifier import ClaimsClassifier
+from modules.dominio import Usuario
 from datetime import datetime
 import uuid
 
@@ -15,31 +17,28 @@ class GestorReclamo:
     def mostrar_reclamos_de_usuario(self, usuario):
         return self.repositorio.obtener_registros_seguidas_por_usuario(usuario)
 
-    def crear_reclamo(self, usuario, contenido, departamento):
-        nuevo_reclamo = Reclamo(
-            id_reclamo=uuid.uuid4(),
-            usuario=usuario,
-            contenido=contenido,
-            departamento=departamento,
-            fecha_hora=datetime.now(),
-            estado="pendiente",
-            usuarios_adheridos=[usuario]
-        )
-        self.repositorio.guardar_registro(nuevo_reclamo)
-        return nuevo_reclamo
-    
-    def clasificar_reclamo(self, claim):
-        """Recibe el reclamo (objeto) y lo clasifica"""
-        depto=self.__clasificador.clasificar([claim.get_descripcion])
-        claim.set_depto(depto[0])
+    def crear_reclamo(self, formulario):
+        # Crea un nuevo reclamo a partir del formulario
+        return Reclamo(*formulario)  # Ajusta según tu clase Reclamo
 
-    def adherir_a_reclamo(self, id_reclamo, usuario):
-        reclamo = self.repositorio.obtener_registro_por_filtro("id_reclamo", id_reclamo)
-        if reclamo and usuario not in reclamo.usuarios_adheridos:
-            reclamo.usuarios_adheridos.append(usuario)
-            self.repositorio.modificar_registro(reclamo)
-            return True
-        return False
+    def clasificar_reclamo(self, reclamo):
+        # Clasifica el reclamo en función de la descripción u otros atributos
+        reclamo.departamento = ClaimsClassifier().clasificar(reclamo.descripcion)
+
+    def buscar_reclamos_similares(self, reclamo):
+        # Busca reclamos con el mismo departamento y descripción similar
+        posibles_reclamos = self.__repo_reclamo.obtener_reclamos_por_departamento(reclamo.departamento)
+        return reclamos_similares([(r.descripcion, r.id) for r in posibles_reclamos], reclamo.descripcion)
+
+    def guardar_reclamo(self, reclamo):
+        # Guarda el reclamo en el repositorio
+        self.__repo_reclamo.guardar_registro(reclamo)
+
+    def adherir_usuario_a_reclamo(self, id_usuario, id_reclamo):
+        # Adhiere un usuario a un reclamo
+        reclamo = self.__repo_reclamo.obtener_registro_por_id(id_reclamo)
+        reclamo.adherir_usuario(id_usuario)
+        self.__repo_reclamo.modificar_registro(reclamo)
 
     def derivar_reclamo(self, id_reclamo, nuevo_departamento):
         reclamo = self.repositorio.obtener_registro_por_filtro("id_reclamo", id_reclamo)

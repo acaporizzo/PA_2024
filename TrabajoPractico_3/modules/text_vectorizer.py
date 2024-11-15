@@ -1,12 +1,13 @@
-from collections import Counter
-from sklearn.base import BaseEstimator, TransformerMixin  
-import nltk, string
+import nltk
+nltk.download("punkt")
+nltk.download("stopwords")
 import numpy as np
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import SnowballStemmer
-nltk.download("stopwords")
-nltk.download("punkt")
+import string
+from collections import Counter
+from sklearn.base import BaseEstimator, TransformerMixin
 
 class TextVectorizer(BaseEstimator, TransformerMixin):
     def __init__(self):
@@ -21,6 +22,7 @@ class TextVectorizer(BaseEstimator, TransformerMixin):
                             if token not in self.stop_words and token not in string.punctuation]
         return ' '.join(word_tokens)
 
+    # Text to Vector
     def __text_to_vector(self, texto):
         word_vector = np.zeros(len(self.vocabulario_))
         texto = self.__get_tokens(texto) #agrego esta linea
@@ -64,4 +66,4 @@ if __name__ == "__main__":
 
     vectorizer = TextVectorizer()
     X_vectorizado = vectorizer.fit_transform(X)
-    print(X_vectorizado)  
+    print(X_vectorizado)

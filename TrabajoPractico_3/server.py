@@ -9,16 +9,17 @@ from modules.factoria import crear_repositorio
 from modules.gestor_login import GestorDeLogin
 from modules.config import app, login_manager, db
 from modules.classifier import ClaimsClassifier
-import nltk, os, uuid
+from modules.create_csv import crear_csv
+import os, uuid, pickle
 
-nltk_data_path = os.path.join(os.path.dirname(__file__), 'nltk_data')
-if not os.path.exists(nltk_data_path):
-    os.makedirs(nltk_data_path)
-if not os.path.exists(os.path.join(nltk_data_path, 'tokenizers/punkt')):
-    try:
-        nltk.download('punkt', download_dir=nltk_data_path)
-    except Exception as e:
-        print("Error al descargar nltk data:", e)
+#nltk_data_path = os.path.join(os.path.dirname(__file__), 'nltk_data')
+#if not os.path.exists(nltk_data_path):
+    #os.makedirs(nltk_data_path)
+#if not os.path.exists(os.path.join(nltk_data_path, 'tokenizers/punkt')):
+    #try:
+    #    nltk.download('punkt', download_dir=nltk_data_path)
+   # except Exception as e:
+    #    print("Error al descargar nltk data:", e)
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -36,7 +37,14 @@ try:
 except Exception as e:
     print("Error al conectar con la base de datos:", e)
 
-
+# Cargar el modelo entrenado
+try:
+    with open('./data/claims_clf.pkl', 'rb') as archivo:
+        clasificador = pickle.load(archivo)
+        print("Modelo cargado exitosamente.")
+except Exception as e:
+    print(f"Error al cargar el modelo: {str(e)}")
+    
 @app.route('/')
 def home():
     if gestor_login.usuario_autenticado:
@@ -127,50 +135,52 @@ def panel_usuario():
     return render_template('panel_usuario.html')
 
 @app.route('/crear_reclamo', methods=['GET', 'POST'])
+@login_required
 def crear_reclamo():
-    user = session.get('usuario')
-    if not user:
-        flash("Inicia sesión para crear un reclamo", "error")
-        return redirect(url_for('iniciar_sesion'))
-    
-    usuario = ModeloUsuario.query.filter_by(nombre_usuario=user).first()
-    if not usuario:
-        flash("Usuario no encontrado", "error")
+    usuario_actual = gestor_login.id_usuario_actual  # ID del usuario autenticado
+    datos_usuario = gestor_usuario.cargar_usuario(usuario_actual)  # Datos del usuario actual
+
+    if request.method == "POST":
+        # Obtener los datos del formulario
+        texto_reclamo = request.form.get("description")  # Descripción del reclamo
+        imagen = request.files.get("image")  # Imagen opcional del reclamo
+
+        # Verificar si se proporcionó texto para el reclamo
+        if not texto_reclamo:
+            flash("La descripción del reclamo es obligatoria.", "error")
+            return render_template("crear_reclamo.html")
+
+        # Clasificar el reclamo usando el modelo
+        try:
+            departamento = clasificador.clasificar([texto_reclamo])[0]  # Clasificar el texto del reclamo
+        except Exception as e:
+            flash(f"Error al clasificar el reclamo: {str(e)}", "error")
+            return render_template("crear_reclamo.html")
+
+        # Crear el formulario de datos para el reclamo
+        formulario = [
+            texto_reclamo,        # Descripción
+            "pendiente",          # Estado inicial
+            departamento,         # Departamento clasificado
+            str(datetime.now()),  # Fecha y hora actuales
+            usuario_actual        # ID del usuario creador
+        ]
+
+        # Agregar la imagen si fue proporcionada
+        if imagen:
+            formulario.append(imagen.read())
+        else:
+            formulario.append(None)
+
+        # Crear y guardar el reclamo
+        nuevo_reclamo = gestor_reclamo.crear_reclamo(formulario)
+        gestor_reclamo.guardar_reclamo(nuevo_reclamo)
+
+        # Confirmar éxito al usuario
+        flash("Reclamo creado y clasificado exitosamente.", "success")
         return redirect(url_for('panel_usuario'))
 
-    if request.method == 'POST':
-        action = request.form.get('action')
-        
-        if action == 'volver_a_usuario':
-            return redirect(url_for('panel_usuario'))
-
-        elif action == 'crear':
-            contenido = request.form.get('description')
-            imagen = request.files.get('image')
-            imagen_data = imagen.read() if imagen else None
-
-            clasificacion = classifier.clasificar([contenido])[0]
-
-            reclamos_similares = ModeloReclamo.query.filter_by(clasificacion=clasificacion).all()
-
-            if reclamos_similares:
-                return render_template("seleccionar_reclamo.html", reclamos=reclamos_similares, contenido=contenido, departamento=departamento)
-
-            nuevo_reclamo = ModeloReclamo(
-                id_usuario=usuario.id,
-                contenido=contenido,
-                departamento=departamento,
-                fecha=datetime.utcnow(),
-                estado="pendiente",
-                clasificacion=clasificacion,
-                imagen=imagen_data
-            )
-
-            db.session.add(nuevo_reclamo)
-            db.session.commit()
-            flash("Reclamo creado exitosamente", "success")
-            return redirect(url_for('panel_usuario'))
-
+    # Renderizar la plantilla de creación de reclamo si no es POST
     return render_template("crear_reclamo.html")
 
 @app.route('/adherir_a_reclamo/<int:reclamo_id>', methods=['POST'])

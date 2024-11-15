@@ -1,16 +1,29 @@
 from datetime import datetime
 
+# Archivo de definición de la clase Usuario
+
 class Usuario:
-    def __init__(self, id, nombre, apellido, email, nombre_usuario, contraseña, claustro,rol, departamento):
+    def __init__(self, id, nombre, apellido, nombre_usuario, email, contraseña, claustro, rol=None, departamento=None):
         self.id = id
         self.nombre = nombre
         self.apellido = apellido
-        self.email = email
         self.nombre_usuario = nombre_usuario
+        self.email = email
         self.contraseña = contraseña
         self.claustro = claustro
         self.rol = rol
         self.departamento = departamento
+
+    def generar_datos_reclamo(self, descripcion):
+        """Genera un formulario de datos para crear un reclamo."""
+        # Retorna una lista con los datos básicos del reclamo
+        return [
+            descripcion,      # Descripción del reclamo
+            "pendiente",      # Estado inicial del reclamo
+            self.departamento, # Departamento asociado al usuario
+            str(datetime.now()),  # Fecha y hora actuales como string
+            self.id           # ID del usuario que crea el reclamo
+        ]
 
 class Reclamo:
     def __init__(self, id_reclamo, usuario, contenido, departamento, estado="pendiente"):
