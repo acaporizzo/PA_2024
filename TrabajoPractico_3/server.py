@@ -1,3 +1,16 @@
+import nltk
+import os
+
+nltk_data_path = os.path.join(os.path.dirname(__file__), 'nltk_data')
+if not os.path.exists(nltk_data_path):
+    os.makedirs(nltk_data_path)
+nltk.data.path.append(nltk_data_path)
+
+try:
+    nltk.download('punkt', download_dir=nltk_data_path)
+except Exception as e:
+    print(f"Error al descargar punkt: {str(e)}")
+
 from flask import render_template, request, redirect, url_for, flash, session
 from flask_login import login_required
 from flask_login import logout_user
@@ -10,7 +23,7 @@ from modules.gestor_login import GestorDeLogin
 from modules.config import app, login_manager, db
 from modules.classifier import ClaimsClassifier
 from modules.create_csv import crear_csv
-import os, uuid, pickle
+import uuid, pickle
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -101,7 +114,6 @@ def iniciar_sesion():
         if not nombre_usuario or not contraseña:
             flash("Complete ambos campos", "error")
         else:
-            # Verificar credenciales usando GestorDeLogin
             usuario_valido = gestor_login.verificar_credenciales(nombre_usuario, contraseña)
             if usuario_valido:
                 gestor_login.login_usuario(usuario_valido)
@@ -126,50 +138,41 @@ def panel_usuario():
 @app.route('/crear_reclamo', methods=['GET', 'POST'])
 @login_required
 def crear_reclamo():
-    usuario_actual = gestor_login.id_usuario_actual  # ID del usuario autenticado
-    datos_usuario = gestor_usuario.cargar_usuario(usuario_actual)  # Datos del usuario actual
+    usuario_actual = gestor_login.id_usuario_actual
+    datos_usuario = gestor_usuario.cargar_usuario(usuario_actual)
 
     if request.method == "POST":
-        # Obtener los datos del formulario
-        texto_reclamo = request.form.get("description")  # Descripción del reclamo
-        imagen = request.files.get("image")  # Imagen opcional del reclamo
+        texto_reclamo = request.form.get("description")
+        imagen = request.files.get("image")
 
-        # Verificar si se proporcionó texto para el reclamo
         if not texto_reclamo:
             flash("La descripción del reclamo es obligatoria.", "error")
             return render_template("crear_reclamo.html")
 
-        # Clasificar el reclamo usando el modelo
         try:
-            departamento = clasificador.clasificar([texto_reclamo])[0]  # Clasificar el texto del reclamo
+            departamento = clasificador.clasificar([texto_reclamo])[0]
         except Exception as e:
             flash(f"Error al clasificar el reclamo: {str(e)}", "error")
             return render_template("crear_reclamo.html")
 
-        # Crear el formulario de datos para el reclamo
         formulario = [
-            texto_reclamo,        # Descripción
-            "pendiente",          # Estado inicial
-            departamento,         # Departamento clasificado
-            str(datetime.now()),  # Fecha y hora actuales
-            usuario_actual        # ID del usuario creador
-        ]
-
-        # Agregar la imagen si fue proporcionada
+            texto_reclamo,       
+            "pendiente",          
+            departamento,         
+            str(datetime.now()),  
+            usuario_actual]
+        
         if imagen:
             formulario.append(imagen.read())
         else:
             formulario.append(None)
 
-        # Crear y guardar el reclamo
         nuevo_reclamo = gestor_reclamo.crear_reclamo(formulario)
         gestor_reclamo.guardar_reclamo(nuevo_reclamo)
 
-        # Confirmar éxito al usuario
         flash("Reclamo creado y clasificado exitosamente.", "success")
         return redirect(url_for('panel_usuario'))
 
-    # Renderizar la plantilla de creación de reclamo si no es POST
     return render_template("crear_reclamo.html")
 
 @app.route('/adherir_a_reclamo/<int:reclamo_id>', methods=['POST'])

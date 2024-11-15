@@ -4,11 +4,12 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from flask_login import LoginManager
 from flask_bootstrap import Bootstrap
-import datetime
+import datetime, os
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask("server")
 app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
+os.makedirs("instance", exist_ok=True)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///instance/base_datos.db'
 
 URL_BD = 'sqlite:///instance/base_datos.db'
@@ -31,3 +32,5 @@ login_manager.init_app(app)
 Bootstrap(app)
 
 db = SQLAlchemy(app)
+
+
