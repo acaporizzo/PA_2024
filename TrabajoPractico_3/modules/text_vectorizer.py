@@ -1,6 +1,7 @@
 import nltk
 nltk.download("punkt")
 nltk.download("stopwords")
+nltk.download('punkt_tab')
 import numpy as np
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords

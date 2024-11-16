@@ -17,28 +17,39 @@ class GestorReclamo:
     def mostrar_reclamos_de_usuario(self, usuario):
         return self.repositorio.obtener_registros_seguidas_por_usuario(usuario)
 
-    def crear_reclamo(self, formulario):
-        # Crea un nuevo reclamo a partir del formulario
-        return Reclamo(*formulario)  # Ajusta según tu clase Reclamo
-
     def clasificar_reclamo(self, reclamo):
         # Clasifica el reclamo en función de la descripción u otros atributos
         reclamo.departamento = ClaimsClassifier().clasificar(reclamo.descripcion)
 
-    def buscar_reclamos_similares(self, reclamo):
-        # Busca reclamos con el mismo departamento y descripción similar
-        posibles_reclamos = self.__repo_reclamo.obtener_reclamos_por_departamento(reclamo.departamento)
-        return reclamos_similares([(r.descripcion, r.id) for r in posibles_reclamos], reclamo.descripcion)
+    def crear_reclamo(self, formulario):
+        """
+        Crea y guarda un nuevo reclamo a partir del formulario.
+        """
+        nuevo_reclamo = Reclamo(*formulario)
+        self.repositorio.insertar_reclamo(nuevo_reclamo)
+        return nuevo_reclamo
+
+    def obtener_registro_por_filtro(self, filtro, valor):
+        """
+        Obtiene un único registro que cumple con el filtro y valor proporcionados.
+        """
+        modelo_reclamo = self.__session.query(ModeloReclamo).filter_by(**{filtro: valor}).first()
+        return self._map_modelo_a_entidad(modelo_reclamo) if modelo_reclamo else None
+
+    
+    def adherir_usuario_a_reclamo(self, reclamo_id, usuario_id):
+        """
+        Añade el usuario a la lista de usuarios adheridos de un reclamo.
+        """
+        reclamo = self.repositorio.obtener_reclamo_por_id(reclamo_id)
+        if usuario_id not in reclamo.usuarios_adheridos:
+            reclamo.usuarios_adheridos.append(usuario_id)
+            self.repositorio.actualizar_reclamo(reclamo)
+        return reclamo
 
     def guardar_reclamo(self, reclamo):
         # Guarda el reclamo en el repositorio
         self.__repo_reclamo.guardar_registro(reclamo)
-
-    def adherir_usuario_a_reclamo(self, id_usuario, id_reclamo):
-        # Adhiere un usuario a un reclamo
-        reclamo = self.__repo_reclamo.obtener_registro_por_id(id_reclamo)
-        reclamo.adherir_usuario(id_usuario)
-        self.__repo_reclamo.modificar_registro(reclamo)
 
     def derivar_reclamo(self, id_reclamo, nuevo_departamento):
         reclamo = self.repositorio.obtener_registro_por_filtro("id_reclamo", id_reclamo)
@@ -55,6 +66,17 @@ class GestorReclamo:
             self.repositorio.modificar_registro(reclamo)
             return reclamo
         return None
+
+    def buscar_reclamos_similares(self, contenido, departamento, session) -> list:
+        """
+        Busca reclamos similares basados en el contenido y departamento.
+        La sesión se pasa como argumento para evitar depender de un atributo interno.
+        """
+        modelo_reclamos = session.query(ModeloReclamo).filter(
+            (ModeloReclamo.contenido.ilike(f"%{contenido}%")) | 
+            (ModeloReclamo.departamento == departamento)
+        ).all()
+        return [self._map_modelo_a_entidad(reclamo) for reclamo in modelo_reclamos]
 
 class GestorUsuario:
     def __init__(self, repo_usuario):

@@ -15,6 +15,24 @@ class RepositorioReclamosSQLAlchemy(RepositorioAbstracto):
         self.__session.add(modelo_reclamo)
         self.__session.commit()
 
+    def insertar_reclamo(self, reclamo):
+        if not isinstance(reclamo, Reclamo):
+            raise ValueError("El parámetro debe ser una instancia de la clase Reclamo")
+        
+        modelo_reclamo = ModeloReclamo(
+            id=reclamo.id_reclamo,  # Cambiado a id_reclamo
+            id_usuario=reclamo.usuario,
+            contenido=reclamo.contenido,
+            departamento=reclamo.departamento,
+            estado=reclamo.estado,
+            clasificacion=None,
+            imagen=None,
+            fecha=reclamo.fecha_hora
+        )
+        self.__session.add(modelo_reclamo)
+        self.__session.commit()
+
+
     def obtener_todos_los_registros(self) -> list:
         modelo_reclamos = self.__session.query(ModeloReclamo).all()
         return [self._map_modelo_a_entidad(reclamo) for reclamo in modelo_reclamos]
@@ -22,7 +40,7 @@ class RepositorioReclamosSQLAlchemy(RepositorioAbstracto):
     def modificar_registro(self, reclamo_modificado):
         if not isinstance(reclamo_modificado, Reclamo):
             raise ValueError("El parámetro no es una instancia de la clase Reclamo")
-        registro = self.__session.query(ModeloReclamo).filter_by(id_reclamo=reclamo_modificado.id_reclamo).first()
+        registro = self.__session.query(ModeloReclamo).filter_by(id=reclamo_modificado.id_reclamo).first()
         if registro:
             registro.contenido = reclamo_modificado.contenido
             registro.departamento = reclamo_modificado.departamento
@@ -40,7 +58,7 @@ class RepositorioReclamosSQLAlchemy(RepositorioAbstracto):
         return [self._map_modelo_a_entidad(reclamo) for reclamo in modelo_reclamos]
 
     def eliminar_registro(self, id_reclamo):
-        registro = self.__session.query(ModeloReclamo).filter_by(id_reclamo=id_reclamo).first()
+        registro = self.__session.query(ModeloReclamo).filter_by(id=id_reclamo).first()
         if registro:
             self.__session.delete(registro)
             self.__session.commit()
@@ -49,26 +67,35 @@ class RepositorioReclamosSQLAlchemy(RepositorioAbstracto):
         modelo_reclamos = self.__session.query(ModeloReclamo).filter(ModeloReclamo.usuarios_adheridos.contains(usuario)).all()
         return [self._map_modelo_a_entidad(reclamo) for reclamo in modelo_reclamos]
 
+    def buscar_reclamos_similares(self, contenido, departamento) -> list:
+        modelo_reclamos = self.__session.query(ModeloReclamo).filter(
+            (ModeloReclamo.contenido.ilike(f"%{contenido}%")) | 
+            (ModeloReclamo.departamento == departamento)
+        ).all()
+        return [self._map_modelo_a_entidad(reclamo) for reclamo in modelo_reclamos]
+
     def _map_entidad_a_modelo(self, entidad: Reclamo):
         return ModeloReclamo(
-            id_reclamo=entidad.id_reclamo,
-            usuario=entidad.usuario,
+            id=entidad.id_reclamo,  # Cambiado de id a id_reclamo
+            id_usuario=entidad.usuario,
             contenido=entidad.contenido,
             departamento=entidad.departamento,
-            fecha_hora=entidad.fecha_hora,
             estado=entidad.estado,
-            usuarios_adheridos=entidad.usuarios_adheridos
+            clasificacion=None,  # Ajusta según tu lógica
+            imagen=None,          # Ajusta si manejas imágenes
+            fecha=entidad.fecha_hora
         )
+
 
     def _map_modelo_a_entidad(self, modelo: ModeloReclamo):
         return Reclamo(
-            id_reclamo=modelo.id_reclamo,
-            usuario=modelo.usuario,
+            id=modelo.id_reclamo,  # Cambiado de id a id_reclamo
+            usuario=modelo.id_usuario,
             contenido=modelo.contenido,
             departamento=modelo.departamento,
-            fecha_hora=modelo.fecha_hora,
+            fecha_hora=modelo.fecha,
             estado=modelo.estado,
-            usuarios_adheridos=modelo.usuarios_adheridos
+            usuarios_adheridos=None  # Ajusta si es necesario
         )
 
 class RepositorioUsuariosSQLAlchemy(RepositorioAbstracto):

@@ -1,6 +1,7 @@
 import nltk
 import os
 
+# Configuración del directorio de datos de NLTK
 nltk_data_path = os.path.join(os.path.dirname(__file__), 'nltk_data')
 if not os.path.exists(nltk_data_path):
     os.makedirs(nltk_data_path)
@@ -8,8 +9,11 @@ nltk.data.path.append(nltk_data_path)
 
 try:
     nltk.download('punkt', download_dir=nltk_data_path)
+    nltk.download('stopwords', download_dir=nltk_data_path)
+    print("Recursos NLTK descargados exitosamente.")
 except Exception as e:
-    print(f"Error al descargar punkt: {str(e)}")
+    print(f"Error al descargar recursos NLTK: {str(e)}")
+
 
 from flask import render_template, request, redirect, url_for, flash, session
 from flask_login import login_required
@@ -139,56 +143,49 @@ def panel_usuario():
 @login_required
 def crear_reclamo():
     usuario_actual = gestor_login.id_usuario_actual
-    datos_usuario = gestor_usuario.cargar_usuario(usuario_actual)
 
     if request.method == "POST":
         texto_reclamo = request.form.get("description")
-        imagen = request.files.get("image")
 
         if not texto_reclamo:
             flash("La descripción del reclamo es obligatoria.", "error")
             return render_template("crear_reclamo.html")
 
         try:
+            # Clasificar el reclamo
             departamento = clasificador.clasificar([texto_reclamo])[0]
         except Exception as e:
             flash(f"Error al clasificar el reclamo: {str(e)}", "error")
             return render_template("crear_reclamo.html")
 
+        session = db.session  # Aquí obtenemos la sesión de SQLAlchemy directamente
+
+        # Buscar reclamos similares
+        reclamos_similares = gestor_reclamo.buscar_reclamos_similares(texto_reclamo, departamento, session)
+
+
+        if reclamos_similares:
+            # Mostrar los reclamos similares al usuario
+            return render_template(
+                "reclamos_similares.html",
+                reclamos_similares=reclamos_similares,
+                texto_reclamo=texto_reclamo,
+                departamento=departamento
+            )
+
+        # Crear un nuevo reclamo si no hay similares
         formulario = [
-            texto_reclamo,       
-            "pendiente",          
-            departamento,         
-            str(datetime.now()),  
-            usuario_actual]
-        
-        if imagen:
-            formulario.append(imagen.read())
-        else:
-            formulario.append(None)
-
-        nuevo_reclamo = gestor_reclamo.crear_reclamo(formulario)
-        gestor_reclamo.guardar_reclamo(nuevo_reclamo)
-
-        flash("Reclamo creado y clasificado exitosamente.", "success")
-        return redirect(url_for('panel_usuario'))
+            str(uuid.uuid4()),  # ID único
+            usuario_actual,     # Usuario actual
+            texto_reclamo,      # Descripción
+            departamento,       # Departamento clasificado
+            "pendiente"         # Estado
+        ]
+        gestor_reclamo.crear_reclamo(formulario)
+        flash("Reclamo creado exitosamente.", "success")
+        return redirect(url_for("panel_usuario"))
 
     return render_template("crear_reclamo.html")
-
-@app.route('/adherir_a_reclamo/<int:reclamo_id>', methods=['POST'])
-def adherir_a_reclamo(reclamo_id):
-    user = session.get('usuario')
-    if not user:
-        flash("Inicia sesión para adherirse a un reclamo", "error")
-        return redirect(url_for('iniciar_sesion'))
-    
-    reclamo = ModeloReclamo.query.get(reclamo_id)
-    if reclamo:
-        flash("Adherido a reclamo", "success")
-    else:
-        flash("Reclamo no encontrado", "error")
-    
-    return redirect(url_for('panel_usuario'))
 
 @app.route('/cerrar_sesion')
 def cerrar_sesion():
