@@ -1,7 +1,6 @@
 import nltk
 import os
 
-# Configuración del directorio de datos de NLTK
 nltk_data_path = os.path.join(os.path.dirname(__file__), 'nltk_data')
 if not os.path.exists(nltk_data_path):
     os.makedirs(nltk_data_path)
@@ -152,38 +151,52 @@ def crear_reclamo():
             return render_template("crear_reclamo.html")
 
         try:
-            # Clasificar el reclamo
-            departamento = clasificador.clasificar([texto_reclamo])[0]
+            clasificacion = clasificador.clasificar([texto_reclamo])[0]
+            reclamo = gestor_reclamo.crear_reclamo([str(uuid.uuid4()), usuario_actual, texto_reclamo, clasificacion, "pendiente"])
         except Exception as e:
             flash(f"Error al clasificar el reclamo: {str(e)}", "error")
             return render_template("crear_reclamo.html")
 
         session = db.session  # Aquí obtenemos la sesión de SQLAlchemy directamente
 
-        # Buscar reclamos similares
-        reclamos_similares = gestor_reclamo.buscar_reclamos_similares(texto_reclamo, departamento, session)
+        posibles = gestor_reclamo.buscar_reclamos_por_departamento(reclamo.clasificacion, db.session)
 
+        if posibles:
+            posibles_data = [(r.descripcion, r.id) for r in posibles]
+            # Buscar reclamos similares
+            similares = gestor_reclamo.reclamos_similares(posibles_data, texto_reclamo)
+        else:
+            similares = []
 
-        if reclamos_similares:
-            # Mostrar los reclamos similares al usuario
-            return render_template(
-                "reclamos_similares.html",
-                reclamos_similares=reclamos_similares,
-                texto_reclamo=texto_reclamo,
-                departamento=departamento
-            )
+        if not similares:
+            # No se encontraron reclamos similares
+            try:
+                # Preparar los datos del reclamo para guardar
+                data = [
+                    reclamo.get_descripcion(),
+                    reclamo.get_estado(),
+                    reclamo.get_clasificacion(),
+                    reclamo.get_fecha(),
+                    reclamo.get_id_usuario()
+                ]
+                if reclamo.get_imagen():
+                    data.append(reclamo.get_imagen())
+                
+                # Guardar el reclamo en la base de datos
+                gestor_reclamo.guardar_reclamo(data)
+                flash("Reclamo creado exitosamente.", "success")
+            except Exception as e:
+                flash(f"Error al guardar el reclamo: {str(e)}", "error")
+            return render_template("reclamo.html", reclamos_similares="no hay reclamos similares")
+        else:
+            # Se encontraron reclamos similares
+            lista_similares = []
+            for id_similar in similares:
+                reclamo_data = gestor_reclamo.buscar_reclamo_por_id(id_similar, db.session)
+                if reclamo_data:
+                    lista_similares.append(reclamo_data)
 
-        # Crear un nuevo reclamo si no hay similares
-        formulario = [
-            str(uuid.uuid4()),  # ID único
-            usuario_actual,     # Usuario actual
-            texto_reclamo,      # Descripción
-            departamento,       # Departamento clasificado
-            "pendiente"         # Estado
-        ]
-        gestor_reclamo.crear_reclamo(formulario)
-        flash("Reclamo creado exitosamente.", "success")
-        return redirect(url_for("panel_usuario"))
+            return render_template("reclamo.html", lista_similares=lista_similares, reclamo=reclamo)
 
     return render_template("crear_reclamo.html")
 

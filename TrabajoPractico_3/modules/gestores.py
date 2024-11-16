@@ -18,8 +18,7 @@ class GestorReclamo:
         return self.repositorio.obtener_registros_seguidas_por_usuario(usuario)
 
     def clasificar_reclamo(self, reclamo):
-        # Clasifica el reclamo en función de la descripción u otros atributos
-        reclamo.departamento = ClaimsClassifier().clasificar(reclamo.descripcion)
+        reclamo.clasificacion = ClaimsClassifier().clasificar(reclamo.descripcion)
 
     def crear_reclamo(self, formulario):
         """
@@ -47,14 +46,16 @@ class GestorReclamo:
             self.repositorio.actualizar_reclamo(reclamo)
         return reclamo
 
-    def guardar_reclamo(self, reclamo):
-        # Guarda el reclamo en el repositorio
-        self.__repo_reclamo.guardar_registro(reclamo)
+    def guardar_reclamo(self, data):
+        nuevo_reclamo = ModeloReclamo(*data)
+        db.session.add(nuevo_reclamo)
+        db.session.commit()
+
 
     def derivar_reclamo(self, id_reclamo, nuevo_departamento):
         reclamo = self.repositorio.obtener_registro_por_filtro("id_reclamo", id_reclamo)
         if reclamo:
-            reclamo.departamento = nuevo_departamento
+            reclamo.clasificacion = nuevo_departamento
             self.repositorio.modificar_registro(reclamo)
             return reclamo
         return None
@@ -66,15 +67,29 @@ class GestorReclamo:
             self.repositorio.modificar_registro(reclamo)
             return reclamo
         return None
+    
+    def reclamos_similares(self, posibles_data, texto_reclamo):
+        similares = []
+        for descripcion, id_reclamo in posibles_data:
+            if self.es_similar(descripcion, texto_reclamo):  # Implementa tu lógica de similitud aquí
+                similares.append(id_reclamo)
+        return similares
 
-    def buscar_reclamos_similares(self, contenido, departamento, session) -> list:
+    def buscar_reclamos_por_departamento(self, clasificacion, session):
+        return session.query(ModeloReclamo).filter_by(clasificacion=clasificacion).all()
+    
+    def buscar_reclamo_por_id(self, id_reclamo, session):
+        return session.query(ModeloReclamo).filter_by(id=id_reclamo).first()
+
+
+    def buscar_reclamos_similares(self, contenido, clasificacion, session) -> list:
         """
         Busca reclamos similares basados en el contenido y departamento.
         La sesión se pasa como argumento para evitar depender de un atributo interno.
         """
         modelo_reclamos = session.query(ModeloReclamo).filter(
             (ModeloReclamo.contenido.ilike(f"%{contenido}%")) | 
-            (ModeloReclamo.departamento == departamento)
+            (ModeloReclamo.clasificacion == clasificacion)
         ).all()
         return [self._map_modelo_a_entidad(reclamo) for reclamo in modelo_reclamos]
 

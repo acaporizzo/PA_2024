@@ -23,15 +23,13 @@ class RepositorioReclamosSQLAlchemy(RepositorioAbstracto):
             id=reclamo.id_reclamo,  # Cambiado a id_reclamo
             id_usuario=reclamo.usuario,
             contenido=reclamo.contenido,
-            departamento=reclamo.departamento,
+            clasificacion=reclamo.clasificacion,
             estado=reclamo.estado,
-            clasificacion=None,
             imagen=None,
             fecha=reclamo.fecha_hora
         )
         self.__session.add(modelo_reclamo)
         self.__session.commit()
-
 
     def obtener_todos_los_registros(self) -> list:
         modelo_reclamos = self.__session.query(ModeloReclamo).all()
@@ -43,7 +41,7 @@ class RepositorioReclamosSQLAlchemy(RepositorioAbstracto):
         registro = self.__session.query(ModeloReclamo).filter_by(id=reclamo_modificado.id_reclamo).first()
         if registro:
             registro.contenido = reclamo_modificado.contenido
-            registro.departamento = reclamo_modificado.departamento
+            registro.clasificacion = reclamo_modificado.clasificacion
             registro.fecha_hora = reclamo_modificado.fecha_hora
             registro.estado = reclamo_modificado.estado
             registro.usuarios_adheridos = reclamo_modificado.usuarios_adheridos
@@ -67,10 +65,10 @@ class RepositorioReclamosSQLAlchemy(RepositorioAbstracto):
         modelo_reclamos = self.__session.query(ModeloReclamo).filter(ModeloReclamo.usuarios_adheridos.contains(usuario)).all()
         return [self._map_modelo_a_entidad(reclamo) for reclamo in modelo_reclamos]
 
-    def buscar_reclamos_similares(self, contenido, departamento) -> list:
+    def buscar_reclamos_similares(self, contenido, clasificacion) -> list:
         modelo_reclamos = self.__session.query(ModeloReclamo).filter(
             (ModeloReclamo.contenido.ilike(f"%{contenido}%")) | 
-            (ModeloReclamo.departamento == departamento)
+            (ModeloReclamo.clasificacion == clasificacion)
         ).all()
         return [self._map_modelo_a_entidad(reclamo) for reclamo in modelo_reclamos]
 
@@ -79,20 +77,18 @@ class RepositorioReclamosSQLAlchemy(RepositorioAbstracto):
             id=entidad.id_reclamo,  # Cambiado de id a id_reclamo
             id_usuario=entidad.usuario,
             contenido=entidad.contenido,
-            departamento=entidad.departamento,
+            clasificacion=entidad.clasificacion,
             estado=entidad.estado,
-            clasificacion=None,  # Ajusta según tu lógica
             imagen=None,          # Ajusta si manejas imágenes
             fecha=entidad.fecha_hora
         )
-
 
     def _map_modelo_a_entidad(self, modelo: ModeloReclamo):
         return Reclamo(
             id=modelo.id_reclamo,  # Cambiado de id a id_reclamo
             usuario=modelo.id_usuario,
             contenido=modelo.contenido,
-            departamento=modelo.departamento,
+            clasificacion=modelo.clasificacion,
             fecha_hora=modelo.fecha,
             estado=modelo.estado,
             usuarios_adheridos=None  # Ajusta si es necesario
