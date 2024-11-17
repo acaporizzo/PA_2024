@@ -20,32 +20,67 @@ class GestorReclamo:
     def clasificar_reclamo(self, reclamo):
         reclamo.clasificacion = ClaimsClassifier().clasificar(reclamo.descripcion)
 
-    def crear_reclamo(self, formulario):
+    def crear_reclamo(self, lista_reclamo): 
         """
         Crea y guarda un nuevo reclamo a partir del formulario.
         """
-        nuevo_reclamo = Reclamo(*formulario)
-        self.repositorio.insertar_reclamo(nuevo_reclamo)
+        nuevo_reclamo = Reclamo(lista_reclamo[0], lista_reclamo[1], lista_reclamo[2], lista_reclamo[3], lista_reclamo[4], lista_reclamo[5])
+        try:
+            nuevo_reclamo.cargar_imagen(lista_reclamo[6])
+        except: 
+            pass
         return nuevo_reclamo
 
-    def obtener_registro_por_filtro(self, filtro, valor):
-        """
-        Obtiene un único registro que cumple con el filtro y valor proporcionados.
-        """
-        modelo_reclamo = self.__session.query(ModeloReclamo).filter_by(**{filtro: valor}).first()
-        return self._map_modelo_a_entidad(modelo_reclamo) if modelo_reclamo else None
+    def obtener_reclamo_por_filtro (self, tipo_de_filtro = "todo", filtro = "nada"):
 
+        tipo_de_filtro = tipo_de_filtro.lower()
+        if tipo_de_filtro == "nada" and filtro == "nada":
+            reclamos= db.session.query(ModeloReclamo).all()
+
+        elif tipo_de_filtro == "usuario":
+             reclamos=db.session.query(ModeloReclamo).filter(ModeloReclamo.id_usuario == filtro).all()
+
+        elif tipo_de_filtro == "estado":
+            reclamos=db.session.query(ModeloReclamo).filter(ModeloReclamo.estado == filtro).all()
+        
+        elif tipo_de_filtro == "clasificacion":
+            reclamos= db.session.query(ModeloReclamo).filter(ModeloReclamo.clasificacion == filtro)
+
+        elif tipo_de_filtro == "id":
+            try:
+                reclamo=db.session.query(ModeloReclamo).filter_by(ModeloReclamo.id == filtro).one()
+                return reclamo
+            except NoResultFound:
+                raise Exception("El reclamo no existe")
+
+        else:
+            raise Exception ("El filtro que eligió no existe, pruebe con ")
+
+        lista_de_datos_reclamos = []
+        if tipo_de_filtro == "id":
+            datos = [reclamo.id, 
+                reclamo.id_usuario, 
+                reclamo.contenido, 
+                reclamo.clasificacion, 
+                reclamo.estado, 
+                reclamo.imagen, 
+                reclamo.fecha]
+            lista_de_datos_reclamos.append(datos)
+
+        else:
+            for reclam in reclamos:
+                datos = [reclam.id, 
+                reclam.id_usuario, 
+                reclam.contenido, 
+                reclam.clasificacion, 
+                reclam.estado, 
+                reclam.imagen, 
+                reclam.fecha]
+            lista_de_datos_reclamos.append(datos)
+
+        return lista_de_datos_reclamos
     
-    def adherir_usuario_a_reclamo(self, reclamo_id, usuario_id):
-        """
-        Añade el usuario a la lista de usuarios adheridos de un reclamo.
-        """
-        reclamo = self.repositorio.obtener_reclamo_por_id(reclamo_id)
-        if usuario_id not in reclamo.usuarios_adheridos:
-            reclamo.usuarios_adheridos.append(usuario_id)
-            self.repositorio.actualizar_reclamo(reclamo)
-        return reclamo
-
+    
     def guardar_reclamo(self, data):
         nuevo_reclamo = ModeloReclamo(*data)
         db.session.add(nuevo_reclamo)
@@ -67,31 +102,6 @@ class GestorReclamo:
             self.repositorio.modificar_registro(reclamo)
             return reclamo
         return None
-    
-    def reclamos_similares(self, posibles_data, texto_reclamo):
-        similares = []
-        for descripcion, id_reclamo in posibles_data:
-            if self.es_similar(descripcion, texto_reclamo):  # Implementa tu lógica de similitud aquí
-                similares.append(id_reclamo)
-        return similares
-
-    def buscar_reclamos_por_departamento(self, clasificacion, session):
-        return session.query(ModeloReclamo).filter_by(clasificacion=clasificacion).all()
-    
-    def buscar_reclamo_por_id(self, id_reclamo, session):
-        return session.query(ModeloReclamo).filter_by(id=id_reclamo).first()
-
-
-    def buscar_reclamos_similares(self, contenido, clasificacion, session) -> list:
-        """
-        Busca reclamos similares basados en el contenido y departamento.
-        La sesión se pasa como argumento para evitar depender de un atributo interno.
-        """
-        modelo_reclamos = session.query(ModeloReclamo).filter(
-            (ModeloReclamo.contenido.ilike(f"%{contenido}%")) | 
-            (ModeloReclamo.clasificacion == clasificacion)
-        ).all()
-        return [self._map_modelo_a_entidad(reclamo) for reclamo in modelo_reclamos]
 
 class GestorUsuario:
     def __init__(self, repo_usuario):
@@ -130,3 +140,4 @@ class GestorBaseDeDatos:
             return usuario
         except NoResultFound: 
             raise Exception("El usuario no fue encontrado")
+    

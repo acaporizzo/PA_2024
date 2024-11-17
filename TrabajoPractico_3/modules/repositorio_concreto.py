@@ -20,13 +20,13 @@ class RepositorioReclamosSQLAlchemy(RepositorioAbstracto):
             raise ValueError("El parámetro debe ser una instancia de la clase Reclamo")
         
         modelo_reclamo = ModeloReclamo(
-            id=reclamo.id_reclamo,  # Cambiado a id_reclamo
-            id_usuario=reclamo.usuario,
-            contenido=reclamo.contenido,
-            clasificacion=reclamo.clasificacion,
-            estado=reclamo.estado,
+            id=reclamo.__id_reclamo,  # Cambiado a id_reclamo
+            id_usuario=reclamo.__usuario,
+            contenido=reclamo.__contenido,
+            clasificacion=reclamo.__clasificacion,
+            estado=reclamo.__estado,
             imagen=None,
-            fecha=reclamo.fecha_hora
+            fecha=reclamo.__fecha_hora
         )
         self.__session.add(modelo_reclamo)
         self.__session.commit()
@@ -38,12 +38,12 @@ class RepositorioReclamosSQLAlchemy(RepositorioAbstracto):
     def modificar_registro(self, reclamo_modificado):
         if not isinstance(reclamo_modificado, Reclamo):
             raise ValueError("El parámetro no es una instancia de la clase Reclamo")
-        registro = self.__session.query(ModeloReclamo).filter_by(id=reclamo_modificado.id_reclamo).first()
+        registro = self.__session.query(ModeloReclamo).filter_by(id=reclamo_modificado.__id_reclamo).first()
         if registro:
-            registro.contenido = reclamo_modificado.contenido
-            registro.clasificacion = reclamo_modificado.clasificacion
-            registro.fecha_hora = reclamo_modificado.fecha_hora
-            registro.estado = reclamo_modificado.estado
+            registro.contenido = reclamo_modificado.__contenido
+            registro.clasificacion = reclamo_modificado.__clasificacion
+            registro.fecha_hora = reclamo_modificado.__fecha_hora
+            registro.estado = reclamo_modificado.__estado
             registro.usuarios_adheridos = reclamo_modificado.usuarios_adheridos
             self.__session.commit()
 
@@ -74,13 +74,13 @@ class RepositorioReclamosSQLAlchemy(RepositorioAbstracto):
 
     def _map_entidad_a_modelo(self, entidad: Reclamo):
         return ModeloReclamo(
-            id=entidad.id_reclamo,  # Cambiado de id a id_reclamo
-            id_usuario=entidad.usuario,
-            contenido=entidad.contenido,
-            clasificacion=entidad.clasificacion,
-            estado=entidad.estado,
+            id=entidad.__id_reclamo,  # Cambiado de id a id_reclamo
+            id_usuario=entidad.__usuario,
+            contenido=entidad.__contenido,
+            clasificacion=entidad.__clasificacion,
+            estado=entidad.__estado,
             imagen=None,          # Ajusta si manejas imágenes
-            fecha=entidad.fecha_hora
+            fecha=entidad.__fecha_hora
         )
 
     def _map_modelo_a_entidad(self, modelo: ModeloReclamo):

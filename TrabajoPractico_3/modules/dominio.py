@@ -1,36 +1,113 @@
 from datetime import datetime
 
-# Archivo de definición de la clase Usuario
-
 class Usuario:
     def __init__(self, id, nombre, apellido, nombre_usuario, email, contraseña, claustro, rol=None, departamento=None):
-        self.id = id
-        self.nombre = nombre
-        self.apellido = apellido
-        self.nombre_usuario = nombre_usuario
-        self.email = email
-        self.contraseña = contraseña
-        self.claustro = claustro
-        self.rol = rol
-        self.departamento = departamento
+        self.__id = id
+        self.__nombre = nombre
+        self.__apellido = apellido
+        self.__nombre_usuario = nombre_usuario
+        self.__email = email
+        self.__contraseña = contraseña
+        self.__claustro = claustro
+        self.__rol = rol
+        self.__departamento = departamento
+        self.__reclamos_adheridos = []  # Lista para almacenar los reclamos adheridos (opcional)
 
-    def generar_datos_reclamo(self, descripcion):
-        """Genera un formulario de datos para crear un reclamo."""
-        # Retorna una lista con los datos básicos del reclamo
-        return [
-            descripcion,      # Descripción del reclamo
-            "pendiente",      # Estado inicial del reclamo
-            self.departamento, # Departamento asociado al usuario
-            str(datetime.now()),  # Fecha y hora actuales como string
-            self.id           # ID del usuario que crea el reclamo
-        ]
+    @property
+    def id(self):
+        return self.__id
+
+    @property
+    def nombre(self):
+        return self.__nombre
+
+    @property
+    def apellido(self):
+        return self.__apellido
+
+    @property
+    def nombre_usuario(self):
+        return self.__nombre_usuario
+
+    @property
+    def email(self):
+        return self.__email
+
+    @property
+    def contraseña(self):
+        return self.__contraseña
+
+    @property
+    def claustro(self):
+        return self.__claustro
+
+    @property
+    def rol(self):
+        return self.__rol
+
+    @property
+    def departamento(self):
+        return self.__departamento
+
+    @property
+    def reclamos_adheridos(self):
+        return self.__reclamos_adheridos  # Retorna los reclamos adheridos al usuario
+
+    # Método para agregar un reclamo a la lista de reclamos adheridos
+    def agregar_reclamo_adherido(self, reclamo_id):
+        if reclamo_id not in self.__reclamos_adheridos:
+            self.__reclamos_adheridos.append(reclamo_id)
+            self.actualizar_reclamo_adherido(reclamo_id)
 
 class Reclamo:
-    def __init__(self, id_reclamo, usuario, contenido, departamento, estado="pendiente"):
-        self.id_reclamo = id_reclamo
-        self.usuario = usuario
-        self.contenido = contenido
-        self.departamento = departamento
-        self.fecha_hora = datetime.now()
-        self.estado = estado
-        self.usuarios_adheridos = []
+    def __init__(self, id_reclamo, usuario, contenido, clasificacion, estado="pendiente", fecha_hora=None, imagen=None, usuarios_adheridos=None):
+        self.__id_reclamo = id_reclamo
+        self.__id_usuario = usuario
+        self.__contenido = contenido
+        self.__clasificacion = clasificacion
+        self.__estado = estado
+        self.__fecha_hora = fecha_hora or datetime.now()  # Usa la fecha actual si no se pasa una
+        self.__imagen = imagen  # Nuevo atributo para la imagen
+        self.__usuarios_adheridos = usuarios_adheridos or []  # Lista de usuarios adheridos (inicialmente vacía)
+
+    @property
+    def id_reclamo(self):
+        return self.__id_reclamo
+
+    @property
+    def id_usuario(self):
+        return self.__id_usuario
+
+    @property
+    def contenido(self):
+        return self.__contenido
+
+    @property
+    def clasificacion(self):
+        return self.__clasificacion
+
+    @property
+    def estado(self):
+        return self.__estado
+
+    @property
+    def fecha_hora(self):
+        return self.__fecha_hora
+
+    @property
+    def imagen(self):
+        return self.__imagen
+
+    @property
+    def usuarios_adheridos(self):
+        return self.__usuarios_adheridos
+
+    # Método para agregar un usuario a la lista de adheridos
+    def agregar_usuario_adherido(self, usuario_id):
+        if usuario_id not in self.__usuarios_adheridos:
+            self.__usuarios_adheridos.append(usuario_id)
+            self.actualizar_usuarios_adheridos(usuario_id)
+
+    # Método para cargar una imagen en el reclamo
+    def cargar_imagen(self, imagen):
+        self.__imagen = imagen

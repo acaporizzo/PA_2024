@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Seleccionar Reclamo Similar</title>
@@ -10,7 +10,7 @@
     <p>Hemos encontrado reclamos similares. Puedes adherirte a uno de los siguientes reclamos:</p>
 
     <ul>
-        {% for reclamo in reclamos %}
+        {% for reclamo in lista_similares %}
             <li>
                 {{ reclamo.contenido }} - Departamento: {{ reclamo.departamento }}
                 <form method="POST" action="{{ url_for('adherir_a_reclamo', reclamo_id=reclamo.id) }}">
@@ -22,8 +22,8 @@
 
     <p>Si prefieres, puedes crear un reclamo nuevo.</p>
     <form method="POST" action="{{ url_for('crear_reclamo') }}">
-        <input type="hidden" name="description" value="{{ contenido }}">
-        <input type="hidden" name="department" value="{{ departamento }}">
+        <input type="hidden" name="description" value="{{ reclamo.contenido }}">
+        <input type="hidden" name="department" value="{{ reclamo.departamento }}">
         <button type="submit" name="action" value="crear">Crear Reclamo Nuevo</button>
     </form>
 </body>

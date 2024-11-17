@@ -8,7 +8,7 @@ class FlaskLoginUser(UserMixin):
         self.id = usuario.id
         self.nombre = usuario.nombre
         self.email = usuario.email
-        self.password = usuario.contraseña
+        self.password = usuario.contraseña  # Usa la property
         self.depto = usuario.departamento
 
 class GestorDeLogin:
@@ -21,7 +21,7 @@ class GestorDeLogin:
         """Verifica si las credenciales son válidas y devuelve un objeto Usuario."""
         try:
             usuario = self.__gestor_usuarios.cargar_usuario_por_nombre(nombre_usuario)
-            if usuario and check_password_hash(usuario.contraseña, contraseña):
+            if usuario and check_password_hash(usuario.contraseña, contraseña):  # Usa la property
                 return usuario
         except Exception as e:
             print(f"Error al verificar credenciales: {e}")
