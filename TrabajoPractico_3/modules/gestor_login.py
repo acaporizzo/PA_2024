@@ -11,7 +11,7 @@ class FlaskLoginUser(UserMixin):
         self.password = usuario.contraseña  # Usa la property
         self.depto = usuario.departamento
 
-class GestorDeLogin:
+class GestorLogin:
     def __init__(self, gestor_usuarios, login_manager, admin_list):
         self.__gestor_usuarios = gestor_usuarios
         login_manager.user_loader(self.__cargar_usuario_actual)

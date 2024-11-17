@@ -53,7 +53,6 @@ class Usuario:
     def reclamos_adheridos(self):
         return self.__reclamos_adheridos  # Retorna los reclamos adheridos al usuario
 
-    # Método para agregar un reclamo a la lista de reclamos adheridos
     def agregar_reclamo_adherido(self, reclamo_id):
         if reclamo_id not in self.__reclamos_adheridos:
             self.__reclamos_adheridos.append(reclamo_id)
@@ -102,12 +101,10 @@ class Reclamo:
     def usuarios_adheridos(self):
         return self.__usuarios_adheridos
 
-    # Método para agregar un usuario a la lista de adheridos
     def agregar_usuario_adherido(self, usuario_id):
         if usuario_id not in self.__usuarios_adheridos:
             self.__usuarios_adheridos.append(usuario_id)
             self.actualizar_usuarios_adheridos(usuario_id)
 
-    # Método para cargar una imagen en el reclamo
     def cargar_imagen(self, imagen):
         self.__imagen = imagen

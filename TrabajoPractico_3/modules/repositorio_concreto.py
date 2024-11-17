@@ -1,12 +1,11 @@
 from modules.dominio import Reclamo, Usuario
 from modules.repositorio_abstracto import RepositorioAbstracto
 from modules.modelos import ModeloReclamo, ModeloUsuario
+from modules.config import db
 
 class RepositorioReclamosSQLAlchemy(RepositorioAbstracto):
     def __init__(self, session):
         self.__session = session
-        tabla_reclamo = ModeloReclamo()
-        tabla_reclamo.metadata.create_all(self.__session.bind)
 
     def guardar_registro(self, reclamo):
         if not isinstance(reclamo, Reclamo):
@@ -95,10 +94,8 @@ class RepositorioReclamosSQLAlchemy(RepositorioAbstracto):
         )
 
 class RepositorioUsuariosSQLAlchemy(RepositorioAbstracto):
-    def __init__(self, session):
-        self.__session = session
-        tabla_usuario = ModeloUsuario()
-        tabla_usuario.metadata.create_all(self.__session.bind)
+    def __init__(self, session=None):
+        self.__session = session or db.session  # Usa la sesión de Flask-SQLAlchemy por defecto
 
     def guardar_registro(self, usuario):
         if not isinstance(usuario, Usuario):
@@ -108,7 +105,10 @@ class RepositorioUsuariosSQLAlchemy(RepositorioAbstracto):
         self.__session.commit()
 
     def obtener_todos_los_registros(self):
+        print(self.__session)
         modelo_usuarios = self.__session.query(ModeloUsuario).all()
+        print(modelo_usuarios)
+
         return [self.__map_modelo_a_entidad(usuario) for usuario in modelo_usuarios]
 
     def modificar_registro(self, usuario_modificado):
@@ -119,7 +119,7 @@ class RepositorioUsuariosSQLAlchemy(RepositorioAbstracto):
             register.nombre = usuario_modificado.nombre
             register.apellido = usuario_modificado.apellido
             register.email = usuario_modificado.email
-            register.password = usuario_modificado.password
+            register.contraseña = usuario_modificado.contraseña
             register.claustro = usuario_modificado.claustro
             register.rol = usuario_modificado.rol
             register.departamento = usuario_modificado.departamento

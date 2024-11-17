@@ -4,8 +4,6 @@ from sqlalchemy.orm.exc import NoResultFound
 from modules.modelos import ModeloReclamo, ModeloUsuario
 from modules.classifier import ClaimsClassifier
 from modules.dominio import Usuario
-from datetime import datetime
-import uuid
 
 class GestorReclamo:
     def __init__(self, repositorio_reclamos):
@@ -21,9 +19,6 @@ class GestorReclamo:
         reclamo.clasificacion = ClaimsClassifier().clasificar(reclamo.descripcion)
 
     def crear_reclamo(self, lista_reclamo): 
-        """
-        Crea y guarda un nuevo reclamo a partir del formulario.
-        """
         nuevo_reclamo = Reclamo(lista_reclamo[0], lista_reclamo[1], lista_reclamo[2], lista_reclamo[3], lista_reclamo[4], lista_reclamo[5])
         try:
             nuevo_reclamo.cargar_imagen(lista_reclamo[6])
@@ -86,7 +81,6 @@ class GestorReclamo:
         db.session.add(nuevo_reclamo)
         db.session.commit()
 
-
     def derivar_reclamo(self, id_reclamo, nuevo_departamento):
         reclamo = self.repositorio.obtener_registro_por_filtro("id_reclamo", id_reclamo)
         if reclamo:
@@ -106,23 +100,24 @@ class GestorReclamo:
 class GestorUsuario:
     def __init__(self, repo_usuario):
         self.__repo_usuario = repo_usuario
+
     def registrar_usuario(self, id, nombre, apellido, nombre_usuario, email, contraseña, claustro, rol, departamento):
-        
-        if any(usuario.nombre_usuario == nombre_usuario for usuario in self.__repo_usuario.obtener_todos_los_registros()):
-            raise ValueError(f"El nombre de usuario '{nombre_usuario}' ya está en uso.")
-        
-        nuevo_usuario = Usuario(
-        id=str(uuid.uuid4()),  #convertimos el UUID a cadena
-        nombre=nombre,
-        apellido=apellido,
-        nombre_usuario=nombre_usuario,
-        email=email,
-        contraseña=contraseña,
-        claustro=claustro,
-        rol=rol,
-        departamento=departamento
-    )
-        self.__repo_usuario.guardar_registro(nuevo_usuario)
+        with db.session.begin():  # Garantiza que la sesión esté activa
+            if any(usuario.nombre_usuario == nombre_usuario for usuario in self.__repo_usuario.obtener_todos_los_registros()):
+                raise ValueError(f"El nombre de usuario '{nombre_usuario}' ya está en uso.")
+
+            nuevo_usuario = Usuario(
+                id=id,
+                nombre=nombre,
+                apellido=apellido,
+                nombre_usuario=nombre_usuario,
+                email=email,
+                contraseña=contraseña,
+                claustro=claustro,
+                rol=rol,
+                departamento=departamento
+            )
+            self.__repo_usuario.guardar_registro(nuevo_usuario)
         return nuevo_usuario
     
     def cargar_usuario_por_nombre(self, nombre_usuario):
@@ -136,7 +131,7 @@ class GestorUsuario:
 class GestorBaseDeDatos:
     def obtener_usuario_por_nombre(self, nombre_usuario):
         try:
-            usuario = db.session.query(ModeloUsuario).filtrer_by(nombre_usuario=nombre_usuario).one()
+            usuario = db.session.query(ModeloUsuario).filter_by(nombre_usuario=nombre_usuario).one()
             return usuario
         except NoResultFound: 
             raise Exception("El usuario no fue encontrado")
