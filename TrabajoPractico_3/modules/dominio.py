@@ -65,7 +65,7 @@ class Reclamo:
         self.__contenido = contenido
         self.__clasificacion = clasificacion
         self.__estado = estado
-        self.__fecha_hora = fecha_hora or datetime.now()  # Usa la fecha actual si no se pasa una
+        self.__fecha_hora = fecha_hora   # Usa la fecha actual si no se pasa una
         self.__imagen = imagen  # Nuevo atributo para la imagen
         self.__usuarios_adheridos = usuarios_adheridos or []  # Lista de usuarios adheridos (inicialmente vacía)
 

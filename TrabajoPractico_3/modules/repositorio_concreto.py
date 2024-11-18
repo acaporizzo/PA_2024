@@ -33,6 +33,18 @@ class RepositorioReclamosSQLAlchemy(RepositorioAbstracto):
     def obtener_todos_los_registros(self) -> list:
         modelo_reclamos = self.__session.query(ModeloReclamo).all()
         return [self._map_modelo_a_entidad(reclamo) for reclamo in modelo_reclamos]
+    
+    def adherir_usuario_a_reclamo(self, id_reclamo, usuario):
+        reclamo = self.__session.query(ModeloReclamo).filter_by(id=id_reclamo).first()
+        if reclamo:
+            if usuario not in reclamo.usuarios_adheridos:
+                reclamo.usuarios_adheridos.append(usuario)
+                self.__session.commit()
+                return True  # Indica que la operación fue exitosa
+            else:
+                return False  # Indica que el usuario ya estaba adherido
+        return None  # Indica que no se encontró el reclamo
+
 
     def modificar_registro(self, reclamo_modificado):
         if not isinstance(reclamo_modificado, Reclamo):
@@ -73,14 +85,15 @@ class RepositorioReclamosSQLAlchemy(RepositorioAbstracto):
 
     def _map_entidad_a_modelo(self, entidad: Reclamo):
         return ModeloReclamo(
-            id=entidad.__id_reclamo,  # Cambiado de id a id_reclamo
-            id_usuario=entidad.__usuario,
-            contenido=entidad.__contenido,
-            clasificacion=entidad.__clasificacion,
-            estado=entidad.__estado,
-            imagen=None,          # Ajusta si manejas imágenes
-            fecha=entidad.__fecha_hora
+            id=entidad.id_reclamo,
+            id_usuario=entidad.id_usuario,
+            contenido=entidad.contenido,
+            clasificacion=entidad.clasificacion,
+            estado=entidad.estado,
+            imagen=entidad.imagen,
+            fecha=entidad.fecha_hora 
         )
+
 
     def _map_modelo_a_entidad(self, modelo: ModeloReclamo):
         return Reclamo(

@@ -27,6 +27,12 @@ from modules.gestor_login import GestorLogin
 from modules.modelos import ModeloReclamo, ModeloUsuario
 from modules.config import app, login_manager, db
 from modules.reclamos_similares import reclamos_similares
+import logging
+
+# Configurar logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 db_path = os.path.join(BASE_DIR, "instance", "base_datos.db")
@@ -42,6 +48,7 @@ repo_reclamo , repo_usuario = crear_repositorio()
 gestor_reclamo = GestorReclamo(repo_reclamo)
 gestor_usuario = GestorUsuario(repo_usuario)
 gestor_login = GestorLogin(gestor_usuario, login_manager, admin_list)
+gestor_BD = GestorBaseDeDatos()
 
 try:
     with open('./data/claims_clf.pkl', 'rb') as archivo:
@@ -141,78 +148,99 @@ def panel_usuario():
 def crear_reclamo():
     id_usuario = str(gestor_login.id_usuario_actual)
     reclamos_similares = []
-    usuario = str(gestor_login.usuario_autenticado)
+    usuario = gestor_usuario.cargar_usuario_por_id(id_usuario)
+    #logger.debug(f'Usuario autenticado: {usuario}, ID Usuario: {id_usuario}')
+
+    if request.method == "GET":
+        return render_template("crear_reclamo.html", reclamos_similares=reclamos_similares)
 
     if request.method == "POST":
         contenido = request.form.get("description")
-        
+        print(f'Contenido del reclamo recibido: {contenido}')
+
         if not contenido:
             flash("La descripción del reclamo es obligatoria.", "error")
+            print('Descripción del reclamo no proporcionada por el usuario.')
             return render_template("crear_reclamo.html", reclamos_similares=reclamos_similares)
 
         try:
             clasificacion = clasificador.clasificar([contenido])[0]
+            print(f'Clasificación obtenida: {clasificacion}')
 
-            id_reclamo = str(uuid.uuid4())  # UUID como cadena
-            fecha_hora = datetime.now()
-            imagen = None  #la imagen es opcional (se queda como None si no se usa)
+            id_reclamo = str(uuid.uuid4())
+            fecha_hora = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            estado = "pendiente"
             
-            lista_reclamo = [
-                id_reclamo,
-                id_usuario,
-                contenido,
-                clasificacion,
-                "pendiente",
-                fecha_hora,
-                imagen]
-            
-            #creamos el reclamo en el sistema (pero no lo guardamos aún), SOLO LO INSTANCIAMOS
+            lista_reclamo = [id_reclamo, id_usuario, contenido, clasificacion, estado, fecha_hora]
+
+            imagen = request.files.get("imagen")
+            if imagen:
+                imagen_data = imagen.read()
+                lista_reclamo.append(imagen_data)
+            else:
+                # Añadir None explícitamente si no hay imagen
+                lista_reclamo.append(None)
+
             reclamo = gestor_reclamo.crear_reclamo(lista_reclamo)
-
+            print(f'Reclamo creado (sin guardar aún): {lista_reclamo}')
         except Exception as e:
             flash(f"Error al clasificar el reclamo: {str(e)}", "error")
+            print(f'Error al clasificar el reclamo: {str(e)}')
             return render_template("crear_reclamo.html", reclamos_similares=reclamos_similares)
 
-        #buscar posibles reclamos similares
+        # Buscar posibles reclamos similares
         try:
             posibles = gestor_reclamo.obtener_reclamo_por_filtro("clasificacion", clasificacion)
-            posibles_reclamos = [(r.get_contenido(), r.get_id_reclamo()) for r in posibles]  # Formato [(descripcion, ID)]
-            reclamos_similares = reclamos_similares(posibles_reclamos, contenido)
+            reclamos_similares = [(r.id, r.contenido) for r in posibles]
+            logger.debug(f'Reclamos similares encontrados: {reclamos_similares}')
         except Exception as e:
-            print(f"Error al buscar reclamos similares: {str(e)}")
+            logger.error(f'Error al buscar reclamos similares: {str(e)}')
+            reclamos_similares = []
 
-        if len(reclamos_similares) > 0:
-            # Si existen reclamos similares, mostramos los reclamos y el usuario podrá adherirse
+        if reclamos_similares:
             reclamo_seleccionado = request.form.get("reclamo_seleccionado")
-       
-            indice_reclamo_seleccionado = int(reclamo_seleccionado) - 1  # Restamos 1 porque el índice es 0-based
-                
-            if reclamo_seleccionado < len(reclamos_similares) and reclamo_seleccionado >= 0:
-                # Buscamos el reclamo seleccionado
-                reclamo_a_adherirse = reclamos_similares[indice_reclamo_seleccionado]
-                    
-                # Ahora adherimos el usuario a este reclamo
+            if reclamo_seleccionado:
                 try:
-                    # Usar la relación para agregar el usuario al reclamo
-                    reclamo_a_adherirse.usuarios_adheridos.append(usuario)
-                    db.session.commit()  # Guardar los cambios en la base de datos
-                    flash("Te has adherido al reclamo exitosamente.", "success")
-                except Exception as e:
-                    flash(f"Error al adherirse al reclamo: {str(e)}", "error")
-                
-                return redirect(url_for('crear_reclamo'))
-            mensaje = "Ingresó un número de reclamo que no existe"
-            return render_template("crear_reclamo.html", reclamos_similares=reclamos_similares, reclamo=reclamo, mensaje=mensaje)
+                    indice_reclamo_seleccionado = int(reclamo_seleccionado) - 1
+                    if 0 <= indice_reclamo_seleccionado < len(reclamos_similares):
+                        reclamo_id = reclamos_similares[indice_reclamo_seleccionado][0]
+                        resultado_adherencia = gestor_reclamo.adherir_usuario_a_reclamo(reclamo_id, usuario)
+                        if resultado_adherencia is True:
+                            flash("Te has adherido al reclamo seleccionado con éxito.", "success")
+                        elif resultado_adherencia is False:
+                            flash("Ya estás adherido a este reclamo.", "info")
+                        else:
+                            flash("No se pudo encontrar el reclamo.", "error")
+                        return redirect(url_for('crear_reclamo'))
+                    else:
+                        flash("Selección de reclamo no válida.", "error")
+                except (ValueError, IndexError):
+                    flash("Selección de reclamo no válida.", "error")
+            else:
+                # Si el usuario no seleccionó ningún reclamo similar, mostrar la opción de crear uno nuevo
+                flash("Hay reclamos similares. Si deseas, puedes adherirte a uno o crear un nuevo reclamo.", "info")
+                return render_template("crear_reclamo.html", reclamos_similares=reclamos_similares, permitir_crear_nuevo=True)
         else:
-            # Si no existen reclamos similares, guardamos el nuevo reclamo, ahora sí se crea uno nuevo
+            # Si no existen reclamos similares, guardar el nuevo reclamo
+
+            print(f"ID reclamo: {id_reclamo} - Tipo: {type(id_reclamo)}")
+            print(f"ID usuario: {id_usuario} - Tipo: {type(id_usuario)}")
+            print(f"Contenido de reclamo: {contenido} - Tipo: {type(contenido)}")
+            print(f"Clasificación: {clasificacion} - Tipo: {type(clasificacion)}")
+            print(f"Estado: {estado} - Tipo: {type(estado)}")
+            print(f"Fecha a insertar: {fecha_hora} - Tipo: {type(fecha_hora)}")
+            print(f"Imagen: {imagen} - Tipo: {type(imagen)}")
+
             try:
                 gestor_reclamo.guardar_reclamo(lista_reclamo)
+                print("Reclamo creado exitosamente.")
                 flash("Reclamo creado exitosamente.", "success")
             except Exception as e:
                 flash(f"Error al guardar el reclamo: {str(e)}", "error")
+                logger.error(f'Error al guardar el reclamo: {str(e)}')
             return render_template("crear_reclamo.html", reclamos_similares="No hay reclamos similares")
 
-    return render_template("crear_reclamo.html", reclamos_similares=reclamos_similares)
+
 
 @app.route('/cerrar_sesion')
 def cerrar_sesion():
@@ -226,8 +254,18 @@ def listar_reclamos():
     return render_template('listar_reclamos.html')
 
 @app.route('/mis_reclamos')
+@login_required  # Si aplica autenticación
 def mis_reclamos():
-    return render_template('mis_reclamos.html')
+    # Obtener el usuario actual
+    id_usuario = str(gestor_login.id_usuario_actual)
+    usuario = gestor_usuario.cargar_usuario_por_id(id_usuario)
+    
+    # Obtener todos los reclamos asociados al usuario
+    reclamos = gestor_reclamo.obtener_reclamo_por_filtro("usuario", id_usuario)
+    print(f'Reclamos obtenidos: {reclamos}')
+    # Renderizar el template y pasar los reclamos
+    return render_template('mis_reclamos.html', reclamos=reclamos)
+
 
 if __name__ == "__main__":
     app.run(debug=True)

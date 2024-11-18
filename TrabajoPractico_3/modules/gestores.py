@@ -39,12 +39,12 @@ class GestorReclamo:
             reclamos=db.session.query(ModeloReclamo).filter(ModeloReclamo.estado == filtro).all()
         
         elif tipo_de_filtro == "clasificacion":
-            reclamos= db.session.query(ModeloReclamo).filter(ModeloReclamo.clasificacion == filtro)
+            reclamos= db.session.query(ModeloReclamo).filter(ModeloReclamo.clasificacion == filtro).all()
 
         elif tipo_de_filtro == "id":
             try:
-                reclamo=db.session.query(ModeloReclamo).filter_by(ModeloReclamo.id == filtro).one()
-                return reclamo
+                reclamo = db.session.query(ModeloReclamo).filter(ModeloReclamo.id == filtro).one()
+                return self._map_modelo_a_entidad(reclamo)
             except NoResultFound:
                 raise Exception("El reclamo no existe")
 
@@ -52,32 +52,38 @@ class GestorReclamo:
             raise Exception ("El filtro que eligió no existe, pruebe con ")
 
         lista_de_datos_reclamos = []
-        if tipo_de_filtro == "id":
-            datos = [reclamo.id, 
-                reclamo.id_usuario, 
-                reclamo.contenido, 
-                reclamo.clasificacion, 
-                reclamo.estado, 
-                reclamo.imagen, 
-                reclamo.fecha]
-            lista_de_datos_reclamos.append(datos)
-
-        else:
-            for reclam in reclamos:
-                datos = [reclam.id, 
-                reclam.id_usuario, 
-                reclam.contenido, 
-                reclam.clasificacion, 
-                reclam.estado, 
-                reclam.imagen, 
-                reclam.fecha]
+        for reclam in reclamos:
+            datos = [
+                reclam.id,
+                reclam.id_usuario,
+                reclam.contenido,
+                reclam.clasificacion,
+                reclam.estado,
+                reclam.imagen,
+                reclam.fecha
+            ]
             lista_de_datos_reclamos.append(datos)
 
         return lista_de_datos_reclamos
     
-    
-    def guardar_reclamo(self, data):
-        nuevo_reclamo = ModeloReclamo(*data)
+    def guardar_reclamo(self, datos):
+        # Asegúrate de que 'imagen' sea manejada desde 'datos'
+        imagen = datos[6]  # Extraer 'imagen' de la lista de datos
+
+        nuevo_reclamo = ModeloReclamo(
+            id=datos[0],
+            id_usuario=datos[1],
+            contenido=datos[2],
+            clasificacion=datos[3],
+            estado=datos[4],
+            fecha=datos[5],  # Si es None, debería ser aceptado
+        )
+
+        try: 
+            nuevo_reclamo.añadir_imagen(imagen)
+        except IndexError: #no hay dato[5], es decir, imagen
+            pass
+
         db.session.add(nuevo_reclamo)
         db.session.commit()
 
@@ -119,12 +125,13 @@ class GestorUsuario:
             )
             self.__repo_usuario.guardar_registro(nuevo_usuario)
         return nuevo_usuario
-    
+
+
     def cargar_usuario_por_nombre(self, nombre_usuario):
         """Carga el usuario desde el repositorio por su nombre de usuario."""
         return self.__repo_usuario.obtener_usuario_por_nombre(nombre_usuario)
 
-    def cargar_usuario(self, id_usuario):
+    def cargar_usuario_por_id(self, id_usuario):
         """Carga el usuario desde el repositorio por su ID."""
         return self.__repo_usuario.obtener_usuario_por_id(id_usuario)
     

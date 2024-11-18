@@ -14,7 +14,7 @@ class FlaskLoginUser(UserMixin):
 class GestorLogin:
     def __init__(self, gestor_usuarios, login_manager, admin_list):
         self.__gestor_usuarios = gestor_usuarios
-        login_manager.user_loader(self.__cargar_usuario_actual)
+        login_manager.user_loader(self._cargar_usuario_actual)
         self.__admin_list = admin_list
 
     def verificar_credenciales(self, nombre_usuario, contraseña):
@@ -44,9 +44,14 @@ class GestorLogin:
     def usuario_autenticado(self):
         return current_user.is_authenticated
 
-    def __cargar_usuario_actual(self, id_usuario):
-        dicc_usuario = self.__gestor_usuarios.cargar_usuario(id_usuario)
+    def _cargar_usuario_actual(self, id_usuario):
+        dicc_usuario = self.__gestor_usuarios.cargar_usuario_por_id(id_usuario)
+        if not dicc_usuario:
+            print(f"Usuario con ID {id_usuario} no encontrado.")
+            return None
+        print(f"Usuario con ID {id_usuario} cargado: {dicc_usuario.nombre}")
         return FlaskLoginUser(dicc_usuario)
+
 
     def logout_usuario(self):
         logout_user()

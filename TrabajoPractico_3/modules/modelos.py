@@ -37,17 +37,20 @@ class ModeloReclamo(db.Model):
     contenido = db.Column(db.Text, nullable=False)
     clasificacion = db.Column(db.String(50), nullable=True)
     estado = db.Column(db.String(20), default="pendiente")
-    imagen = db.Column(db.LargeBinary, nullable=True)
-    fecha = db.Column(db.DateTime, default=datetime.utcnow)
+    imagen = db.Column(db.LargeBinary)
+    fecha = db.Column(db.String, nullable=True)
 
     # Relación muchos a muchos con usuarios
     usuarios_adheridos = relationship('ModeloUsuario', secondary=reclamos_usuarios, back_populates='reclamos_adheridos')
 
-    def __init__(self, id_reclamo=None, id_usuario=None, contenido=None, clasificacion=None, estado="pendiente", fecha_hora=None, imagen=None):
-        self.id = id_reclamo
+    def __init__(self, id, id_usuario, contenido, clasificacion, estado, fecha): #cuando instancio utilizo estos nombres
+        self.id = id
         self.id_usuario = id_usuario
         self.contenido = contenido
         self.clasificacion = clasificacion
         self.estado = estado
-        self.fecha = fecha_hora or datetime.utcnow()
+        self.imagen = None
+        self.fecha = fecha
+
+    def añadir_imagen (self, imagen):
         self.imagen = imagen

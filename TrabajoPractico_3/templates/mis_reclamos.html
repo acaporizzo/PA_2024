@@ -1,15 +1,68 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mis Reclamos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}"> <!-- Enlace opcional para estilos -->
 </head>
 <body>
-    <h1>Mis Reclamos</h1>
-    <ul>
-        {% for reclamo in reclamos %}
-            <li>ID: {{ reclamo.id }} | Estado: {{ reclamo.estado }} | Fecha: {{ reclamo.fecha }} | Contenido: {{ reclamo.contenido }} | Departamento: {{ reclamo.departamento }}</li>
-        {% endfor %}
-    </ul>
+    <header>
+        <h1>Mis Reclamos</h1>
+    </header>
+
+    <main>
+        {% if reclamos %}
+            <table border="1" cellpadding="10" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>ID Reclamo</th>
+                        <th>Contenido</th>
+                        <th>Clasificación</th>
+                        <th>Estado</th>
+                        <th>Fecha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reclamo in reclamos %}
+                        <tr>
+                            <td>{{ reclamo.id_reclamo }}</td>
+                            <td>{{ reclamo.contenido }}</td>
+                            <td>{{ reclamo.clasificacion }}</td>
+                            <td>{{ reclamo.estado }}</td>
+                            <td>{{ reclamo.fecha_hora }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No tienes reclamos registrados.</p>
+        {% endif %}
+
+        <!-- Botón para volver al panel de usuario -->
+        <div style="margin-top: 20px;">
+            <a href="{{ url_for('panel_usuario') }}" class="button">Volver al Panel de Usuario</a>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 - Sistema de Gestión de Reclamos</p>
+    </footer>
+
+    <style>
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            background-color: #007bff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </body>
 </html>
