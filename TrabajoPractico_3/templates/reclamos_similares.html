@@ -1,20 +1,32 @@
-<h1>Reclamos similares encontrados</h1>
-<p>Estos reclamos podrían ser similares al que quieres crear:</p>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reclamos Similares</title>
+</head>
+<body>
+    <h1>Reclamos Similares Encontrados</h1>
+    <p>Estos reclamos podrían ser similares al que quieres crear:</p>
 
-<ul>
-    {% for reclamo in reclamos_similares %}
-    <li>
-        <p><strong>Descripción:</strong> {{ reclamo.contenido }}</p>
-        <p><strong>Departamento:</strong> {{ reclamo.departamento }}</p>
-        <form action="{{ url_for('adherir_reclamo', reclamo_id=reclamo.id_reclamo) }}" method="post">
-            <button type="submit">Adherirme a este reclamo</button>
-        </form>
-    </li>
-    {% endfor %}
-</ul>
+    {% if reclamos_similares and reclamos_similares|length > 0 %}
+    <form method="POST" action="{{ url_for('crear_reclamo') }}">
+        <ul>
+            {% for reclamo in reclamos_similares %}
+                <li>
+                    <strong>Reclamo {{ loop.index }}:</strong> {{ reclamo.contenido }} - Clasificación: {{ reclamo.clasificacion }}<br>
+                    <input type="radio" name="reclamo_seleccionado" value="{{ reclamo.id }}" required>
+                </li>
+            {% endfor %}
+        </ul>
+        <button type="submit">Adherirse al Reclamo Seleccionado</button>
+    </form>    
 
-<h2>O puedes crear uno nuevo</h2>
-<form action="{{ url_for('crear_reclamo') }}" method="post">
-    <input type="hidden" name="description" value="{{ texto_reclamo }}">
-    <button type="submit">Crear nuevo reclamo</button>
-</form>
+    <form method="POST" action="{{ url_for('crear_reclamo') }}">
+        <button type="submit">Crear un nuevo reclamo</button>
+    </form>
+    
+    {% else %}
+    <p>No se encontraron reclamos similares.</p>
+    {% endif %}
+</body>
+</html>
