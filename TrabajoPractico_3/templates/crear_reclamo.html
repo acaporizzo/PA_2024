@@ -18,7 +18,7 @@
         <button type="submit">Crear Reclamo</button>
     </form>
 
-    {% if reclamos_similares %}
+    {% if reclamos_similares and reclamos_similares|length > 0 %}
         <h3>Reclamos Similares Encontrados</h3>
         <form method="POST" action="{{ url_for('crear_reclamo') }}">
             <ul>
@@ -26,14 +26,12 @@
                     <li>
                         <strong>Reclamo {{ loop.index }}:</strong> {{ reclamo.contenido }} - Departamento: {{ reclamo.clasificacion }}<br>
                         <em>Usuarios adheridos: {{ reclamo.usuarios_adheridos }}</em>
-                        <input type="radio" name="reclamo_seleccionado" value="{{ loop.index }}" required>
+                        <input type="radio" name="reclamo_seleccionado" value="{{ reclamo.id }}" required>
                     </li>
                 {% endfor %}
             </ul>
             <button type="submit">Adherirse al Reclamo Seleccionado</button>
         </form>
-        
-        <!-- Formulario para crear un nuevo reclamo de todas formas -->
         <form method="POST" action="{{ url_for('crear_reclamo') }}">
             <input type="hidden" name="confirmar_creacion" value="1">
             <button type="submit">Crear un nuevo reclamo de todas formas</button>
@@ -41,6 +39,7 @@
     {% else %}
         <p>No se encontraron reclamos similares.</p>
     {% endif %}
+
 
     <a href="{{ url_for('panel_usuario') }}">Volver al Panel de Usuario</a>
 </body>

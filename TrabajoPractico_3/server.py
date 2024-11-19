@@ -33,7 +33,6 @@ import logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 db_path = os.path.join(BASE_DIR, "instance", "base_datos.db")
 
@@ -149,7 +148,6 @@ def crear_reclamo():
     id_usuario = str(gestor_login.id_usuario_actual)
     reclamos_similares = []
     usuario = gestor_usuario.cargar_usuario_por_id(id_usuario)
-    #logger.debug(f'Usuario autenticado: {usuario}, ID Usuario: {id_usuario}')
 
     if request.method == "GET":
         return render_template("crear_reclamo.html", reclamos_similares=reclamos_similares)
@@ -185,44 +183,48 @@ def crear_reclamo():
             print(f'Reclamo creado (sin guardar aún): {lista_reclamo}')
         except Exception as e:
             flash(f"Error al clasificar el reclamo: {str(e)}", "error")
-            print(f'Error al clasificar el reclamo: {str(e)}')
+
             return render_template("crear_reclamo.html", reclamos_similares=reclamos_similares)
 
-        # Buscar posibles reclamos similares
         try:
+            # Obtén los reclamos que coincidan con la clasificación
             posibles = gestor_reclamo.obtener_reclamo_por_filtro("clasificacion", clasificacion)
-            reclamos_similares = [(r.id, r.contenido) for r in posibles]
-            logger.debug(f'Reclamos similares encontrados: {reclamos_similares}')
+
+            # Adaptar los reclamos a una estructura de diccionario esperada por la plantilla
+            reclamos_similares = [
+            {
+                "id": r["id"],
+                "contenido": r["contenido"],
+                "clasificacion": r["clasificacion"]
+            }
+            for r in posibles]
+
         except Exception as e:
-            logger.error(f'Error al buscar reclamos similares: {str(e)}')
+            print(f'Error al buscar reclamos similares: {str(e)}')
             reclamos_similares = []
 
         if reclamos_similares:
             reclamo_seleccionado = request.form.get("reclamo_seleccionado")
             if reclamo_seleccionado:
                 try:
-                    indice_reclamo_seleccionado = int(reclamo_seleccionado) - 1
-                    if 0 <= indice_reclamo_seleccionado < len(reclamos_similares):
-                        reclamo_id = reclamos_similares[indice_reclamo_seleccionado][0]
-                        resultado_adherencia = gestor_reclamo.adherir_usuario_a_reclamo(reclamo_id, usuario)
-                        if resultado_adherencia is True:
-                            flash("Te has adherido al reclamo seleccionado con éxito.", "success")
-                        elif resultado_adherencia is False:
-                            flash("Ya estás adherido a este reclamo.", "info")
-                        else:
-                            flash("No se pudo encontrar el reclamo.", "error")
-                        return redirect(url_for('crear_reclamo'))
+                    reclamo_id = reclamo_seleccionado
+                    resultado_adherencia = gestor_reclamo.adherir_usuario_a_reclamo(reclamo_id, usuario)
+
+                    if resultado_adherencia == "adherido_exitosamente":
+                        flash("Te has adherido al reclamo seleccionado con éxito.", "success")
+                        return redirect(url_for('mis_reclamos'))
+                    elif resultado_adherencia == "ya_adherido":
+                        flash("Ya estás adherido a este reclamo.", "info")
                     else:
-                        flash("Selección de reclamo no válida.", "error")
-                except (ValueError, IndexError):
-                    flash("Selección de reclamo no válida.", "error")
+                        flash("No se pudo encontrar el reclamo.", "error")
+                except Exception as e:
+                    flash(f"Error al adherirse al reclamo: {str(e)}", "error")
             else:
                 # Si el usuario no seleccionó ningún reclamo similar, mostrar la opción de crear uno nuevo
                 flash("Hay reclamos similares. Si deseas, puedes adherirte a uno o crear un nuevo reclamo.", "info")
                 return render_template("crear_reclamo.html", reclamos_similares=reclamos_similares, permitir_crear_nuevo=True)
         else:
             # Si no existen reclamos similares, guardar el nuevo reclamo
-
             print(f"ID reclamo: {id_reclamo} - Tipo: {type(id_reclamo)}")
             print(f"ID usuario: {id_usuario} - Tipo: {type(id_usuario)}")
             print(f"Contenido de reclamo: {contenido} - Tipo: {type(contenido)}")
@@ -240,8 +242,27 @@ def crear_reclamo():
                 logger.error(f'Error al guardar el reclamo: {str(e)}')
             return render_template("crear_reclamo.html", reclamos_similares="No hay reclamos similares")
 
+@app.route('/mis_reclamos', methods=['GET'])
+@login_required
+def mis_reclamos():
+    id_usuario = str(gestor_login.id_usuario_actual)
+    try:
+        # Obtener reclamos creados por el usuario
+        reclamos_creados = gestor_reclamo.obtener_reclamo_por_filtro("usuario", id_usuario)
 
+        # Obtener reclamos a los que el usuario se ha adherido
+        reclamos_adheridos = gestor_reclamo.obtener_reclamos_adheridos_por_usuario(id_usuario)
 
+        return render_template(
+            "mis_reclamos.html", 
+            reclamos_creados=reclamos_creados, 
+            reclamos_adheridos=reclamos_adheridos
+        )
+    except Exception as e:
+        flash(f"Error al cargar tus reclamos: {str(e)}", "error")
+        return render_template("mis_reclamos.html", reclamos_creados=[], reclamos_adheridos=[])
+
+    
 @app.route('/cerrar_sesion')
 def cerrar_sesion():
     logout_user()
@@ -252,20 +273,6 @@ def cerrar_sesion():
 @app.route('/listar_reclamos')
 def listar_reclamos():
     return render_template('listar_reclamos.html')
-
-@app.route('/mis_reclamos')
-@login_required  # Si aplica autenticación
-def mis_reclamos():
-    # Obtener el usuario actual
-    id_usuario = str(gestor_login.id_usuario_actual)
-    usuario = gestor_usuario.cargar_usuario_por_id(id_usuario)
-    
-    # Obtener todos los reclamos asociados al usuario
-    reclamos = gestor_reclamo.obtener_reclamo_por_filtro("usuario", id_usuario)
-    print(f'Reclamos obtenidos: {reclamos}')
-    # Renderizar el template y pasar los reclamos
-    return render_template('mis_reclamos.html', reclamos=reclamos)
-
 
 if __name__ == "__main__":
     app.run(debug=True)

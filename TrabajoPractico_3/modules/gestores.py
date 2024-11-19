@@ -26,49 +26,61 @@ class GestorReclamo:
             pass
         return nuevo_reclamo
 
-    def obtener_reclamo_por_filtro (self, tipo_de_filtro = "todo", filtro = "nada"):
-
+    def obtener_reclamo_por_filtro(self, tipo_de_filtro="todo", filtro="nada"):
         tipo_de_filtro = tipo_de_filtro.lower()
         if tipo_de_filtro == "nada" and filtro == "nada":
-            reclamos= db.session.query(ModeloReclamo).all()
-
+            reclamos = db.session.query(ModeloReclamo).all()
         elif tipo_de_filtro == "usuario":
-             reclamos=db.session.query(ModeloReclamo).filter(ModeloReclamo.id_usuario == filtro).all()
-
+            reclamos = db.session.query(ModeloReclamo).filter(ModeloReclamo.id_usuario == filtro).all()
         elif tipo_de_filtro == "estado":
-            reclamos=db.session.query(ModeloReclamo).filter(ModeloReclamo.estado == filtro).all()
-        
+            reclamos = db.session.query(ModeloReclamo).filter(ModeloReclamo.estado == filtro).all()
         elif tipo_de_filtro == "clasificacion":
-            reclamos= db.session.query(ModeloReclamo).filter(ModeloReclamo.clasificacion == filtro).all()
-
+            reclamos = db.session.query(ModeloReclamo).filter(ModeloReclamo.clasificacion == filtro).all()
         elif tipo_de_filtro == "id":
             try:
                 reclamo = db.session.query(ModeloReclamo).filter(ModeloReclamo.id == filtro).one()
                 return self._map_modelo_a_entidad(reclamo)
             except NoResultFound:
                 raise Exception("El reclamo no existe")
-
         else:
-            raise Exception ("El filtro que eligió no existe, pruebe con ")
+            raise Exception("El filtro que eligió no existe, pruebe con uno válido")
 
         lista_de_datos_reclamos = []
-        for reclam in reclamos:
-            datos = [
-                reclam.id,
-                reclam.id_usuario,
-                reclam.contenido,
-                reclam.clasificacion,
-                reclam.estado,
-                reclam.imagen,
-                reclam.fecha
-            ]
+        for reclamo in reclamos:
+            datos = {
+                "id": reclamo.id,
+                "id_usuario": reclamo.id_usuario,
+                "contenido": reclamo.contenido,
+                "clasificacion": reclamo.clasificacion,
+                "estado": reclamo.estado,
+                "imagen": reclamo.imagen,
+                "fecha": reclamo.fecha
+            }
             lista_de_datos_reclamos.append(datos)
 
         return lista_de_datos_reclamos
     
+    def obtener_reclamos_adheridos_por_usuario(self, id_usuario):
+        try:
+            usuario = db.session.query(ModeloUsuario).filter_by(id=id_usuario).first()
+            if not usuario:
+                raise Exception("Usuario no encontrado")
+
+            return [
+                {
+                    "id": r.id,
+                    "contenido": r.contenido,
+                    "clasificacion": r.clasificacion,
+                    "estado": r.estado,
+                    "fecha": r.fecha
+                }
+                for r in usuario.reclamos_adheridos
+            ]
+        except Exception as e:
+            raise Exception(f"Error al obtener reclamos adheridos: {str(e)}")
+
     def guardar_reclamo(self, datos):
-        # Asegúrate de que 'imagen' sea manejada desde 'datos'
-        imagen = datos[6]  # Extraer 'imagen' de la lista de datos
+        imagen = datos[6]
 
         nuevo_reclamo = ModeloReclamo(
             id=datos[0],
@@ -76,16 +88,35 @@ class GestorReclamo:
             contenido=datos[2],
             clasificacion=datos[3],
             estado=datos[4],
-            fecha=datos[5],  # Si es None, debería ser aceptado
+            fecha=datos[5],
         )
-
         try: 
             nuevo_reclamo.añadir_imagen(imagen)
-        except IndexError: #no hay dato[5], es decir, imagen
+        except IndexError:
             pass
 
         db.session.add(nuevo_reclamo)
         db.session.commit()
+
+    def adherir_usuario_a_reclamo(self, id_reclamo, usuario):
+        try:
+            reclamo = db.session.query(ModeloReclamo).filter_by(id=id_reclamo).first()
+            if not reclamo:
+                return "reclamo_no_encontrado"
+
+            # Verificar si el usuario ya está adherido
+            if usuario in reclamo.usuarios_adheridos:
+                return "ya_adherido"
+
+            # Adherir al usuario al reclamo
+            reclamo.usuarios_adheridos.append(usuario)
+
+            db.session.commit()  # Guardar cambios en la tabla intermedia
+            return "adherido_exitosamente"
+        except Exception as e:
+            db.session.rollback()
+            raise Exception(f"Error al adherir usuario al reclamo: {str(e)}")
+
 
     def derivar_reclamo(self, id_reclamo, nuevo_departamento):
         reclamo = self.repositorio.obtener_registro_por_filtro("id_reclamo", id_reclamo)
