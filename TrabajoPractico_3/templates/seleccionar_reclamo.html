@@ -26,5 +26,10 @@
         <input type="hidden" name="department" value="{{ reclamo.departamento }}">
         <button type="submit" name="action" value="crear">Crear Reclamo Nuevo</button>
     </form>
+
+    <!-- Botón para volver al panel de usuario -->
+    <div style="margin-top: 20px;">
+        <a href="{{ url_for('panel_usuario') }}" class="button">Volver al Panel de Usuario</a>
+    </div>
 </body>
 </html>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Listar Reclamos</title>
@@ -7,18 +7,71 @@
 <body>
     <h1>Reclamos Pendientes</h1>
     <form method="POST" action="{{ url_for('listar_reclamos') }}">
-        <label>Filtrar por Departamento:</label>
-        <input type="text" name="departamento">
-        <button type="submit">Filtrar</button>
+        <label>Filtrar por:</label>
+        <select name="filtro_tipo" onchange="this.form.submit()">
+            <option value="" selected disabled>Seleccione un tipo de filtro</option>
+            <option value="clasificacion" {% if filtro_tipo == 'clasificacion' %}selected{% endif %}>Clasificación</option>
+            <option value="estado" {% if filtro_tipo == 'estado' %}selected{% endif %}>Estado</option>
+        </select>
+
+        <label>Valor:</label>
+        <select name="filtro_valor" {% if not filtro_tipo %}disabled{% endif %}>
+            <option value="" selected disabled>Seleccione un valor</option>
+
+            <!-- Opciones de clasificación -->
+            {% if filtro_tipo == 'clasificacion' %}
+                {% for valor in filtros['clasificacion'] %}
+                    <option value="{{ valor }}" {% if filtro_valor == valor %}selected{% endif %}>{{ valor }}</option>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Opciones de estado -->
+            {% if filtro_tipo == 'estado' %}
+                {% for valor in filtros['estado'] %}
+                    <option value="{{ valor }}" {% if filtro_valor == valor %}selected{% endif %}>{{ valor }}</option>
+                {% endfor %}
+            {% endif %}
+        </select>
+
+        <button type="submit">Aplicar Filtro</button>
     </form>
-    <ul>
-        {% for reclamo in reclamos %}
-            <li>ID: {{ reclamo.id }} | Estado: {{ reclamo.estado }} | Fecha: {{ reclamo.fecha }} | Contenido: {{ reclamo.contenido }} | Departamento: {{ reclamo.departamento }} | Adherentes: {{ reclamo.adherentes }}
-                <form method="POST" action="{{ url_for('adherirse', reclamo_id=reclamo.id) }}">
-                    <button type="submit">Adherirse</button>
-                </form>
-            </li>
-        {% endfor %}
-    </ul>
+
+    <!-- Mostrar mensaje si no se encuentran reclamos -->
+    {% if mensaje %}
+        <p style="color: red;">{{ mensaje }}</p>
+    {% endif %}
+
+    <!-- Mostrar reclamos en una tabla solo si ambos filtros están seleccionados -->
+    {% if filtro_tipo and filtro_valor %}
+        {% if reclamos %}
+            <table border="1" cellpadding="10" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Contenido</th>
+                        <th>Clasificación</th>
+                        <th>Estado</th>
+                        <th>Fecha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reclamo in reclamos %}
+                        <tr>
+                            <td>{{ reclamo.id }}</td>
+                            <td>{{ reclamo.contenido }}</td>
+                            <td>{{ reclamo.clasificacion }}</td>
+                            <td>{{ reclamo.estado }}</td>
+                            <td>{{ reclamo.fecha }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    {% endif %}
+
+    <!-- Botón para volver al panel de usuario -->
+    <div style="margin-top: 20px;">
+        <a href="{{ url_for('panel_usuario') }}" class="button">Volver al Panel de Usuario</a>
+    </div>
 </body>
 </html>

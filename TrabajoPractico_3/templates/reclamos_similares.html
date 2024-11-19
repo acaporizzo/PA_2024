@@ -6,10 +6,11 @@
 </head>
 <body>
     <h1>Reclamos Similares Encontrados</h1>
-    <p>Estos reclamos podrían ser similares al que quieres crear:</p>
 
     {% if reclamos_similares and reclamos_similares|length > 0 %}
-    <form method="POST" action="{{ url_for('crear_reclamo') }}">
+    
+    <form method="POST" action="{{ url_for('seleccionar_reclamo') }}">
+        <p>Estos reclamos podrían ser similares al que quieres crear:</p>
         <ul>
             {% for reclamo in reclamos_similares %}
                 <li>
@@ -18,10 +19,12 @@
                 </li>
             {% endfor %}
         </ul>
+        <input type="hidden" name="adherirse" value="true">
         <button type="submit">Adherirse al Reclamo Seleccionado</button>
-    </form>    
+    </form>
 
     <form method="POST" action="{{ url_for('crear_reclamo') }}">
+        <input type="hidden" name="confirmar_creacion" value="true">
         <button type="submit">Crear un nuevo reclamo</button>
     </form>
     

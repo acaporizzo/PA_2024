@@ -28,6 +28,7 @@ class GestorReclamo:
 
     def obtener_reclamo_por_filtro(self, tipo_de_filtro="todo", filtro="nada"):
         tipo_de_filtro = tipo_de_filtro.lower()
+        filtro = filtro.lower()
         if tipo_de_filtro == "nada" and filtro == "nada":
             reclamos = db.session.query(ModeloReclamo).all()
         elif tipo_de_filtro == "usuario":
@@ -39,7 +40,7 @@ class GestorReclamo:
         elif tipo_de_filtro == "id":
             try:
                 reclamo = db.session.query(ModeloReclamo).filter(ModeloReclamo.id == filtro).one()
-                return self._map_modelo_a_entidad(reclamo)
+                return self.repositorio._map_modelo_a_entidad(reclamo)  # Llama al método desde el repositorio
             except NoResultFound:
                 raise Exception("El reclamo no existe")
         else:

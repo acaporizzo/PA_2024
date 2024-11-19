@@ -1,68 +1,64 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mis Reclamos</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}"> <!-- Enlace opcional para estilos -->
-</head>
-<body>
-    <header>
-        <h1>Mis Reclamos</h1>
-    </header>
-
-    <main>
-        {% if reclamos %}
-            <table border="1" cellpadding="10" cellspacing="0">
-                <thead>
+{% if reclamos_creados or reclamos_adheridos %}
+    <h2>Reclamos Creados</h2>
+    {% if reclamos_creados %}
+        <table border="1" cellpadding="10" cellspacing="0">
+            <thead>
+                <tr>
+                    <th>ID Reclamo</th>
+                    <th>Contenido</th>
+                    <th>Clasificación</th>
+                    <th>Estado</th>
+                    <th>Fecha</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reclamo in reclamos_creados %}
                     <tr>
-                        <th>ID Reclamo</th>
-                        <th>Contenido</th>
-                        <th>Clasificación</th>
-                        <th>Estado</th>
-                        <th>Fecha</th>
+                        <td>{{ reclamo.id }}</td>
+                        <td>{{ reclamo.contenido }}</td>
+                        <td>{{ reclamo.clasificacion }}</td>
+                        <td>{{ reclamo.estado }}</td>
+                        <td>{{ reclamo.fecha }}</td>
                     </tr>
-                </thead>
-                <tbody>
-                    {% for reclamo in reclamos %}
-                        <tr>
-                            <td>{{ reclamo.id_reclamo }}</td>
-                            <td>{{ reclamo.contenido }}</td>
-                            <td>{{ reclamo.clasificacion }}</td>
-                            <td>{{ reclamo.estado }}</td>
-                            <td>{{ reclamo.fecha_hora }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <p>No tienes reclamos registrados.</p>
-        {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No tienes reclamos creados.</p>
+    {% endif %}
 
-        <!-- Botón para volver al panel de usuario -->
-        <div style="margin-top: 20px;">
-            <a href="{{ url_for('panel_usuario') }}" class="button">Volver al Panel de Usuario</a>
-        </div>
-    </main>
+    <h2>Reclamos Adheridos</h2>
+    {% if reclamos_adheridos %}
+        <table border="1" cellpadding="10" cellspacing="0">
+            <thead>
+                <tr>
+                    <th>ID Reclamo</th>
+                    <th>Contenido</th>
+                    <th>Clasificación</th>
+                    <th>Estado</th>
+                    <th>Fecha</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reclamo in reclamos_adheridos %}
+                    <tr>
+                        <td>{{ reclamo.id }}</td>
+                        <td>{{ reclamo.contenido }}</td>
+                        <td>{{ reclamo.clasificacion }}</td>
+                        <td>{{ reclamo.estado }}</td>
+                        <td>{{ reclamo.fecha }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No tienes reclamos adheridos.</p>
+    {% endif %}
+{% else %}
+    <p>No tienes reclamos registrados.</p>
+{% endif %}
 
-    <footer>
-        <p>&copy; 2024 - Sistema de Gestión de Reclamos</p>
-    </footer>
-
-    <style>
-        .button {
-            display: inline-block;
-            padding: 10px 20px;
-            font-size: 16px;
-            color: white;
-            background-color: #007bff;
-            text-decoration: none;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-        .button:hover {
-            background-color: #0056b3;
-        }
-    </style>
-</body>
-</html>
+<!-- Botón para volver al panel de usuario -->
+<div style="margin-top: 20px;">
+    <a href="{{ url_for('panel_usuario') }}" class="button">Volver al Panel de Usuario</a>
+</div>

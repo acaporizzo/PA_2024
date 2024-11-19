@@ -19,7 +19,7 @@ class RepositorioReclamosSQLAlchemy(RepositorioAbstracto):
             raise ValueError("El parámetro debe ser una instancia de la clase Reclamo")
         
         modelo_reclamo = ModeloReclamo(
-            id=reclamo.__id_reclamo,  # Cambiado a id_reclamo
+            id=reclamo.__id,
             id_usuario=reclamo.__usuario,
             contenido=reclamo.__contenido,
             clasificacion=reclamo.__clasificacion,
@@ -85,7 +85,7 @@ class RepositorioReclamosSQLAlchemy(RepositorioAbstracto):
 
     def _map_entidad_a_modelo(self, entidad: Reclamo):
         return ModeloReclamo(
-            id=entidad.id_reclamo,
+            id=entidad.id,
             id_usuario=entidad.id_usuario,
             contenido=entidad.contenido,
             clasificacion=entidad.clasificacion,
@@ -97,7 +97,7 @@ class RepositorioReclamosSQLAlchemy(RepositorioAbstracto):
 
     def _map_modelo_a_entidad(self, modelo: ModeloReclamo):
         return Reclamo(
-            id=modelo.id_reclamo,  # Cambiado de id a id_reclamo
+            id_reclamo=modelo.id,
             usuario=modelo.id_usuario,
             contenido=modelo.contenido,
             clasificacion=modelo.clasificacion,
