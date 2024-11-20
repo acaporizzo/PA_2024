@@ -21,7 +21,7 @@ class GestorLogin:
         """Verifica si las credenciales son válidas y devuelve un objeto Usuario."""
         try:
             usuario = self.__gestor_usuarios.cargar_usuario_por_nombre(nombre_usuario)
-            if usuario and check_password_hash(usuario.contraseña, contraseña):  # Usa la property
+            if usuario and check_password_hash(usuario.contraseña, contraseña):
                 return usuario
         except Exception as e:
             print(f"Error al verificar credenciales: {e}")

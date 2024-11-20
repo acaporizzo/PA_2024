@@ -22,7 +22,7 @@
         }
     </style>
     <script>
-        // Script para mostrar/ocultar el campo de selección de roles según el claustro seleccionado
+        // Mostrar/ocultar el campo de selección de roles según el claustro seleccionado
         function mostrarOcultarRol() {
             const claustro = document.getElementById("claustro").value;
             const rolDiv = document.getElementById("rolDiv");
@@ -30,6 +30,18 @@
                 rolDiv.style.display = "block";
             } else {
                 rolDiv.style.display = "none";
+                document.getElementById("departamentoDiv").style.display = "none"; // Ocultar también el selector de departamentos
+            }
+        }
+
+        // Mostrar/ocultar el campo de selección de departamentos según el rol seleccionado
+        function mostrarOcultarDepartamento() {
+            const rol = document.getElementById("rol").value;
+            const departamentoDiv = document.getElementById("departamentoDiv");
+            if (rol === "Jefe de Departamento") {
+                departamentoDiv.style.display = "block";
+            } else {
+                departamentoDiv.style.display = "none";
             }
         }
     </script>
@@ -69,9 +81,20 @@
         <!-- Selector de rol, oculto inicialmente -->
         <div id="rolDiv" style="display: none;">
             <label for="rol">Rol:</label>
-            <select id="rol" name="rol">
+            <select id="rol" name="rol" onchange="mostrarOcultarDepartamento()">
+                <option value="">Seleccionar...</option>
                 <option value="Jefe de Departamento">Jefe de Departamento</option>
                 <option value="Secretario Técnico">Secretario Técnico</option>
+            </select><br>
+        </div>
+
+        <!-- Selector de departamento, oculto inicialmente -->
+        <div id="departamentoDiv" style="display: none;">
+            <label for="departamento">Departamento:</label>
+            <select id="departamento" name="departamento">
+                <option value="maestranza">Maestranza</option>
+                <option value="secretaria_tecnica">Secretaría Técnica</option>
+                <option value="soporte_informatico">Soporte Informático</option>
             </select><br>
         </div>
 

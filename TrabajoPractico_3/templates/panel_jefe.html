@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        /* Estilo para ocultar el contenido de ayuda inicialmente */
+        .popup-hidden {
+            display: none;
+        }
+        .popup-visible {
+            display: block;
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+    <script>
+        function togglePopup() {
+            const popupContent = document.getElementById("popup-content");
+            // Alterna la visibilidad del contenido
+            if (popupContent.classList.contains("popup-hidden")) {
+                popupContent.classList.remove("popup-hidden");
+                popupContent.classList.add("popup-visible");
+            } else {
+                popupContent.classList.remove("popup-visible");
+                popupContent.classList.add("popup-hidden");
+            }
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <h2>Servicio de reclamos FIUNER</h2>
+        <h3>{{depto}}</h3>
+    </header>
+    <section>
+        <nav>
+            <h1>¿Qué desea hacer? </h1>
+            <form action="/jefe/{{departamento}}" method="post">
+                <input type="submit" value="Analítica" name="button_value">
+            </form><br>
+            <form action="/jefe/{{departamento}}" method="post">
+                <input type="submit" value="Manejar reclamos" name="button_value">
+            </form>
+            {% if depto=="Secretaría técnica": %}
+                <br>
+                <form action="/jefe/{{departamento}}" method="post">
+                    <input type="submit" value="Panel general" name="button_value">
+                </form>
+            {% endif %}
+            <br>
+            <form action="/cerrar_sesion" method="get">
+                <input type="submit" value="Salir">
+            </form><br>
+            <button id="popup-button" onclick="togglePopup()">Ayuda</button>
+            
+            <div id="popup-content" class="popup-hidden">
+                <h2>Guía de Uso</h2>
+                <p>Este es el panel de jefe de departamento. Aquí puede:</p>
+                <ul>
+                    <li>Seleccionar "Analítica" para ver estadísticas y descargar reportes.</li>
+                    <li>Seleccionar "Manejar reclamos" para gestionar los reclamos correspondientes.</li>
+                    <li>Usar "Salir" para cerrar sesión.</li>
+                </ul>
+                <p>Seleccione una opción para continuar.</p>
+            </div>
+        </nav>
+    </section>
+</body>
+</html>

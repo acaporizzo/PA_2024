@@ -29,7 +29,6 @@ from modules.config import app, login_manager, db
 from modules.reclamos_similares import reclamos_similares
 import logging
 
-# Configurar logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
@@ -55,7 +54,7 @@ try:
         print("Modelo cargado exitosamente.")
 except Exception as e:
     print(f"Error al cargar el modelo: {str(e)}")
-    
+
 @app.route('/')
 def home():
     if gestor_login.usuario_autenticado:
@@ -75,20 +74,16 @@ def registrar():
         rol = None 
         departamento = None
 
-        if claustro == "PAyS":
-            rol = request.form.get('rol')
-            if rol not in ["Jefe de Departamento", "Secretario Técnico"]:
-                flash("Debe seleccionar un rol válido para el claustro PAyS", "error")
-                return redirect(url_for('registrar'))
-
-            if rol == "Jefe de Departamento":
-                departamento = request.form.get('departamento')
-                if departamento not in ["maestranza", "soporte informático", "secretaría técnica"]:
-                    flash("Debe seleccionar un departamento válido para el rol de Jefe de Departamento", "error")
-                    return redirect(url_for('registrar'))
-
         if contraseña != confirmacion:
             flash("Las contraseñas no coinciden", "error")
+            return redirect(url_for('registrar'))
+        
+        if gestor_usuario.existe_email(email):
+            flash("El correo electrónico ya está registrado. Usa otro.", "error")
+            return redirect(url_for('registrar'))
+        
+        if gestor_usuario.existe_nombre_usuario(nombre_usuario):
+            flash("El nombre de usuario ya está en uso. Elige otro.", "error")
             return redirect(url_for('registrar'))
         
         id = str(uuid.uuid4())
@@ -125,12 +120,11 @@ def iniciar_sesion():
             usuario_valido = gestor_login.verificar_credenciales(nombre_usuario, contraseña)
             if usuario_valido:
                 gestor_login.login_usuario(usuario_valido)
-                tipo_usuario = usuario_valido.departamento
+                tipo_usuario = usuario_valido.rol
+                departamento = usuario_valido.departamento
 
-                if tipo_usuario == "jefe":
-                    return redirect(url_for('panel_jefe'))
-                elif tipo_usuario == "secretario_tecnico":
-                    return redirect(url_for('panel_secretario_tecnico'))
+                if tipo_usuario == "Jefe de Departamento":
+                    return redirect(url_for('panel_jefe', depto=departamento))
                 else:
                     return redirect(url_for('panel_usuario'))
             else:
@@ -141,6 +135,21 @@ def iniciar_sesion():
 @app.route('/panel_usuario')
 def panel_usuario():
     return render_template("panel_usuario.html")
+
+@app.route('/panel_jefe/<depto>', methods=['GET', 'POST'])
+def panel_jefe(depto):
+    depto=depto.capitalize()
+    if request.method == 'POST':
+        direction=request.form["button_value"]
+        if direction=="Manejar reclamos":
+            return redirect(url_for('manejar', depto=depto))
+        elif direction=="Analítica":
+            return redirect(url_for('analitica', depto=depto)) 
+        elif direction=="Panel general":
+            return redirect(url_for('panel_general', depto=depto))
+        
+    #reclamos_depto=GestorReclamo.obtener_reclamo_por_filtro("departamento", depto.lower())
+    return render_template('panel_jefe.html', opciones=["Analítica", "Manejar Reclamos", "Ayuda", "Salir"])
 
 @app.route('/crear_reclamo', methods=['GET', 'POST'])
 @login_required
@@ -254,14 +263,23 @@ def seleccionar_reclamo():
         # Manejar acción de crear un nuevo reclamo si el usuario no quiere adherirse
         if request.form.get("confirmar_creacion"):
             try:
+                # Verificar que los datos del reclamo están en la sesión
+                if not lista_reclamo:
+                    print("Error: lista_reclamo no está disponible en la sesión.")
+                    flash("Hubo un problema al procesar tu reclamo. Por favor, intenta de nuevo.", "error")
+                    return redirect(url_for('crear_reclamo'))
+
+                print(f"Intentando guardar el siguiente reclamo: {lista_reclamo}")
+
+                # Intentar guardar el reclamo
                 gestor_reclamo.guardar_reclamo(lista_reclamo)
                 print("Reclamo creado exitosamente.", "success")
                 return redirect(url_for('mis_reclamos'))
             except Exception as e:
                 print(f"Error al guardar el reclamo, a pesar de tener similares: {str(e)}", "error")
+                flash("No se pudo guardar tu reclamo. Intenta nuevamente.", "error")
                 return render_template("reclamos_similares.html", reclamos_similares=reclamos_similares)
 
-    
 @app.route('/mis_reclamos', methods=['GET'])
 @login_required
 def mis_reclamos():
@@ -281,14 +299,6 @@ def mis_reclamos():
     except Exception as e:
         flash(f"Error al cargar tus reclamos: {str(e)}", "error")
         return render_template("mis_reclamos.html", reclamos_creados=[], reclamos_adheridos=[])
-
-    
-@app.route('/cerrar_sesion')
-def cerrar_sesion():
-    logout_user()
-    flash("Sesión cerrada", "success")
-    
-    return redirect(url_for('iniciar_sesion'))
 
 @app.route('/listar_reclamos', methods=['GET', 'POST'])
 def listar_reclamos():
@@ -315,6 +325,9 @@ def listar_reclamos():
             # Obtener todos los reclamos pendientes si no hay filtros
             reclamos = gestor_reclamo.obtener_reclamo_por_filtro(tipo_de_filtro="estado", filtro="pendiente")
 
+        for reclamo in reclamos:
+            reclamo["numero_adherentes"] = gestor_reclamo.obtener_numero_adherentes(reclamo["id"])
+
     return render_template(
         'listar_reclamos.html', 
         reclamos=reclamos, 
@@ -324,6 +337,36 @@ def listar_reclamos():
         mensaje=mensaje
     )
 
+@app.route('/manejar_reclamos/<departamento>', methods=['GET', 'POST'])
+def manejar(departamento):
+    departamento = departamento.capitalize()
+    
+    if request.method == 'POST':
+        reclamo_id = request.form["reclamo_id"]
+        nuevo_estado = request.form["nuevo_estado"]
+        
+        # Actualizar el estado del reclamo en la base de datos
+        try:
+            GestorReclamo.actualizar_estado_reclamo(reclamo_id, nuevo_estado)
+            flash(f"Estado del reclamo {reclamo_id} actualizado a '{nuevo_estado}'", "success")
+        except Exception as e:
+            flash(f"Error al actualizar el reclamo: {str(e)}", "error")
+    
+    # Obtener todos los reclamos del departamento
+    try:
+        reclamos = GestorReclamo.obtener_reclamo_por_filtro("departamento", departamento.lower())
+    except Exception as e:
+        flash(f"Error al obtener los reclamos: {str(e)}", "error")
+        reclamos = []
+    
+    return render_template('manejar.html', reclamos=reclamos, departamento=departamento)
+
+@app.route('/cerrar_sesion')
+def cerrar_sesion():
+    logout_user()
+    flash("Sesión cerrada", "success")
+    
+    return redirect(url_for('iniciar_sesion'))
 
 if __name__ == "__main__":
     app.run(debug=True)

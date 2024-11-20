@@ -4,6 +4,8 @@ from sqlalchemy.orm.exc import NoResultFound
 from modules.modelos import ModeloReclamo, ModeloUsuario
 from modules.classifier import ClaimsClassifier
 from modules.dominio import Usuario
+from uuid import uuid4
+from werkzeug.security import generate_password_hash
 
 class GestorReclamo:
     def __init__(self, repositorio_reclamos):
@@ -43,6 +45,8 @@ class GestorReclamo:
                 return self.repositorio._map_modelo_a_entidad(reclamo)  # Llama al método desde el repositorio
             except NoResultFound:
                 raise Exception("El reclamo no existe")
+        elif tipo_de_filtro == "departamento":
+            reclamos = db.session.query(ModeloReclamo).filter(ModeloReclamo.departamento == filtro).all()
         else:
             raise Exception("El filtro que eligió no existe, pruebe con uno válido")
 
@@ -61,6 +65,16 @@ class GestorReclamo:
 
         return lista_de_datos_reclamos
     
+    def obtener_numero_adherentes(self, id_reclamo):
+        try:
+            reclamo = db.session.query(ModeloReclamo).filter_by(id=id_reclamo).first()
+            if not reclamo:
+                return 0
+            
+            return len(reclamo.usuarios_adheridos)
+        except Exception as e:
+            raise Exception(f"Error al obtener el número de adherentes: {str(e)}")
+
     def obtener_reclamos_adheridos_por_usuario(self, id_usuario):
         try:
             usuario = db.session.query(ModeloUsuario).filter_by(id=id_usuario).first()
@@ -158,14 +172,19 @@ class GestorUsuario:
             self.__repo_usuario.guardar_registro(nuevo_usuario)
         return nuevo_usuario
 
-
     def cargar_usuario_por_nombre(self, nombre_usuario):
-        """Carga el usuario desde el repositorio por su nombre de usuario."""
         return self.__repo_usuario.obtener_usuario_por_nombre(nombre_usuario)
 
     def cargar_usuario_por_id(self, id_usuario):
-        """Carga el usuario desde el repositorio por su ID."""
         return self.__repo_usuario.obtener_usuario_por_id(id_usuario)
+ 
+    def existe_email(self, email):
+        usuario = db.session.query(ModeloUsuario).filter_by(email=email).first()
+        return usuario is not None
+    
+    def existe_nombre_usuario(self, nombre_usuario):
+        usuario = db.session.query(ModeloUsuario).filter_by(nombre_usuario=nombre_usuario).first()
+        return usuario is not None
     
 class GestorBaseDeDatos:
     def obtener_usuario_por_nombre(self, nombre_usuario):
@@ -174,4 +193,35 @@ class GestorBaseDeDatos:
             return usuario
         except NoResultFound: 
             raise Exception("El usuario no fue encontrado")
+        
+    def guardar_nuevo_objeto(self, tipo_objeto, datos):
+        """
+        Guarda un nuevo objeto en la base de datos basado en su tipo.
+        
+        :param tipo_objeto: Tipo de objeto a guardar (por ejemplo, "jefe").
+        :param datos: Lista con los datos del objeto.
+        """
+        try:
+            if tipo_objeto == "jefe":
+                # Crear un nuevo usuario con rol "jefe" utilizando los datos proporcionados
+                nuevo_usuario = ModeloUsuario(
+                    id=str(uuid4()),  # Generar un ID único
+                    nombre=datos[0],
+                    apellido=datos[1],
+                    nombre_usuario=datos[2],
+                    email=datos[3],
+                    contraseña=generate_password_hash(datos[4]),  # Hashear la contraseña
+                    claustro=datos[5],
+                    rol=datos[6],
+                    departamento=datos[7]
+                )
+                db.session.add(nuevo_usuario)  # Agregar el usuario a la sesión
+                db.session.commit()  # Confirmar los cambios en la base de datos
+                print(f"Jefe {datos[2]} guardado exitosamente.")
+            else:
+                raise ValueError(f"Tipo de objeto '{tipo_objeto}' no soportado.")
+        except Exception as e:
+            db.session.rollback()  # Revertir los cambios en caso de error
+            print(f"Error al guardar el objeto de tipo '{tipo_objeto}': {e}")
+            raise
     
