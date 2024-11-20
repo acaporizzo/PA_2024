@@ -54,12 +54,12 @@ class RepositorioUsuariosSQLAlchemy(RepositorioAbstracto):
         modelo_usuario = self.__map_entidad_a_modelo(usuario)
         self.__session.add(modelo_usuario)
         self.__session.commit()
-
     def obtener_todos_los_registros(self):
-        print(self.__session)
+        print(self.__session)  # Para depuración
         modelo_usuarios = self.__session.query(ModeloUsuario).all()
-        print(modelo_usuarios)
-    
+        print(modelo_usuarios)  # Para depuración
+        return modelo_usuarios if modelo_usuarios else []  # Garantiza que siempre devuelva una lista
+
     def obtener_usuario_por_nombre(self, nombre_usuario):
         """Obtiene un usuario de la base de datos por nombre de usuario."""
         modelo_usuario = self.__session.query(ModeloUsuario).filter_by(nombre_usuario=nombre_usuario).first()

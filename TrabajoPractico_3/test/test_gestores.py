@@ -4,7 +4,6 @@ from flask import Flask
 from modules.config import db
 from modules.dominio import Reclamo, Usuario
 from modules.gestores import GestorReclamo, GestorUsuario, GestorBaseDeDatos
-from modules.modelos import ModeloReclamo, ModeloUsuario
 
 class TestGestores(unittest.TestCase):
     @classmethod

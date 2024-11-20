@@ -158,8 +158,9 @@ class GestorUsuario:
         self.__repo_usuario = repo_usuario
 
     def registrar_usuario(self, id, nombre, apellido, nombre_usuario, email, contraseña, claustro, rol, departamento):
-        with db.session.begin():  # Garantiza que la sesión esté activa
-            if any(usuario.nombre_usuario == nombre_usuario for usuario in self.__repo_usuario.obtener_todos_los_registros()):
+        #with db.session.begin():  # Garantiza que la sesión esté activa
+            registros = self.__repo_usuario.obtener_todos_los_registros()
+            if registros and any(usuario.nombre_usuario == nombre_usuario for usuario in registros):
                 raise ValueError(f"El nombre de usuario '{nombre_usuario}' ya está en uso.")
 
             nuevo_usuario = Usuario(
@@ -174,7 +175,7 @@ class GestorUsuario:
                 departamento=departamento
             )
             self.__repo_usuario.guardar_registro(nuevo_usuario)
-        return nuevo_usuario
+            return nuevo_usuario
 
     def cargar_usuario_por_id(self, id_usuario):
         return self.__repo_usuario.obtener_usuario_por_id(id_usuario)

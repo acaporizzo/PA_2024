@@ -37,7 +37,6 @@ db_path = os.path.join(BASE_DIR, "instance", "base_datos.db")
 with app.app_context():
     db.create_all()
     inspector = inspect(db.engine)
-    print("Tablas existentes:", inspector.get_table_names())
 
 admin_list = [1]
 repo_reclamo , repo_usuario = crear_repositorio()
@@ -50,7 +49,6 @@ gestor_BD = GestorBaseDeDatos()
 try:
     with open('./data/claims_clf.pkl', 'rb') as archivo:
         clasificador = pickle.load(archivo)
-        print("Modelo cargado exitosamente.")
 except Exception as e:
     print(f"Error al cargar el modelo: {str(e)}")
 
@@ -98,11 +96,9 @@ def registrar():
                 rol=rol,               
                 departamento=departamento  
             )
-            flash("Usuario registrado con éxito. Inicia sesión.", "success")
             return redirect(url_for('iniciar_sesion'))
         
         except ValueError as e:
-            flash(str(e), "error")
             return redirect(url_for('registrar'))
 
     return render_template('registro.html')
@@ -138,26 +134,18 @@ def panel_usuario():
 @app.route('/panel_jefe/<depto>', methods=['GET', 'POST'])
 def panel_jefe(depto):
     depto = depto.capitalize()
-    print(f"Accediendo a /panel_jefe con depto: {depto}")
     
     if request.method == 'POST':
         direction = request.form.get("button_value")
-        print(f"Formulario enviado con dirección: {direction}")
         
         if direction == "Manejar reclamos":
-            print(f"Redirigiendo a manejar_reclamos con departamento: {depto}")
             return redirect(url_for('manejar_reclamos', departamento=depto))
         elif direction == "Analítica":
-            print(f"Redirigiendo a analitica con departamento: {depto}")
             return redirect(url_for('analitica', departamento=depto))
         elif direction == "Panel general":
-            print(f"Redirigiendo a panel_general con departamento: {depto}")
             return redirect(url_for('panel_general', departamento=depto))
     
-    print("Mostrando panel_jefe.html")
     return render_template('panel_jefe.html', opciones=["Analítica", "Manejar Reclamos", "Ayuda", "Salir"], depto=depto)
-
-
 
 @app.route('/crear_reclamo', methods=['GET', 'POST'])
 @login_required
@@ -170,17 +158,12 @@ def crear_reclamo():
         return render_template("crear_reclamo.html", reclamos_similares=[])
 
     if request.method == "POST":
-        # Paso 1: El usuario ingresa el contenido del reclamo
         contenido = request.form.get("description")
-        print(f'Contenido del reclamo recibido: {contenido}')
 
         if not contenido:
-            flash("La descripción del reclamo es obligatoria.", "error")
-            print('Descripción del reclamo no proporcionada por el usuario.')
             return render_template("crear_reclamo.html", reclamos_similares=[])
 
         try:
-            # Paso 2: Clasificar el reclamo
             clasificacion = clasificador.clasificar([contenido])[0]
             id_reclamo = str(uuid.uuid4())
             fecha_hora = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -197,17 +180,13 @@ def crear_reclamo():
 
             # Crear reclamo pero no guardarlo aún
             reclamo = gestor_reclamo.crear_reclamo(lista_reclamo)
-            print(f'Reclamo creado (sin guardar aún): {lista_reclamo}')
 
-            # Paso 3: Buscar reclamos similares por clasificación
             posibles = gestor_reclamo.obtener_reclamo_por_filtro("clasificacion", clasificacion)
             reclamos_similares = [
                 {"id": r["id"], "contenido": r["contenido"], "clasificacion": r["clasificacion"]}
                 for r in posibles
             ]
-            print(f"Reclamos similares son: {reclamos_similares}")
 
-            # Paso 4: Si hay reclamos similares, redirigir a la nueva ruta para seleccionar un reclamo
             if reclamos_similares:
                 # Guardar el reclamo en la sesión temporal para usarlo en la otra ruta
                 session['lista_reclamo'] = lista_reclamo
@@ -215,13 +194,10 @@ def crear_reclamo():
                 session['reclamos_similares'] = reclamos_similares
                 return redirect(url_for('seleccionar_reclamo'))
 
-            # Si no hay reclamos similares, guardar el reclamo directamente
             gestor_reclamo.guardar_reclamo(lista_reclamo)
-            print("Reclamo creado exitosamente.", "success")
             return redirect(url_for('mis_reclamos'))
 
         except Exception as e:
-            print(f"Error al procesar el reclamo: {str(e)}", "error")
             return render_template("crear_reclamo.html")
 
 @app.route('/seleccionar_reclamo', methods=['GET', 'POST'])
@@ -232,40 +208,29 @@ def seleccionar_reclamo():
     clasificacion_actual = session.get('clasificacion_actual')
     usuario_id = gestor_login.id_usuario_actual
     usuario = db.session.query(ModeloUsuario).filter_by(id=usuario_id).first()
-    print(f"El usuario es el siguiente {usuario}")
 
     if request.method == "GET":
         return render_template("reclamos_similares.html", reclamos_similares=reclamos_similares)
 
     if request.method == "POST":
-        # Manejar acción de adherirse a un reclamo similar
-        print("Datos recibidos en la solicitud POST:", request.form)
         if request.form.get("adherirse"):
-            print("Se recibió el valor de 'adherirse'")
             reclamo_id = request.form.get("reclamo_seleccionado")
-            print(f"ID del reclamo seleccionado para adherirse: {reclamo_id} y es del tipo {type(reclamo_id)}:")
 
             if reclamo_id:
                 try:
-                    # Usar el método del gestor para obtener el reclamo por su ID
                     reclamo_seleccionado = gestor_reclamo.obtener_reclamo_por_filtro(tipo_de_filtro="id", filtro=reclamo_id)
                     if not reclamo_seleccionado:
-                        print("El reclamo seleccionado no se encontró.", "error")
                         return render_template("reclamos_similares.html", reclamos_similares=reclamos_similares)
 
-                    # Procesar la adhesión
                     resultado_adherencia = gestor_reclamo.adherir_usuario_a_reclamo(reclamo_seleccionado.id_reclamo, usuario)
 
                     if resultado_adherencia == "adherido_exitosamente":
-                        print("Te has adherido al reclamo seleccionado con éxito.", "success")
                         return redirect(url_for('mis_reclamos'))
                     elif resultado_adherencia == "ya_adherido":
-                        print("Ya estás adherido a este reclamo.", "info")
                         return redirect(url_for('mis_reclamos'))
                     else:
                         print("No se pudo encontrar el reclamo.", "error")
                 except Exception as e:
-                    print(f"Error al adherirse al reclamo: {str(e)}", "error")
                     return render_template("reclamos_similares.html", reclamos_similares=reclamos_similares)
 
         # Manejar acción de crear un nuevo reclamo si el usuario no quiere adherirse
@@ -273,19 +238,11 @@ def seleccionar_reclamo():
             try:
                 # Verificar que los datos del reclamo están en la sesión
                 if not lista_reclamo:
-                    print("Error: lista_reclamo no está disponible en la sesión.")
-                    flash("Hubo un problema al procesar tu reclamo. Por favor, intenta de nuevo.", "error")
                     return redirect(url_for('crear_reclamo'))
 
-                print(f"Intentando guardar el siguiente reclamo: {lista_reclamo}")
-
-                # Intentar guardar el reclamo
                 gestor_reclamo.guardar_reclamo(lista_reclamo)
-                print("Reclamo creado exitosamente.", "success")
                 return redirect(url_for('mis_reclamos'))
             except Exception as e:
-                print(f"Error al guardar el reclamo, a pesar de tener similares: {str(e)}", "error")
-                flash("No se pudo guardar tu reclamo. Intenta nuevamente.", "error")
                 return render_template("reclamos_similares.html", reclamos_similares=reclamos_similares)
 
 @app.route('/mis_reclamos', methods=['GET'])
@@ -293,10 +250,8 @@ def seleccionar_reclamo():
 def mis_reclamos():
     id_usuario = str(gestor_login.id_usuario_actual)
     try:
-        # Obtener reclamos creados por el usuario
         reclamos_creados = gestor_reclamo.obtener_reclamo_por_filtro("usuario", id_usuario)
 
-        # Obtener reclamos a los que el usuario se ha adherido
         reclamos_adheridos = gestor_reclamo.obtener_reclamos_adheridos_por_usuario(id_usuario)
 
         return render_template(
@@ -305,7 +260,6 @@ def mis_reclamos():
             reclamos_adheridos=reclamos_adheridos
         )
     except Exception as e:
-        flash(f"Error al cargar tus reclamos: {str(e)}", "error")
         return render_template("mis_reclamos.html", reclamos_creados=[], reclamos_adheridos=[])
 
 @app.route('/listar_reclamos', methods=['GET', 'POST'])
@@ -320,17 +274,14 @@ def listar_reclamos():
     mensaje = None
 
     if request.method == 'POST':
-        # Obtener el tipo de filtro y su valor del formulario
         filtro_tipo = request.form.get('filtro_tipo')
         filtro_valor = request.form.get('filtro_valor')
 
-        # Aplicar el filtro si ambos están presentes
         if filtro_tipo and filtro_valor:
             reclamos = gestor_reclamo.obtener_reclamo_por_filtro(tipo_de_filtro=filtro_tipo, filtro=filtro_valor)
             if not reclamos:
                 mensaje = f"No se encontraron reclamos para el filtro '{filtro_tipo}' con valor '{filtro_valor}'."
         else:
-            # Obtener todos los reclamos pendientes si no hay filtros
             reclamos = gestor_reclamo.obtener_reclamo_por_filtro(tipo_de_filtro="estado", filtro="pendiente")
 
         for reclamo in reclamos:
@@ -349,38 +300,24 @@ def listar_reclamos():
 def manejar_reclamos(departamento):
     print(f"Accediendo a /manejar_reclamos con departamento: {departamento}")
 
-    # Obtener todos los reclamos del departamento primero
     try:
         reclamos = gestor_reclamo.obtener_reclamo_por_filtro("clasificacion", departamento)
-        print(f"Reclamos obtenidos para el departamento: {departamento} - Cantidad: {len(reclamos)}")
     except Exception as e:
-        flash(f"Error al obtener los reclamos: {str(e)}", "error")
-        print(f"Error al obtener los reclamos para el departamento {departamento}: {str(e)}")
         reclamos = []
 
-     # Procesar actualización de estado solo si es una solicitud POST
     if request.method == 'POST':
         reclamo_id = request.form.get("reclamo_id")
         nuevo_estado = request.form.get("nuevo_estado")
         
-        print(f"Formulario POST recibido en /manejar_reclamos con reclamo_id: {reclamo_id} y nuevo_estado: {nuevo_estado}")
-        
         if reclamo_id and nuevo_estado:
             try:
                 gestor_reclamo.actualizar_estado_reclamo(reclamo_id, nuevo_estado)
-                flash(f"Estado del reclamo {reclamo_id} actualizado a '{nuevo_estado}'", "success")
-                print(f"Estado del reclamo {reclamo_id} actualizado a {nuevo_estado}")
-                # Actualizar la lista de reclamos después de cambiar el estado
                 reclamos = gestor_reclamo.obtener_reclamo_por_filtro("clasificacion", departamento)
-                print("Lista de reclamos actualizada después de cambiar el estado")
             except Exception as e:
-                flash(f"Error al actualizar el reclamo: {str(e)}", "error")
                 print(f"Error al actualizar el reclamo: {str(e)}")
         else:
-            flash("Por favor, seleccione un reclamo y un estado válido para actualizar.", "error")
             print("Error: No se proporcionó reclamo_id o nuevo_estado")
 
-    print("Renderizando manejar_reclamos.html con los reclamos obtenidos")
     return render_template(
         'manejar_reclamos.html',
         reclamos=reclamos,
