@@ -19,7 +19,6 @@
     <script>
         function togglePopup() {
             const popupContent = document.getElementById("popup-content");
-            // Alterna la visibilidad del contenido
             if (popupContent.classList.contains("popup-hidden")) {
                 popupContent.classList.remove("popup-hidden");
                 popupContent.classList.add("popup-visible");
@@ -33,24 +32,20 @@
 <body>
     <header>
         <h2>Servicio de reclamos FIUNER</h2>
-        <h3>{{depto}}</h3>
+        <h3>{{ depto }}</h3>
     </header>
     <section>
         <nav>
             <h1>¿Qué desea hacer? </h1>
-            <form action="/jefe/{{departamento}}" method="post">
+            <form action="{{ url_for('panel_jefe', depto=depto) }}" method="post">
                 <input type="submit" value="Analítica" name="button_value">
-            </form><br>
-            <form action="/jefe/{{departamento}}" method="post">
+            </form>
+            <br>
+            <form action="{{ url_for('panel_jefe', depto=depto) }}" method="post">
                 <input type="submit" value="Manejar reclamos" name="button_value">
             </form>
-            {% if depto=="Secretaría técnica": %}
-                <br>
-                <form action="/jefe/{{departamento}}" method="post">
-                    <input type="submit" value="Panel general" name="button_value">
-                </form>
-            {% endif %}
             <br>
+            
             <form action="/cerrar_sesion" method="get">
                 <input type="submit" value="Salir">
             </form><br>

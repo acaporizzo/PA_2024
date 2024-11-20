@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manejar Reclamos</title>
+</head>
+<body>
+    <h1>Reclamos del Departamento: {{ departamento }}</h1>
+    
+    {% if reclamos %}
+        <table border="1">
+            <tr>
+                <th>ID Reclamo</th>
+                <th>ID Usuario Generador</th>
+                <th>ID Usuario(s) Adheridos</th>
+                <th>Fecha/Hora</th>
+                <th>Estado Actual</th>
+                <th>Acciones</th>
+            </tr>
+            {% for reclamo in reclamos %}
+            <tr>
+                <td>{{ reclamo.id }}</td>
+                <td>{{ reclamo.id_usuario }}</td>
+                <td>{{ reclamo.usuarios_adheridos | join(', ') }}</td> <!-- Muestra los IDs de los usuarios adheridos -->
+                <td>{{ reclamo.fecha }}</td>
+                <td>{{ reclamo.estado }}</td>
+                <td>
+                    <form method="POST" action="{{ url_for('manejar_reclamos', departamento=departamento) }}">
+                        <input type="hidden" name="reclamo_id" value="{{ reclamo.id }}">
+                        <select name="nuevo_estado">
+                            <option value="Pendiente" {% if reclamo.estado == 'Pendiente' %}selected{% endif %}>Pendiente</option>
+                            <option value="En proceso" {% if reclamo.estado == 'En proceso' %}selected{% endif %}>En proceso</option>
+                            <option value="Resuelto" {% if reclamo.estado == 'Resuelto' %}selected{% endif %}>Resuelto</option>
+                            <option value="Invalido" {% if reclamo.estado == 'Invalido' %}selected{% endif %}>Invalido</option>
+                        </select>
+                        <button type="submit">Actualizar Estado</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>No hay reclamos disponibles para este departamento.</p>
+    {% endif %}
+</body>
+</html>

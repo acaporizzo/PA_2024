@@ -38,7 +38,7 @@ class GestorReclamo:
         elif tipo_de_filtro == "estado":
             reclamos = db.session.query(ModeloReclamo).filter(ModeloReclamo.estado == filtro).all()
         elif tipo_de_filtro == "clasificacion":
-            reclamos = db.session.query(ModeloReclamo).filter(ModeloReclamo.clasificacion == filtro).all()
+            reclamos = db.session.query(ModeloReclamo).filter(ModeloReclamo.clasificacion.ilike(f'%{filtro}%')).all()
         elif tipo_de_filtro == "id":
             try:
                 reclamo = db.session.query(ModeloReclamo).filter(ModeloReclamo.id == filtro).one()
@@ -93,6 +93,26 @@ class GestorReclamo:
             ]
         except Exception as e:
             raise Exception(f"Error al obtener reclamos adheridos: {str(e)}")
+        
+    def obtener_id_usuarios_adheridos(self, id_reclamo):
+        """
+        Obtiene los IDs de los usuarios que están adheridos a un reclamo dado.
+
+        :param id_reclamo: ID del reclamo para el que se quieren obtener los usuarios adheridos.
+        :return: Una lista de IDs de usuarios adheridos o una lista vacía si no hay usuarios adheridos.
+        """
+        try:
+            # Busca el reclamo por su ID
+            reclamo = self.db_session.query(ModeloReclamo).filter_by(id=id_reclamo).first()
+            if not reclamo:
+                raise Exception(f"Reclamo con ID {id_reclamo} no encontrado.")
+            
+            # Obtener IDs de usuarios adheridos si es una relación
+            usuarios_adheridos_ids = [usuario.id for usuario in reclamo.usuarios_adheridos]
+            return usuarios_adheridos_ids
+        except Exception as e:
+            print(f"Error al obtener los usuarios adheridos para el reclamo {id_reclamo}: {e}")
+            return []
 
     def guardar_reclamo(self, datos):
         imagen = datos[6]
@@ -141,13 +161,13 @@ class GestorReclamo:
             return reclamo
         return None
 
-    def modificar_estado_reclamo(self, id_reclamo, nuevo_estado):
-        reclamo = self.repositorio.obtener_registro_por_filtro("id_reclamo", id_reclamo)
+    def actualizar_estado_reclamo(self, reclamo_id, nuevo_estado):
+        reclamo = db.session.query(ModeloReclamo).filter(ModeloReclamo.id == reclamo_id).one_or_none()  # Usa 'id' en lugar de 'id_reclamo'
         if reclamo:
             reclamo.estado = nuevo_estado
-            self.repositorio.modificar_registro(reclamo)
-            return reclamo
-        return None
+            db.session.commit()
+        else:
+            raise Exception("El reclamo no existe")
 
 class GestorUsuario:
     def __init__(self, repo_usuario):

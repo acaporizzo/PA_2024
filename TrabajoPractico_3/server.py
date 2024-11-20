@@ -138,18 +138,27 @@ def panel_usuario():
 
 @app.route('/panel_jefe/<depto>', methods=['GET', 'POST'])
 def panel_jefe(depto):
-    depto=depto.capitalize()
+    depto = depto.capitalize()
+    print(f"Accediendo a /panel_jefe con depto: {depto}")
+    
     if request.method == 'POST':
-        direction=request.form["button_value"]
-        if direction=="Manejar reclamos":
-            return redirect(url_for('manejar', depto=depto))
-        elif direction=="Analítica":
-            return redirect(url_for('analitica', depto=depto)) 
-        elif direction=="Panel general":
-            return redirect(url_for('panel_general', depto=depto))
+        direction = request.form.get("button_value")
+        print(f"Formulario enviado con dirección: {direction}")
         
-    #reclamos_depto=GestorReclamo.obtener_reclamo_por_filtro("departamento", depto.lower())
-    return render_template('panel_jefe.html', opciones=["Analítica", "Manejar Reclamos", "Ayuda", "Salir"])
+        if direction == "Manejar reclamos":
+            print(f"Redirigiendo a manejar_reclamos con departamento: {depto}")
+            return redirect(url_for('manejar_reclamos', departamento=depto))
+        elif direction == "Analítica":
+            print(f"Redirigiendo a analitica con departamento: {depto}")
+            return redirect(url_for('analitica', departamento=depto))
+        elif direction == "Panel general":
+            print(f"Redirigiendo a panel_general con departamento: {depto}")
+            return redirect(url_for('panel_general', departamento=depto))
+    
+    print("Mostrando panel_jefe.html")
+    return render_template('panel_jefe.html', opciones=["Analítica", "Manejar Reclamos", "Ayuda", "Salir"], depto=depto)
+
+
 
 @app.route('/crear_reclamo', methods=['GET', 'POST'])
 @login_required
@@ -338,28 +347,53 @@ def listar_reclamos():
     )
 
 @app.route('/manejar_reclamos/<departamento>', methods=['GET', 'POST'])
-def manejar(departamento):
-    departamento = departamento.capitalize()
-    
-    if request.method == 'POST':
-        reclamo_id = request.form["reclamo_id"]
-        nuevo_estado = request.form["nuevo_estado"]
-        
-        # Actualizar el estado del reclamo en la base de datos
-        try:
-            GestorReclamo.actualizar_estado_reclamo(reclamo_id, nuevo_estado)
-            flash(f"Estado del reclamo {reclamo_id} actualizado a '{nuevo_estado}'", "success")
-        except Exception as e:
-            flash(f"Error al actualizar el reclamo: {str(e)}", "error")
-    
-    # Obtener todos los reclamos del departamento
+def manejar_reclamos(departamento):
+    print(f"Accediendo a /manejar_reclamos con departamento: {departamento}")
+
+    # Obtener todos los reclamos del departamento primero
     try:
-        reclamos = GestorReclamo.obtener_reclamo_por_filtro("departamento", departamento.lower())
+        reclamos = gestor_reclamo.obtener_reclamo_por_filtro("clasificacion", departamento)
+        print(f"Reclamos obtenidos para el departamento: {departamento} - Cantidad: {len(reclamos)}")
     except Exception as e:
         flash(f"Error al obtener los reclamos: {str(e)}", "error")
+        print(f"Error al obtener los reclamos para el departamento {departamento}: {str(e)}")
         reclamos = []
-    
-    return render_template('manejar.html', reclamos=reclamos, departamento=departamento)
+
+     # Procesar actualización de estado solo si es una solicitud POST
+    if request.method == 'POST':
+        reclamo_id = request.form.get("reclamo_id")
+        nuevo_estado = request.form.get("nuevo_estado")
+        if reclamo_id:
+            # Solo obtener usuarios adheridos si hay un reclamo_id
+            usuarios_adheridos = gestor_reclamo.obtener_id_usuarios_adheridos(reclamo_id)
+            print(f"Estos son los usuarios adheridos: {usuarios_adheridos}")
+        
+        print(f"Formulario POST recibido en /manejar_reclamos con reclamo_id: {reclamo_id} y nuevo_estado: {nuevo_estado}")
+        
+        if reclamo_id and nuevo_estado:
+            try:
+                gestor_reclamo.actualizar_estado_reclamo(reclamo_id, nuevo_estado)
+                flash(f"Estado del reclamo {reclamo_id} actualizado a '{nuevo_estado}'", "success")
+                print(f"Estado del reclamo {reclamo_id} actualizado a {nuevo_estado}")
+                # Actualizar la lista de reclamos después de cambiar el estado
+                reclamos = gestor_reclamo.obtener_reclamo_por_filtro("clasificacion", departamento)
+                print("Lista de reclamos actualizada después de cambiar el estado")
+            except Exception as e:
+                flash(f"Error al actualizar el reclamo: {str(e)}", "error")
+                print(f"Error al actualizar el reclamo: {str(e)}")
+        else:
+            flash("Por favor, seleccione un reclamo y un estado válido para actualizar.", "error")
+            print("Error: No se proporcionó reclamo_id o nuevo_estado")
+
+
+    print("Renderizando manejar_reclamos.html con los reclamos obtenidos")
+    return render_template(
+        'manejar_reclamos.html',
+        reclamos=reclamos,
+        departamento=departamento,
+        usuarios_adheridos=usuarios_adheridos
+    )
+
 
 @app.route('/cerrar_sesion')
 def cerrar_sesion():
