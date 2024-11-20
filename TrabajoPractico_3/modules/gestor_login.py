@@ -1,14 +1,12 @@
-from flask_login import UserMixin, login_user, logout_user, login_required, current_user
+from flask_login import UserMixin, login_user, logout_user, current_user
 from werkzeug.security import check_password_hash
-from flask import abort
-from functools import wraps
 
 class FlaskLoginUser(UserMixin):
     def __init__(self, usuario):
         self.id = usuario.id
         self.nombre = usuario.nombre
         self.email = usuario.email
-        self.password = usuario.contraseña  # Usa la property
+        self.password = usuario.contraseña
         self.depto = usuario.departamento
 
 class GestorLogin:
@@ -51,8 +49,3 @@ class GestorLogin:
             return None
         print(f"Usuario con ID {id_usuario} cargado: {dicc_usuario.nombre}")
         return FlaskLoginUser(dicc_usuario)
-
-
-    def logout_usuario(self):
-        logout_user()
-        print("Usuario ha cerrado sesión")

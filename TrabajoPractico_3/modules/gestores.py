@@ -3,22 +3,12 @@ from modules.config import db
 from sqlalchemy.orm.exc import NoResultFound
 from modules.modelos import ModeloReclamo, ModeloUsuario
 from modules.classifier import ClaimsClassifier
-from modules.dominio import Usuario
 from uuid import uuid4
 from werkzeug.security import generate_password_hash
 
 class GestorReclamo:
     def __init__(self, repositorio_reclamos):
         self.repositorio = repositorio_reclamos
-
-    def mostrar_reclamos(self):
-        return self.repositorio.obtener_todos_los_registros()
-
-    def mostrar_reclamos_de_usuario(self, usuario):
-        return self.repositorio.obtener_registros_seguidas_por_usuario(usuario)
-
-    def clasificar_reclamo(self, reclamo):
-        reclamo.clasificacion = ClaimsClassifier().clasificar(reclamo.descripcion)
 
     def crear_reclamo(self, lista_reclamo): 
         nuevo_reclamo = Reclamo(lista_reclamo[0], lista_reclamo[1], lista_reclamo[2], lista_reclamo[3], lista_reclamo[4], lista_reclamo[5])
@@ -105,14 +95,19 @@ class GestorReclamo:
             # Busca el reclamo por su ID
             reclamo = self.db_session.query(ModeloReclamo).filter_by(id=id_reclamo).first()
             if not reclamo:
-                raise Exception(f"Reclamo con ID {id_reclamo} no encontrado.")
-            
-            # Obtener IDs de usuarios adheridos si es una relación
-            usuarios_adheridos_ids = [usuario.id for usuario in reclamo.usuarios_adheridos]
-            return usuarios_adheridos_ids
+                print(f"Reclamo con ID {id_reclamo} no encontrado.")
+                return []
+            print(f"Usuarios adheridos encontrados para el reclamo {id_reclamo}: {reclamo.usuarios_adheridos}")
+            if reclamo.usuarios_adheridos:
+                usuarios_adheridos_ids = [usuario.id for usuario in reclamo.usuarios_adheridos]
+                print(f"IDs de usuarios adheridos al reclamo {id_reclamo}: {usuarios_adheridos_ids}")
+                return usuarios_adheridos_ids
+            else:
+                print(f"No hay usuarios adheridos al reclamo {id_reclamo}.")
+                return []
         except Exception as e:
             print(f"Error al obtener los usuarios adheridos para el reclamo {id_reclamo}: {e}")
-            return []
+            return[]
 
     def guardar_reclamo(self, datos):
         imagen = datos[6]
@@ -139,27 +134,16 @@ class GestorReclamo:
             if not reclamo:
                 return "reclamo_no_encontrado"
 
-            # Verificar si el usuario ya está adherido
             if usuario in reclamo.usuarios_adheridos:
                 return "ya_adherido"
 
-            # Adherir al usuario al reclamo
             reclamo.usuarios_adheridos.append(usuario)
 
-            db.session.commit()  # Guardar cambios en la tabla intermedia
+            db.session.commit()
             return "adherido_exitosamente"
         except Exception as e:
             db.session.rollback()
             raise Exception(f"Error al adherir usuario al reclamo: {str(e)}")
-
-
-    def derivar_reclamo(self, id_reclamo, nuevo_departamento):
-        reclamo = self.repositorio.obtener_registro_por_filtro("id_reclamo", id_reclamo)
-        if reclamo:
-            reclamo.clasificacion = nuevo_departamento
-            self.repositorio.modificar_registro(reclamo)
-            return reclamo
-        return None
 
     def actualizar_estado_reclamo(self, reclamo_id, nuevo_estado):
         reclamo = db.session.query(ModeloReclamo).filter(ModeloReclamo.id == reclamo_id).one_or_none()  # Usa 'id' en lugar de 'id_reclamo'
@@ -192,11 +176,11 @@ class GestorUsuario:
             self.__repo_usuario.guardar_registro(nuevo_usuario)
         return nuevo_usuario
 
-    def cargar_usuario_por_nombre(self, nombre_usuario):
-        return self.__repo_usuario.obtener_usuario_por_nombre(nombre_usuario)
-
     def cargar_usuario_por_id(self, id_usuario):
         return self.__repo_usuario.obtener_usuario_por_id(id_usuario)
+    
+    def cargar_usuario_por_nombre(self, nombre_usuario):
+        return self.__repo_usuario.obtener_usuario_por_nombre(nombre_usuario)
  
     def existe_email(self, email):
         usuario = db.session.query(ModeloUsuario).filter_by(email=email).first()
@@ -207,12 +191,6 @@ class GestorUsuario:
         return usuario is not None
     
 class GestorBaseDeDatos:
-    def obtener_usuario_por_nombre(self, nombre_usuario):
-        try:
-            usuario = db.session.query(ModeloUsuario).filter_by(nombre_usuario=nombre_usuario).one()
-            return usuario
-        except NoResultFound: 
-            raise Exception("El usuario no fue encontrado")
         
     def guardar_nuevo_objeto(self, tipo_objeto, datos):
         """
@@ -223,25 +201,23 @@ class GestorBaseDeDatos:
         """
         try:
             if tipo_objeto == "jefe":
-                # Crear un nuevo usuario con rol "jefe" utilizando los datos proporcionados
                 nuevo_usuario = ModeloUsuario(
-                    id=str(uuid4()),  # Generar un ID único
+                    id=str(uuid4()),
                     nombre=datos[0],
                     apellido=datos[1],
                     nombre_usuario=datos[2],
                     email=datos[3],
-                    contraseña=generate_password_hash(datos[4]),  # Hashear la contraseña
+                    contraseña=generate_password_hash(datos[4]),
                     claustro=datos[5],
                     rol=datos[6],
                     departamento=datos[7]
                 )
-                db.session.add(nuevo_usuario)  # Agregar el usuario a la sesión
-                db.session.commit()  # Confirmar los cambios en la base de datos
+                db.session.add(nuevo_usuario)
+                db.session.commit()
                 print(f"Jefe {datos[2]} guardado exitosamente.")
             else:
                 raise ValueError(f"Tipo de objeto '{tipo_objeto}' no soportado.")
         except Exception as e:
-            db.session.rollback()  # Revertir los cambios en caso de error
+            db.session.rollback()
             print(f"Error al guardar el objeto de tipo '{tipo_objeto}': {e}")
             raise
-    

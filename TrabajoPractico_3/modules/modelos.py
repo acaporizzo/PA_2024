@@ -1,6 +1,5 @@
 from sqlalchemy import Table, Column
 from sqlalchemy.orm import relationship
-from datetime import datetime
 from sqlalchemy import Column, String
 from modules.config import db
 

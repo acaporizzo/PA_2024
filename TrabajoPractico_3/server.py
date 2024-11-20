@@ -26,7 +26,6 @@ from modules.factoria import crear_repositorio
 from modules.gestor_login import GestorLogin
 from modules.modelos import ModeloReclamo, ModeloUsuario
 from modules.config import app, login_manager, db
-from modules.reclamos_similares import reclamos_similares
 import logging
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -363,10 +362,6 @@ def manejar_reclamos(departamento):
     if request.method == 'POST':
         reclamo_id = request.form.get("reclamo_id")
         nuevo_estado = request.form.get("nuevo_estado")
-        if reclamo_id:
-            # Solo obtener usuarios adheridos si hay un reclamo_id
-            usuarios_adheridos = gestor_reclamo.obtener_id_usuarios_adheridos(reclamo_id)
-            print(f"Estos son los usuarios adheridos: {usuarios_adheridos}")
         
         print(f"Formulario POST recibido en /manejar_reclamos con reclamo_id: {reclamo_id} y nuevo_estado: {nuevo_estado}")
         
@@ -385,15 +380,12 @@ def manejar_reclamos(departamento):
             flash("Por favor, seleccione un reclamo y un estado válido para actualizar.", "error")
             print("Error: No se proporcionó reclamo_id o nuevo_estado")
 
-
     print("Renderizando manejar_reclamos.html con los reclamos obtenidos")
     return render_template(
         'manejar_reclamos.html',
         reclamos=reclamos,
-        departamento=departamento,
-        usuarios_adheridos=usuarios_adheridos
+        departamento=departamento
     )
-
 
 @app.route('/cerrar_sesion')
 def cerrar_sesion():

@@ -13,7 +13,6 @@
             <tr>
                 <th>ID Reclamo</th>
                 <th>ID Usuario Generador</th>
-                <th>ID Usuario(s) Adheridos</th>
                 <th>Fecha/Hora</th>
                 <th>Estado Actual</th>
                 <th>Acciones</th>
@@ -22,7 +21,6 @@
             <tr>
                 <td>{{ reclamo.id }}</td>
                 <td>{{ reclamo.id_usuario }}</td>
-                <td>{{ reclamo.usuarios_adheridos | join(', ') }}</td> <!-- Muestra los IDs de los usuarios adheridos -->
                 <td>{{ reclamo.fecha }}</td>
                 <td>{{ reclamo.estado }}</td>
                 <td>

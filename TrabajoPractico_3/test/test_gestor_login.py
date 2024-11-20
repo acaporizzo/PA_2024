@@ -1,83 +1,78 @@
 import unittest
 from unittest.mock import MagicMock, patch
-from flask import Flask
-from flask_login import LoginManager, login_user, logout_user, current_user
 from werkzeug.security import generate_password_hash
-from modules.gestor_login import FlaskLoginUser, GestorLogin  # Reemplaza 'your_module' con el nombre de tu archivo
+from flask_login import LoginManager
+from modules.gestor_login import GestorLogin, FlaskLoginUser
 
-class MockUsuario:
+class UsuarioMock:
+    """Mock de un usuario del sistema."""
     def __init__(self, id, nombre, email, contraseña, departamento):
         self.id = id
         self.nombre = nombre
         self.email = email
-        self.contraseña = generate_password_hash(contraseña)  # Contraseña encriptada
+        self.contraseña = contraseña
         self.departamento = departamento
 
 class TestGestorLogin(unittest.TestCase):
     def setUp(self):
-        # Configuración del entorno de Flask
-        self.app = Flask(__name__)
-        self.app.secret_key = 'test_secret_key'
-        self.login_manager = LoginManager(self.app)
+        # Crear mocks necesarios
+        self.gestor_usuarios_mock = MagicMock()
+        self.login_manager = LoginManager()
+        self.admin_list = ['admin@example.com']
 
-        # Usuario de prueba
-        self.mock_usuario = MockUsuario(
-            id=1,
-            nombre="Juan",
-            email="juan@example.com",
-            contraseña="password123",
-            departamento="Informática"
-        )
+        # Instanciar el GestorLogin con mocks
+        self.gestor_login = GestorLogin(self.gestor_usuarios_mock, self.login_manager, self.admin_list)
 
-        # Mock del gestor de usuarios
-        self.mock_gestor_usuarios = MagicMock()
-        self.mock_gestor_usuarios.cargar_usuario_por_nombre.return_value = self.mock_usuario
-        self.mock_gestor_usuarios.cargar_usuario_por_id.return_value = self.mock_usuario
+    def test_verificar_credenciales_exitoso(self):
+        """Prueba que verificar_credenciales devuelva un usuario válido."""
+        usuario = UsuarioMock(1, "test_user", "test@example.com", generate_password_hash("1234"), "TI")
+        self.gestor_usuarios_mock.cargar_usuario_por_nombre.return_value = usuario
 
-        self.gestor_login = GestorLogin(self.mock_gestor_usuarios, self.login_manager, admin_list=["admin"])
+        resultado = self.gestor_login.verificar_credenciales("test_user", "1234")
 
-        # Crear contexto de prueba de Flask
-        self.app_context = self.app.app_context()
-        self.app_context.push()
+        self.assertIsNotNone(resultado)
+        self.assertEqual(resultado.nombre, "test_user")
+        self.gestor_usuarios_mock.cargar_usuario_por_nombre.assert_called_once_with("test_user")
 
-    def tearDown(self):
-        self.app_context.pop()
+    def test_verificar_credenciales_incorrecto(self):
+        """Prueba que verificar_credenciales falle con credenciales incorrectas."""
+        usuario = UsuarioMock(1, "test_user", "test@example.com", generate_password_hash("1234"), "TI")
+        self.gestor_usuarios_mock.cargar_usuario_por_nombre.return_value = usuario
 
-    def test_verificar_credenciales_correctas(self):
-        usuario = self.gestor_login.verificar_credenciales("Juan", "password123")
-        self.assertIsNotNone(usuario)
-        self.assertEqual(usuario.nombre, "Juan")
+        resultado = self.gestor_login.verificar_credenciales("test_user", "wrong_password")
 
-    def test_verificar_credenciales_incorrectas(self):
-        usuario = self.gestor_login.verificar_credenciales("Juan", "wrongpassword")
-        self.assertIsNone(usuario)
+        self.assertIsNone(resultado)
+        self.gestor_usuarios_mock.cargar_usuario_por_nombre.assert_called_once_with("test_user")
 
-    #def test_login_usuario(self):
-    #    with self.app.test_request_context():  # Contexto de solicitud
-    #        with patch('flask_login.login_user') as mock_login_user:
-    #            self.gestor_login.login_usuario(self.mock_usuario)
-    #            mock_login_user.assert_called_once()
+    #@patch("gestor_login.login_user")
+    #def test_login_usuario(self, mock_login_user):
+    #    """Prueba que login_usuario invoque a login_user correctamente."""
+    #    usuario = UsuarioMock(1, "test_user", "test@example.com", "1234", "TI")
 
-    #def test_logout_usuario(self):
-    #    with self.app.test_request_context():  # Contexto de solicitud
-    #        with patch('flask_login.logout_user') as mock_logout_user:
-    #           self.gestor_login.logout_usuario()
-    #           mock_logout_user.assert_called_once()
+    #    self.gestor_login.login_usuario(usuario)
 
-    def test_nombre_usuario_actual(self):
-        with self.app.test_request_context():  # Contexto de solicitud
-            login_user(FlaskLoginUser(self.mock_usuario))
-            self.assertEqual(self.gestor_login.nombre_usuario_actual, "Juan")
+    #    mock_login_user.assert_called_once()
+    #    self.assertEqual(mock_login_user.call_args[0][0].nombre, "test_user")
 
-    def test_id_usuario_actual(self):
-        with self.app.test_request_context():  # Contexto de solicitud
-            login_user(FlaskLoginUser(self.mock_usuario))
-            self.assertEqual(self.gestor_login.id_usuario_actual, 1)
+    def test_cargar_usuario_actual(self):
+        """Prueba que _cargar_usuario_actual cargue correctamente un usuario."""
+        usuario = UsuarioMock(1, "test_user", "test@example.com", "1234", "TI")
+        self.gestor_usuarios_mock.cargar_usuario_por_id.return_value = usuario
 
-    def test_usuario_autenticado(self):
-        with self.app.test_request_context():  # Contexto de solicitud
-            login_user(FlaskLoginUser(self.mock_usuario))
-            self.assertTrue(self.gestor_login.usuario_autenticado)
+        resultado = self.gestor_login._cargar_usuario_actual(1)
+
+        self.assertIsNotNone(resultado)
+        self.assertEqual(resultado.nombre, "test_user")
+        self.gestor_usuarios_mock.cargar_usuario_por_id.assert_called_once_with(1)
+
+    def test_cargar_usuario_actual_no_encontrado(self):
+        """Prueba que _cargar_usuario_actual devuelva None si el usuario no existe."""
+        self.gestor_usuarios_mock.cargar_usuario_por_id.return_value = None
+
+        resultado = self.gestor_login._cargar_usuario_actual(1)
+
+        self.assertIsNone(resultado)
+        self.gestor_usuarios_mock.cargar_usuario_por_id.assert_called_once_with(1)
 
 if __name__ == "__main__":
     unittest.main()

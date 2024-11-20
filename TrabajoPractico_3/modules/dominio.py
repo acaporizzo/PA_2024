@@ -11,7 +11,7 @@ class Usuario:
         self.__claustro = claustro
         self.__rol = rol
         self.__departamento = departamento
-        self.__reclamos_adheridos = []  # Lista para almacenar los reclamos adheridos (opcional)
+        self.__reclamos_adheridos = []
 
     @property
     def id(self):
@@ -51,7 +51,7 @@ class Usuario:
 
     @property
     def reclamos_adheridos(self):
-        return self.__reclamos_adheridos  # Retorna los reclamos adheridos al usuario
+        return self.__reclamos_adheridos
 
     def agregar_reclamo_adherido(self, reclamo_id):
         if reclamo_id not in self.__reclamos_adheridos:
@@ -65,9 +65,9 @@ class Reclamo:
         self.__contenido = contenido
         self.__clasificacion = clasificacion
         self.__estado = estado
-        self.__fecha_hora = fecha_hora   # Usa la fecha actual si no se pasa una
-        self.__imagen = imagen  # Nuevo atributo para la imagen
-        self.__usuarios_adheridos = usuarios_adheridos or []  # Lista de usuarios adheridos (inicialmente vacía)
+        self.__fecha_hora = fecha_hora
+        self.__imagen = imagen
+        self.__usuarios_adheridos = usuarios_adheridos or []
 
     @property
     def id_reclamo(self):
